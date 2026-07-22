@@ -1,0 +1,80 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Three services. Postgres is a derived projection -- losing pgdata costs social
+# data only, and `manage.py reindex --full` rebuilds the rest from ./data/store.
+#
+# Build with the commit stamped in so /up can report it:
+#   GIT_COMMIT=$(git rev-parse HEAD) docker compose up -d --build
+# or just run ./scripts/build.sh, which does that for you.
+
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: snap-cook-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-snapcook}
+      POSTGRES_USER: ${POSTGRES_USER:-snapcook}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env}
+    volumes:
+      # Unraid: /mnt/user/appdata/snap-cook/pgdata
+      - ./pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-snapcook}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  web:
+    build:
+      context: .
+      args:
+        GIT_COMMIT: ${GIT_COMMIT:-unknown}
+    image: snap-cook:0.1.0
+    container_name: snap-cook-web
+    restart: unless-stopped
+    command: ["web"]
+    ports:
+      - "8931:8931"
+    volumes:
+      # The authoritative recipe store. Back THIS up.
+      # Unraid: /mnt/user/appdata/snap-cook/data
+      - ./data:/data
+    env_file:
+      - .env
+    environment:
+      - DJANGO_DEBUG=0
+      - POSTGRES_HOST=db
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8931/up')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  worker:
+    image: snap-cook:0.1.0
+    container_name: snap-cook-worker
+    restart: unless-stopped
+    command: ["worker"]
+    volumes:
+      # MUST be the same mount as web: the import job writes store objects that
+      # the web tier then reads. Diverging these two paths produces a very
+      # confusing "the import succeeded but the recipe does not exist" bug.
+      - ./data:/data
+    env_file:
+      - .env
+    environment:
+      - DJANGO_DEBUG=0
+      - POSTGRES_HOST=db
+    depends_on:
+      db:
+        condition: service_healthy
+      # Not for correctness -- so the web container has run migrations before
+      # the worker starts querying tables.
+      web:
+        condition: service_started

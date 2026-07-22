@@ -1,0 +1,21 @@
+Herb omelette
+============================================================
+Approximations, a pan, a timer and a temperature in one small dish.
+
+Serves 2 · scaled 2x · en / us
+
+Ingredients
+-----------
+  - 6 egg
+  - salt to taste
+  - pepper to taste
+  - 1 oz butter
+
+Steps
+-----
+  1. Beat 6 egg with salt to taste and pepper to taste.
+  2. Melt 1 oz butter in the non-stick pan at 320 °F, pour in the beaten eggs and cook for 3 min.
+
+Notes
+-----
+  ! not scaled automatically (manual); check this value for a 2x batch

@@ -1,0 +1,45 @@
+# Byte-compiled / optimized
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment variables -- NEVER commit. CI asserts this file is untracked.
+.env
+
+# Runtime data. /data/store is the authoritative recipe store; back it up, don't commit it.
+data/
+pgdata/
+staticfiles/
+*.log
+*.sqlite3
+
+# Test / tooling caches
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Hypothesis: the example database IS committed (see docs/reference/testing.md) so a
+# falsifying example found in CI reproduces locally. Only the internal cache is ignored.
+.hypothesis/unicode_data/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml
+
+# NOTE: uv.lock IS committed -- see planning/decisions/0006-commit-uv-lock.md

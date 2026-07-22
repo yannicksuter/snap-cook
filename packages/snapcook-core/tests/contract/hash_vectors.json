@@ -1,0 +1,153 @@
+{
+  "_comment": "FROZEN CROSS-LANGUAGE HASH VECTORS. Any client (Dart, Rust, JS) that implements RFC 8785 + SHA-256 must reproduce these exactly. A change here is a FORMAT_VERSION-bump-level breaking change.",
+  "algo": "sha256 over RFC 8785 JCS bytes, prefixed 'sc1:'",
+  "vectors": {
+    "empty-object": {
+      "doc": {},
+      "jcs": "{}",
+      "hash": "sc1:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    "ascii-string": {
+      "doc": {
+        "name": "bread"
+      },
+      "jcs": "{\"name\":\"bread\"}",
+      "hash": "sc1:d16ec35bf901a39edb20c1430d0a66cdfa0cbb39b02e9a241f71cc6994587841"
+    },
+    "integer": {
+      "doc": {
+        "count": 42
+      },
+      "jcs": "{\"count\":42}",
+      "hash": "sc1:b35539ce83f07b2fe8fb4bdce27fb9666c2122af4ad9a5850a711d906fb58998"
+    },
+    "negative-integer": {
+      "doc": {
+        "count": -7
+      },
+      "jcs": "{\"count\":-7}",
+      "hash": "sc1:b40ba37482d1a06905effa498b49d0c9eb79ea78a4ff33c89faa27ac1335dab3"
+    },
+    "boolean-true": {
+      "doc": {
+        "flag": true
+      },
+      "jcs": "{\"flag\":true}",
+      "hash": "sc1:2a8199939ad03f40b3086f82c20981e00cff6eabe05aa9d2aac65dbb068306f8"
+    },
+    "boolean-false": {
+      "doc": {
+        "flag": false
+      },
+      "jcs": "{\"flag\":false}",
+      "hash": "sc1:162812b5029481cad8f13633c055ef8dd11002768113523749dcf83a8e597254"
+    },
+    "null-value": {
+      "doc": {
+        "value": null
+      },
+      "jcs": "{\"value\":null}",
+      "hash": "sc1:1c197daef20de3f47eec5e2f735ec6669869d3180cc29f35be4788511e0af0f8"
+    },
+    "decimal-as-string": {
+      "doc": {
+        "qty": "0.1"
+      },
+      "jcs": "{\"qty\":\"0.1\"}",
+      "hash": "sc1:7ef6160d6c65a8f69191afc1adf67ac6569e8b254e3cb63fde5a469aff565541"
+    },
+    "decimal-trailing": {
+      "doc": {
+        "qty": "1.5"
+      },
+      "jcs": "{\"qty\":\"1.5\"}",
+      "hash": "sc1:a1ffe7f16fb0452928931feb90d11d1993f7c0a04026d5800e720beda5d1f8dd"
+    },
+    "key-order-a": {
+      "doc": {
+        "a": "1",
+        "z": "2"
+      },
+      "jcs": "{\"a\":\"1\",\"z\":\"2\"}",
+      "hash": "sc1:c234251c1e73258b83b43155e92359d861e9b576be6ccbaaf550074f698db6bf"
+    },
+    "key-order-z-first": {
+      "doc": {
+        "z": "2",
+        "a": "1"
+      },
+      "jcs": "{\"a\":\"1\",\"z\":\"2\"}",
+      "hash": "sc1:c234251c1e73258b83b43155e92359d861e9b576be6ccbaaf550074f698db6bf"
+    },
+    "nested": {
+      "doc": {
+        "outer": {
+          "inner": {
+            "leaf": "1"
+          }
+        }
+      },
+      "jcs": "{\"outer\":{\"inner\":{\"leaf\":\"1\"}}}",
+      "hash": "sc1:ed01b91b500c5a39d6255061370e3d73f650e89a9ec0ee5bb45630fe3648a3f4"
+    },
+    "list-order": {
+      "doc": {
+        "tags": [
+          "b",
+          "a"
+        ]
+      },
+      "jcs": "{\"tags\":[\"b\",\"a\"]}",
+      "hash": "sc1:b4b48c25efc8fb665cb25a9f8af2b56fbf0ec7dab2a54c91a91b0febf7bb6741"
+    },
+    "unicode-nfc": {
+      "doc": {
+        "name": "café"
+      },
+      "jcs": "{\"name\":\"café\"}",
+      "hash": "sc1:645fa443126a8954fc6d871912b8fc67bc2ee8feae417efe55546251962ca74d"
+    },
+    "unicode-cjk": {
+      "doc": {
+        "name": "味噌汁"
+      },
+      "jcs": "{\"name\":\"味噌汁\"}",
+      "hash": "sc1:601934fe248a80c06402405962c6fde36c3970631bb557f3a907e0773e1b371d"
+    },
+    "unicode-emoji": {
+      "doc": {
+        "name": "🍞"
+      },
+      "jcs": "{\"name\":\"🍞\"}",
+      "hash": "sc1:033b8d9ddc1573eab4c8481a468f5bb747bb72c406fdaac5d072d9b18642093b"
+    },
+    "escapes": {
+      "doc": {
+        "text": "line1\nline2\t\"quoted\"\\"
+      },
+      "jcs": "{\"text\":\"line1\\nline2\\t\\\"quoted\\\"\\\\\"}",
+      "hash": "sc1:9b1179fcd63d05c8a4047926f4e1c1a918962747d1cac4d15f6cfe857b21d132"
+    },
+    "empty-string": {
+      "doc": {
+        "name": ""
+      },
+      "jcs": "{\"name\":\"\"}",
+      "hash": "sc1:1390696a77e5d6f4375e9b36450c26bb67e99662fcd31b71cecd8ceda332040e"
+    },
+    "deep-list-of-objects": {
+      "doc": {
+        "steps": [
+          {
+            "id": "a"
+          },
+          {
+            "id": "b"
+          }
+        ]
+      },
+      "jcs": "{\"steps\":[{\"id\":\"a\"},{\"id\":\"b\"}]}",
+      "hash": "sc1:07de34ddbee9660b63b808af14ccd14d9ca58a13902c261d9e70c68e820c230a"
+    }
+  }
+}

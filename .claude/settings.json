@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(uv sync)",
+      "Bash(uv run:*)",
+      "Bash(uv add:*)",
+      "Bash(uv lock:*)",
+      "Bash(ruff:*)",
+      "Bash(pytest:*)",
+      "Bash(./scripts/test-fast.sh:*)",
+      "Bash(./scripts/test.sh:*)",
+      "Bash(./scripts/update-golden.sh:*)",
+      "Bash(./scripts/build.sh:*)",
+      "Bash(python apps/web/manage.py:*)",
+      "Bash(docker compose:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+Rösti
+============================================================
+The Swiss potato classic — the milestone's acceptance recipe, authored in German and read in both languages.
+
+Serves 4 · scaled 2x · en / us
+
+Ingredients
+-----------
+  - 3 1/2 lb potato
+  - 2 medium onion
+  - salt to taste
+  - pepper to taste (optional)
+  - 2 3/4 oz butter
+
+Steps
+-----
+  1. Coarsely grate 3 1/2 lb potato and 2 medium onion, then season with salt to taste and pepper to taste.
+  2. Melt 2 3/4 oz butter in the frying pan at 355 °F, add the grated potatoes, press flat and fry for 15 min until the underside is golden, then flip.
+
+Notes
+-----
+  ! not scaled automatically (manual); check this value for a 2x batch

@@ -1,0 +1,56 @@
+name: Bug report
+description: Something behaves incorrectly
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you expected, and what happened instead.
+    validations: {required: true}
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. ...
+        2. ...
+    validations: {required: true}
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: "Output of `curl -s <your-host>/up` — it reports the exact build commit."
+      placeholder: '{"status": "ok", "commit": "a1b2c3d..."}'
+    validations: {required: true}
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Rendering (text)
+        - Rendering (flowchart)
+        - Rendering (print)
+        - Units / scaling / conversion
+        - Import
+        - Versioning / forking / diff
+        - Auth / API
+        - Deployment
+        - Other
+    validations: {required: true}
+
+  - type: input
+    id: recipe
+    attributes:
+      label: Recipe content hash (optional)
+      description: If a specific recipe is involved, its `sc1:` hash makes this exactly reproducible.
+      placeholder: "sc1:9f2a..."
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      render: shell

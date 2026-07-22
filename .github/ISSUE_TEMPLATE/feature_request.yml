@@ -1,0 +1,32 @@
+name: Feature request
+description: Suggest an improvement
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the **problem** first. A well-stated problem often has a better
+        solution than the one that prompted the issue — especially for schema
+        changes, where the modelling question matters more than the field name.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What are you trying to do that is hard or impossible today?
+      placeholder: "Recipes with a resting period spanning days render confusingly because..."
+    validations: {required: true}
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Possible solution (optional)
+
+  - type: checkboxes
+    id: schema
+    attributes:
+      label: Does this need a schema change?
+      options:
+        - label: "Yes — this changes how recipes are stored"
+        - label: "I've considered what it means for text, flowchart and print rendering"
+        - label: "I've considered what it means for scaling and unit conversion"

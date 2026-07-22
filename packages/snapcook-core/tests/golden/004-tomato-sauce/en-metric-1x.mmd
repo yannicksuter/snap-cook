@@ -1,0 +1,21 @@
+flowchart TD
+    nod_ts_softened["softened aromatics"]
+    nod_ts_crushed["crushed tomatoes"]
+    nod_ts_sauce["tomato sauce"]
+    iuse_ts_oil(["30 ml olive oil"])
+    iuse_ts_onion(["1 medium onion"])
+    iuse_ts_garlic(["2 garlic"])
+    join_act_ts_1{"sweat"}
+    iuse_ts_tomato(["6 tomato"])
+    iuse_ts_salt(["salt to taste"])
+    join_act_ts_3{"simmer"}
+
+    iuse_ts_oil --> join_act_ts_1
+    iuse_ts_onion --> join_act_ts_1
+    iuse_ts_garlic --> join_act_ts_1
+    join_act_ts_1 -->|sweat| nod_ts_softened
+    iuse_ts_tomato -->|crush| nod_ts_crushed
+    nod_ts_softened --> join_act_ts_3
+    nod_ts_crushed --> join_act_ts_3
+    iuse_ts_salt --> join_act_ts_3
+    join_act_ts_3 -->|simmer, 30 min| nod_ts_sauce

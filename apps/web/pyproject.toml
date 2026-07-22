@@ -1,0 +1,48 @@
+# snap-cook web -- the Django deployable.
+#
+# AGPL-3.0-or-later, unlike packages/snapcook-core which is Apache-2.0.
+# See ../../LICENSING.md for why the split exists.
+#
+# Lower-bound (">=") constraints only, never "==". Reproducibility comes from
+# the committed uv.lock, not from pinning here; pinning in both places just
+# creates two sources of truth that drift.
+
+[project]
+name = "snapcook-web"
+version = "0.1.0"
+description = "snap-cook Django web application"
+requires-python = ">=3.12"
+license = "AGPL-3.0-or-later"
+dependencies = [
+    "snapcook-core",
+    "django>=5.1",
+    "django-ninja>=1.3",
+    "django-allauth[socialaccount]>=65.0",
+    "psycopg[binary]>=3.2",
+    "django-q2>=1.7",
+    "gunicorn>=23.0",
+    "whitenoise>=6.7",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest-django>=4.9",
+]
+
+# This is an application run from source via manage.py, not an installable
+# library. uv provisions its dependencies without trying to build it, so no
+# build backend or matching package directory is required.
+[tool.uv]
+package = false
+
+# Django's own pytest configuration lives here rather than in the workspace root
+# so that `pytest packages/` -- the tier-0 inner loop -- never imports Django and
+# never touches a database.
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "snapcookweb.settings"
+pythonpath = ["."]
+testpaths = ["accounts", "catalog", "recipes", "imports", "social", "api", "tests"]
+markers = [
+    "integration: needs Postgres and migrations",
+]

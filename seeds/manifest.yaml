@@ -1,0 +1,68 @@
+# Machine-readable twin of THIRD_PARTY_DATA.md.
+#
+# A test asserts these two agree. Without it they drift within a couple of
+# months, and a licensing document you cannot back up is worse than none.
+#
+# A CI check additionally asserts that every source with `default_seed: true`
+# has `share_alike: false` -- that is what stops a well-meaning PR from quietly
+# imposing copyleft obligations on the whole dataset.
+
+version: 1
+
+sources:
+  - code: usda_fdc
+    name: USDA FoodData Central
+    url: https://fdc.nal.usda.gov/
+    license_spdx: CC0-1.0
+    share_alike: false
+    attribution_required: false
+    redistributable: true
+    default_seed: true
+    feeds:
+      - nutrition.*
+      - count_weight.*
+    attribution: >-
+      Nutrient and portion data from USDA FoodData Central, U.S. Department of
+      Agriculture, Agricultural Research Service.
+
+  - code: fao_infoods
+    name: FAO/INFOODS Density Database v2.0
+    url: https://www.fao.org/infoods/infoods/tables-and-databases/faoinfoods-databases/en/
+    license_spdx: LicenseRef-FAO-INFOODS
+    share_alike: false
+    attribution_required: true
+    redistributable: true
+    default_seed: true
+    feeds:
+      - density_g_per_ml
+    attribution: >-
+      Density data from the FAO/INFOODS Density Database version 2.0, Food and
+      Agriculture Organization of the United Nations.
+
+  # ---- share-alike: excluded from the default seed. See ADR 0005. ----
+  - code: open_tandoor
+    name: open-tandoor-data
+    url: https://github.com/TandoorRecipes/open-tandoor-data
+    license_spdx: ODbL-1.0
+    share_alike: true
+    attribution_required: true
+    redistributable: true
+    default_seed: false
+    requires_flag: SNAPCOOK_ALLOW_SHARE_ALIKE_DATA
+    feeds:
+      - names.*
+      - category
+      - unit_conversion.*
+
+  - code: off
+    name: Open Food Facts
+    url: https://world.openfoodfacts.org/data
+    license_spdx: ODbL-1.0
+    share_alike: true
+    attribution_required: true
+    redistributable: true
+    default_seed: false
+    requires_flag: SNAPCOOK_ALLOW_SHARE_ALIKE_DATA
+    feeds:
+      - names.*
+      - allergens.*

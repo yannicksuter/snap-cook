@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Rösti</title>
+<style>:root { --ink: #1a1a1a; --muted: #6b6b6b; --rule: #e0ddd6; --accent: #b5651d; }
+* { box-sizing: border-box; }
+body { font-family: Georgia, 'Times New Roman', serif; color: var(--ink);
+       max-width: 40rem; margin: 2rem auto; padding: 0 1.5rem; line-height: 1.5; }
+h1 { font-size: 2rem; margin: 0 0 .25rem; }
+.meta { color: var(--muted); font-size: .9rem; margin-bottom: 1.5rem; }
+.desc { font-style: italic; color: #333; margin-bottom: 1.5rem; }
+h2 { font-size: 1.1rem; text-transform: uppercase; letter-spacing: .08em;
+     border-bottom: 2px solid var(--rule); padding-bottom: .25rem; margin-top: 2rem; }
+ul.ingredients { list-style: none; padding: 0; }
+ul.ingredients li { padding: .3rem 0; border-bottom: 1px solid var(--rule); }
+.qty { font-weight: bold; }
+.opt { color: var(--muted); font-style: italic; }
+ol.steps { padding-left: 1.4rem; }
+ol.steps li { margin: .6rem 0; padding-left: .3rem; }
+.notes { background: #faf6ef; border-left: 3px solid var(--accent);
+         padding: .5rem .9rem; font-size: .9rem; color: #5a4a34; }
+@media print { body { margin: 0; max-width: none; } h2 { page-break-after: avoid; }
+               ol.steps li, ul.ingredients li { page-break-inside: avoid; } }
+</style>
+</head>
+<body>
+<h1>Rösti</h1>
+<p class="meta">Serves 4 · de · us · 2×</p>
+<p class="desc">Der Schweizer Kartoffelklassiker.</p>
+<h2>Ingredients</h2>
+<ul class="ingredients">
+<li><span class="qty">3 1/2 lb</span> Kartoffel</li>
+<li><span class="qty">2 mittlere</span> Zwiebel</li>
+<li>Salz <span class="qty">nach Geschmack</span></li>
+<li>Pfeffer <span class="qty">nach Geschmack</span> <span class="opt">(optional)</span></li>
+<li><span class="qty">2 3/4 oz</span> Butter</li>
+</ul>
+<h2>Method</h2>
+<ol class="steps">
+<li>Reiben Sie 3 1/2 lb Kartoffel und 2 mittlere Zwiebel grob, dann würzen Sie mit Salz nach Geschmack und Pfeffer nach Geschmack.</li>
+<li>Schmelzen Sie 2 3/4 oz Butter in der Bratpfanne bei 355 °F, geben Sie die geriebene Kartoffeln hinein, drücken flach und braten Sie 15 min bis die Unterseite goldbraun ist, dann wenden.</li>
+</ol>
+<h2>Notes</h2>
+<p class="notes">not scaled automatically (manual); check this value for a 2x batch</p>
+</body>
+</html>

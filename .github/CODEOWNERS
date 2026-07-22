@@ -1,0 +1,18 @@
+# Default owner for everything.
+*                                   @yannicksuter
+
+# Extra scrutiny: changing these invalidates every content hash that has ever
+# been written, in every store, including ones we do not control.
+/packages/snapcook-core/src/snapcook_core/canonical/   @yannicksuter
+/packages/snapcook-core/tests/contract/                @yannicksuter
+
+# The most likely breach path in the system.
+/apps/web/api/ops.py                @yannicksuter
+/apps/web/api/auth.py               @yannicksuter
+/apps/web/catalog/access.py         @yannicksuter
+
+# Licensing posture.
+/LICENSE                            @yannicksuter
+/LICENSING.md                       @yannicksuter
+/THIRD_PARTY_DATA.md                @yannicksuter
+/seeds/manifest.yaml                @yannicksuter

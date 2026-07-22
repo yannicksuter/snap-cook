@@ -1,0 +1,73 @@
+# snap-cook uv workspace root.
+#
+# This root is a *virtual* workspace: it is not itself a package. It exists to
+# pin the shared toolchain (ruff, pytest, coverage, hypothesis) in one place and
+# to tie the two members together:
+#
+#   packages/snapcook-core  -- the pure-Python domain library (Apache-2.0)
+#   apps/web                -- the Django deployable (AGPL-3.0)
+#
+# Tier-0 tests (core) must run with no Django and no database. That is why
+# DJANGO_SETTINGS_MODULE is deliberately NOT set here -- it lives in
+# apps/web/pyproject.toml, so `pytest packages/` never imports Django.
+
+[tool.uv.workspace]
+members = ["packages/*", "apps/*"]
+
+[tool.uv.sources]
+snapcook-core = { workspace = true }
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15",
+    "pytest>=8.0",
+    "pytest-cov>=6.0",
+    "pytest-xdist>=3.6",
+    "pytest-socket>=0.7",
+    "pytest-django>=4.9",
+    "hypothesis>=6.120",
+    "dirty-equals>=0.8",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+
+[tool.ruff.lint.isort]
+# Without this, ruff files our own packages under third-party and the import
+# blocks shuffle depending on which tree you run it from.
+known-first-party = [
+    "snapcook_core",
+    "snapcookweb",
+    "accounts",
+    "catalog",
+    "recipes",
+    "imports",
+    "social",
+    "api",
+]
+
+[tool.pytest.ini_options]
+# Tier 0 only. Django lives under apps/web and carries its own pytest config.
+testpaths = ["packages/snapcook-core/tests"]
+markers = [
+    "golden: compares against a committed golden file (see scripts/update-golden.sh)",
+    "property: Hypothesis property-based test",
+    "contract: frozen wire contract; a failure here is a breaking change",
+    "integration: needs Postgres and migrations",
+    "eval: needs live LLM credentials; never runs in PR CI",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["snapcook_core"]
+
+[tool.coverage.report]
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "@overload",
+]

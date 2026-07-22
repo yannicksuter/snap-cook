@@ -1,0 +1,81 @@
+{% comment %}
+SPDX-License-Identifier: AGPL-3.0-or-later
+
+Tailwind and HTMX come from a CDN. There is deliberately no npm build step --
+see the Conventions list in AGENTS.md. The cost is a CDN dependency at runtime;
+the benefit is that `docker compose up` is the entire toolchain.
+{% endcomment %}
+<!doctype html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}snap-cook{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            'sc-bg':     '#0f1115',
+            'sc-card':   '#171a21',
+            'sc-edge':   '#252a34',
+            'sc-accent': '#f0a04b',
+            'sc-leaf':   '#7bc47f',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body class="h-full bg-sc-bg text-neutral-200 font-sans antialiased flex flex-col">
+
+  <header class="border-b border-sc-edge">
+    <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="{% url 'recipes:index' %}" class="flex items-center gap-2 group">
+        <span class="text-xl font-semibold tracking-tight text-neutral-100 group-hover:text-sc-accent transition-colors">snap-cook</span>
+        <span class="text-[10px] uppercase tracking-widest text-neutral-500 border border-sc-edge rounded px-1.5 py-0.5">alpha</span>
+      </a>
+      <nav class="flex items-center gap-4 text-sm">
+        {% if user.is_authenticated %}
+          <span class="text-neutral-400">{{ user.email|default:user.username }}</span>
+          <a href="{% url 'account_logout' %}" class="text-neutral-400 hover:text-neutral-100 transition-colors">Sign out</a>
+        {% else %}
+          <a href="{% url 'account_login' %}" class="text-sc-accent hover:underline">Sign in</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-5xl w-full mx-auto px-6 py-10">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="border-t border-sc-edge">
+    <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between text-xs text-neutral-500">
+      <span>Recipes as structured data &mdash; not documents.</span>
+      {% comment %}
+        The build commit, so "which version am I looking at?" is answerable
+        from the browser. Matches what /up reports.
+      {% endcomment %}
+      <span class="font-mono">
+        {% if deployed_commit_url %}
+          <a href="{{ deployed_commit_url }}" class="hover:text-neutral-300 transition-colors">{{ deployed_commit_short }}</a>
+        {% else %}
+          {{ deployed_commit_short }}
+        {% endif %}
+      </span>
+    </div>
+  </footer>
+
+</body>
+</html>

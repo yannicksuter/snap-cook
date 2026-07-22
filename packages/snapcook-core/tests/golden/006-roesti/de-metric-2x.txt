@@ -1,0 +1,22 @@
+Rösti
+============================================================
+Der Schweizer Kartoffelklassiker.
+
+Serves 4 · scaled 2x · de / metric
+
+Ingredients
+-----------
+  - 1.5 kg Kartoffel
+  - 2 mittlere Zwiebel
+  - Salz nach Geschmack
+  - Pfeffer nach Geschmack (optional)
+  - 80 g Butter
+
+Steps
+-----
+  1. Reiben Sie 1.5 kg Kartoffel und 2 mittlere Zwiebel grob, dann würzen Sie mit Salz nach Geschmack und Pfeffer nach Geschmack.
+  2. Schmelzen Sie 80 g Butter in der Bratpfanne bei 180 °C, geben Sie die geriebene Kartoffeln hinein, drücken flach und braten Sie 15 min bis die Unterseite goldbraun ist, dann wenden.
+
+Notes
+-----
+  ! not scaled automatically (manual); check this value for a 2x batch

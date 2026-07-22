@@ -1,0 +1,44 @@
+{% extends "recipes/base.html" %}
+{% comment %}SPDX-License-Identifier: AGPL-3.0-or-later{% endcomment %}
+
+{% block title %}Recipes &mdash; snap-cook{% endblock %}
+
+{% block content %}
+  <div class="flex items-baseline justify-between mb-8">
+    <h1 class="text-2xl font-semibold text-neutral-100">Recipes</h1>
+    <span class="text-sm text-neutral-500">{{ recipes|length }} visible</span>
+  </div>
+
+  {% if recipes %}
+    <ul class="grid gap-3 sm:grid-cols-2">
+      {% for recipe in recipes %}
+        <li>
+          <a href="{% url 'recipes:detail' recipe.slug %}" class="block rounded-lg border border-sc-edge bg-sc-card p-4 hover:border-neutral-600 transition-colors">
+            <div class="flex items-start justify-between gap-3">
+              <h2 class="font-medium text-neutral-100">{{ recipe.title }}</h2>
+              <span class="shrink-0 text-[10px] uppercase tracking-wider text-neutral-500 border border-sc-edge rounded px-1.5 py-0.5">
+                {{ recipe.get_visibility_display }}
+              </span>
+            </div>
+            {% if recipe.description %}
+              <p class="mt-2 text-sm text-neutral-400 line-clamp-2">{{ recipe.description }}</p>
+            {% endif %}
+            <p class="mt-3 text-xs text-neutral-500 font-mono">{{ recipe.lang }} &middot; {{ recipe.updated_at|date:"Y-m-d" }}</p>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    {% comment %}
+      M0 lands here: auth works, the projection is queryable, nothing is stored
+      yet. The recipe store reader arrives with M1.
+    {% endcomment %}
+    <div class="rounded-lg border border-dashed border-sc-edge p-12 text-center">
+      <p class="text-neutral-300 font-medium">No recipes yet.</p>
+      <p class="mt-2 text-sm text-neutral-500 max-w-md mx-auto">
+        Recipes live as files under the store directory, and Postgres only indexes them.
+        Once the version store lands, anything committed there will appear here.
+      </p>
+    </div>
+  {% endif %}
+{% endblock %}

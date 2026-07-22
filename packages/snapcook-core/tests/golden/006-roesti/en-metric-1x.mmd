@@ -1,0 +1,19 @@
+flowchart TD
+    nod_ro_grated["grated potatoes"]
+    nod_ro_done["rösti"]
+    iuse_ro_potato(["800 g potato"])
+    iuse_ro_onion(["1 medium onion"])
+    iuse_ro_salt(["salt to taste"])
+    iuse_ro_pepper(["pepper to taste"])
+    join_act_ro_1{"grate"}
+    iuse_ro_butter(["40 g butter"])
+    join_act_ro_2{"fry"}
+
+    iuse_ro_potato --> join_act_ro_1
+    iuse_ro_onion --> join_act_ro_1
+    iuse_ro_salt --> join_act_ro_1
+    iuse_ro_pepper --> join_act_ro_1
+    join_act_ro_1 -->|grate| nod_ro_grated
+    nod_ro_grated --> join_act_ro_2
+    iuse_ro_butter --> join_act_ro_2
+    join_act_ro_2 -->|fry, 15 min @ 180 °C| nod_ro_done
