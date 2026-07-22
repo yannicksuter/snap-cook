@@ -11,9 +11,12 @@ build.
 
 ```
 evals/cases/<id>/
-├── source.pdf | source.jpg | source.url
+├── source.pdf | source.jpg | source.url | source.txt
 └── gold.yaml          # hand-corrected, the ground truth
 ```
+
+`source.txt` cases should include full webpage selections with realistic noise,
+not only pre-cleaned recipe text.
 
 ## Running
 

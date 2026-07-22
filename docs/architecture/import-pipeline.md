@@ -1,17 +1,18 @@
 # Import pipeline
 
 ```
-image / PDF / URL
-       │
-       ▼
+image / PDF / URL / pasted text
+            │
+            ▼
   [ 202 job_id ]  ── never in the request cycle
        │
        ▼
   django-q worker
        │
-       ├─ URL:   recipe-scrapers (JSON-LD, microdata)
-       ├─ image: OCR
-       └─ all:   LLM → RawExtraction
+       ├─ URL:         recipe-scrapers (JSON-LD, microdata)
+       ├─ image/PDF:   text extraction / OCR
+       ├─ pasted text: retain the complete, potentially noisy selection
+       └─ all:         LLM isolates recipe → RawExtraction
        │
        ▼
   normalize()  ── pure Python in snapcook-core, fully testable
@@ -40,6 +41,9 @@ That reprioritises it well above where a feature list would put it.
 4. **Provider abstraction from day one.** A self-hosted model is planned; the
    boundary is `RecipeImporter` returning `RawExtraction`.
 5. **Imports land private.** See the legal note in `LICENSING.md`.
+6. **Do not require clean pasted text.** The textarea accepts a full webpage
+   selection. Navigation, ads, comments, recommendations and unrelated prose
+   are filtered by extraction, not manually by the user.
 
 ## What is kept and what is dropped
 
@@ -62,4 +66,6 @@ easy to get wrong.
 
 The valuable tests are pure functions over `RawExtraction`: wrong units,
 ambiguous ingredient names, missing amounts, hallucinated steps, non-DAG
-ordering, mixed-language output.
+ordering, mixed-language output. Provider evals also include noisy pasted
+webpages and assert that surrounding navigation, ads, comments and recommended
+content do not leak into the extracted recipe.

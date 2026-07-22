@@ -5,8 +5,9 @@ pipeline is structured the way it is.
 
 ## Why a separate service
 
-Recipe extraction (image / PDF / URL → structured draft) currently calls a
-hosted model API. The intent is to run inference locally, which means:
+Recipe extraction (image / PDF / URL / noisy pasted text → structured draft)
+currently calls a hosted model API. The intent is to run inference locally,
+which means:
 
 - **GPU-bound and slow to start.** It cannot live in the web container, whose
   restart time should stay in seconds.

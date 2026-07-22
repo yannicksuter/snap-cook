@@ -46,7 +46,7 @@ aspirational: `reindex --full` truncates exactly `catalog` and nothing else.
 - **Web UI** — Django view → `catalog.access` for visibility → `snapcook_core`
   for rendering → template
 - **API** — django-ninja → same two calls → JSON
-- **Import** — upload → `202 {job_id}` → django-q worker → LLM → draft →
+- **Import** — source submission → `202 {job_id}` → django-q worker → LLM → draft →
   human review → commit to store → reindex
 
 ## See also
@@ -56,4 +56,4 @@ aspirational: `reindex --full` truncates exactly `catalog` and nothing else.
 - [`dag-model.md`](dag-model.md) — the recipe graph
 - [`rendering.md`](rendering.md) — one model, three renderers
 - [`units-and-i18n.md`](units-and-i18n.md) — conversion and translation
-- [`import-pipeline.md`](import-pipeline.md) — image/PDF/URL to draft
+- [`import-pipeline.md`](import-pipeline.md) — image/PDF/URL/pasted text to draft

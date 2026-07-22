@@ -64,9 +64,11 @@ one. Read-only endpoints first; write endpoints stay behind a second flag.
 
 ## M3 — Import pipeline
 
-django-q2 and the worker container, upload UI (image / PDF / URL), the provider
-adapter, `importing/normalize.py`, the draft review UI, fixture capture, the
-`pytest-socket` ban, and the eval harness.
+django-q2 and the worker container, import UI (image / PDF / URL / pasted text),
+the provider adapter, `importing/normalize.py`, the draft review UI, fixture
+capture, the `pytest-socket` ban, and the eval harness. Pasted text may be a
+full, noisy webpage selection; extraction must isolate the recipe rather than
+requiring the user to clean it first.
 
 Worth stating plainly: **structure is a tax on the author, and nobody will hand-
 author a graph.** The importer is not a convenience feature — it is the primary

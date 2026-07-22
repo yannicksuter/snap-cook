@@ -4,8 +4,8 @@
 
 ## Context
 
-Recipe import (image/PDF/URL → LLM → draft) takes 10–60 seconds and cannot run
-in the request cycle. This is a single-box homelab deployment, and
+Recipe import (image/PDF/URL/pasted text → LLM → draft) takes 10–60 seconds and
+cannot run in the request cycle. This is a single-box homelab deployment, and
 `/ops/api/jobs` — inspecting the queue without database access — is a stated
 requirement.
 
