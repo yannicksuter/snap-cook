@@ -4,7 +4,7 @@
 # django-q cluster. Dispatch happens in entrypoint.sh on the first argument, so
 # there is exactly one image to build, tag and deploy.
 
-FROM python:3.13-slim AS base
+FROM python:3.14-slim AS base
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
