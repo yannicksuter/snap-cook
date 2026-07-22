@@ -937,7 +937,7 @@ requires-dist = [
     { name = "django-ninja", specifier = ">=1.3" },
     { name = "django-q2", specifier = ">=1.7" },
     { name = "gunicorn", specifier = ">=23.0" },
-    { name = "psycopg", extras = ["binary"], specifier = ">=3.2" },
+    { name = "psycopg", extras = ["binary"], specifier = ">=3.3.4" },
     { name = "pytest-django", marker = "extra == 'dev'", specifier = ">=4.9" },
     { name = "python-dotenv", specifier = ">=1.0" },
     { name = "snapcook-core", editable = "packages/snapcook-core" },
