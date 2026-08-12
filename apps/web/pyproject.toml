@@ -27,7 +27,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "pytest-django>=4.9",
+    "pytest-django>=4.13.0",
 ]
 
 # This is an application run from source via manage.py, not an installable
