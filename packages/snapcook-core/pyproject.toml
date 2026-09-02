@@ -18,7 +18,7 @@ requires-python = ">=3.12"
 license = "Apache-2.0"
 dependencies = [
     # Schema + validation. Strict mode is what neutralises YAML's implicit typing.
-    "pydantic>=2.9",
+    "pydantic>=2.13.5",
     # Unit registry. Chosen for offset-unit support (degC<->degF is affine, not
     # multiplicative) and contexts (per-ingredient density makes volume->mass legal).
     "pint>=0.24",
