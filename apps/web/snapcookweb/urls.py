@@ -33,6 +33,8 @@ urlpatterns = [
     path("up", views.up, name="up"),
     path("admin/", admin.site.urls),
     path("accounts/", include("allauth.urls")),
+    path("settings/", include("accounts.urls")),
+    path("", include("imports.urls")),
     path("", include("recipes.urls")),
 ]
 

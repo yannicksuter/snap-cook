@@ -1,0 +1,525 @@
+# German interface strings for snap-cook.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: snap-cook\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-16 21:16+0000\n"
+"PO-Revision-Date: 2026-11-16 21:30+0100\n"
+"Last-Translator: snap-cook\n"
+"Language-Team: German\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: accounts/forms.py
+msgid "Language"
+msgstr "Sprache"
+
+#: accounts/forms.py
+msgid "Metric: grams and millilitres"
+msgstr "Metrisch: Gramm und Milliliter"
+
+#: accounts/forms.py
+msgid "US: cups and ounces"
+msgstr "US: Cups und Unzen"
+
+#: accounts/forms.py
+msgid "Units"
+msgstr "Einheiten"
+
+#: accounts/templates/accounts/settings.html
+msgid "Settings"
+msgstr "Einstellungen"
+
+#: accounts/templates/accounts/settings.html
+msgid "For menus and buttons, and the language recipes open in."
+msgstr ""
+"Für Menüs und Schaltflächen. Rezepte öffnen sich ebenfalls in dieser Sprache."
+
+#: accounts/templates/accounts/settings.html
+msgid "Save"
+msgstr "Speichern"
+
+#: accounts/templates/accounts/settings.html
+#, python-format
+msgid "Signed in as %(email)s"
+msgstr "Angemeldet als %(email)s"
+
+#: accounts/templates/accounts/settings.html
+msgid "Sign out"
+msgstr "Abmelden"
+
+#: accounts/views.py
+msgid "Saved."
+msgstr "Gespeichert."
+
+#: imports/forms.py
+#
+msgid "Link to a recipe"
+msgstr "Link zu einem Rezept"
+
+#: imports/forms.py imports/templates/imports/add.html
+#
+msgid "Recipe text"
+msgstr "Rezepttext"
+
+#: imports/forms.py
+msgid "Photos"
+msgstr "Fotos"
+
+#: imports/forms.py
+msgid "Choose at least one photo."
+msgstr "Wähle mindestens ein Foto."
+
+#: imports/forms.py
+#, python-format
+msgid "At most %(count)s photos at once."
+msgstr "Höchstens %(count)s Fotos auf einmal."
+
+#: imports/forms.py
+msgid "Each photo can be at most 7 MB."
+msgstr "Jedes Foto darf höchstens 7 MB haben."
+
+#: imports/forms.py
+msgid ""
+"This is an iPhone HEIC photo. Choose it from the photo picker, which sends a "
+"JPEG, or set the camera to “Most Compatible”."
+msgstr "Das ist ein HEIC-Foto vom iPhone. Wähle es über die Fotoauswahl, die ein JPEG sendet, oder stelle die Kamera auf „Maximale Kompatibilität“."
+
+#: imports/forms.py
+msgid "Use a photo (JPEG, PNG, WebP, GIF) or a PDF."
+msgstr "Verwende ein Foto (JPEG, PNG, WebP, GIF) oder ein PDF."
+
+#: imports/forms.py
+msgid "Name"
+msgstr "Name"
+
+#: imports/forms.py
+msgid "Short description"
+msgstr "Kurze Beschreibung"
+
+#: imports/forms.py
+#
+msgid "Serves"
+msgstr "Portionen"
+
+#: imports/templates/imports/_progress.html
+#: imports/templates/imports/status.html
+msgid "Reading your recipe…"
+msgstr "Dein Rezept wird gelesen…"
+
+#: imports/templates/imports/_progress.html
+msgid "Photos received"
+msgstr "Fotos erhalten"
+
+#: imports/templates/imports/_progress.html
+msgid "Link received"
+msgstr "Link erhalten"
+
+#: imports/templates/imports/_progress.html
+msgid "Text received"
+msgstr "Text erhalten"
+
+#: imports/templates/imports/_progress.html
+msgid "Finding the ingredients and steps"
+msgstr "Zutaten und Schritte werden gesucht"
+
+#: imports/templates/imports/_progress.html
+msgid "Ready for you to check"
+msgstr "Bereit zum Prüfen"
+
+#: imports/templates/imports/_progress.html
+msgid ""
+"This usually takes under a minute. You can leave this page: the draft waits "
+"for you on Home."
+msgstr "Das dauert meist weniger als eine Minute. Du kannst die Seite verlassen: Der Entwurf wartet auf der Startseite auf dich."
+
+#: imports/templates/imports/_progress.html
+msgid "That did not work"
+msgstr "Das hat nicht geklappt"
+
+#: imports/templates/imports/_progress.html
+msgid "Look at what was read"
+msgstr "Ansehen, was gelesen wurde"
+
+#: imports/templates/imports/_progress.html
+msgid "Try again"
+msgstr "Nochmals versuchen"
+
+#: imports/templates/imports/_progress.html
+msgid "Delete"
+msgstr "Löschen"
+
+#: imports/templates/imports/add.html recipes/templates/recipes/index.html
+#
+msgid "Add a recipe"
+msgstr "Rezept hinzufügen"
+
+#: imports/templates/imports/add.html imports/templates/imports/review.html
+msgid "Close"
+msgstr "Schliessen"
+
+#: imports/templates/imports/add.html imports/views.py
+msgid "Reading recipes is not set up on this server yet."
+msgstr "Das Einlesen von Rezepten ist auf diesem Server noch nicht eingerichtet."
+
+#: imports/templates/imports/add.html
+msgid ""
+"Set SNAPCOOK_LLM_API_KEY on the worker container; docs/install.md says how."
+msgstr "Setze SNAPCOOK_LLM_API_KEY im Worker-Container; wie das geht, steht in docs/install.md."
+
+#: imports/templates/imports/add.html
+msgid ""
+"snap-cook picks out the ingredients and the steps, and leaves everything "
+"else out."
+msgstr "snap-cook sucht die Zutaten und die Schritte heraus und lässt alles andere weg."
+
+#: imports/templates/imports/add.html
+msgid "Take a photo"
+msgstr "Foto aufnehmen"
+
+#: imports/templates/imports/add.html
+msgid "Of a cookbook page or a handwritten card"
+msgstr "Von einer Kochbuchseite oder einer handgeschriebenen Karte"
+
+#: imports/templates/imports/add.html
+msgid "Read the photo"
+msgstr "Foto einlesen"
+
+#: imports/templates/imports/add.html
+msgid "Or paste a link"
+msgstr "Oder einen Link einfügen"
+
+#: imports/templates/imports/add.html
+#
+msgid "Get the recipe"
+msgstr "Rezept holen"
+
+#: imports/templates/imports/add.html
+msgid "Other ways"
+msgstr "Andere Wege"
+
+#: imports/templates/imports/add.html
+msgid "Choose from your photos"
+msgstr "Aus deinen Fotos wählen"
+
+#: imports/templates/imports/add.html
+msgid "Screenshots or a PDF too, several pages at once"
+msgstr "Auch Screenshots oder ein PDF, mehrere Seiten auf einmal"
+
+#: imports/templates/imports/add.html
+msgid "Read the photos"
+msgstr "Fotos einlesen"
+
+#: imports/templates/imports/add.html
+msgid "Paste text"
+msgstr "Text einfügen"
+
+#: imports/templates/imports/add.html
+msgid "From an email, a message or a whole web page"
+msgstr "Aus einer E-Mail, einer Nachricht oder einer ganzen Webseite"
+
+#: imports/templates/imports/add.html
+msgid "Read the text"
+msgstr "Text einlesen"
+
+#: imports/templates/imports/add.html
+msgid "New recipes stay private until you share them."
+msgstr "Neue Rezepte bleiben privat, bis du sie teilst."
+
+#: imports/templates/imports/review.html
+#
+msgid "Check the recipe"
+msgstr "Rezept prüfen"
+
+#: imports/templates/imports/review.html
+msgid "Draft, only you"
+msgstr "Entwurf, nur für dich"
+
+#: imports/templates/imports/review.html
+msgid "Change anything that looks wrong, then save."
+msgstr "Ändere, was nicht stimmt, und speichere dann."
+
+#: imports/templates/imports/review.html
+msgid "Left out:"
+msgstr "Weggelassen:"
+
+#: imports/templates/imports/review.html
+msgid "From:"
+msgstr "Quelle:"
+
+#: imports/templates/imports/review.html
+#, python-format
+msgid ""
+"A step uses “%(name)s”, but no step makes it. Check the recipe text below."
+msgstr "Ein Schritt verwendet „%(name)s“, aber kein Schritt stellt es her. Prüfe den Rezepttext unten."
+
+#: imports/templates/imports/review.html
+msgid "Keep it as it is"
+msgstr "So lassen"
+
+#: imports/templates/imports/review.html recipes/templates/recipes/_render.html
+msgid "Ingredients"
+msgstr "Zutaten"
+
+#: imports/templates/imports/review.html recipes/templates/recipes/_render.html
+msgid "optional"
+msgstr "optional"
+
+#: imports/templates/imports/review.html recipes/templates/recipes/_render.html
+msgid "Steps"
+msgstr "Schritte"
+
+#: imports/templates/imports/review.html
+msgid "Edit the recipe text"
+msgstr "Rezepttext bearbeiten"
+
+#: imports/templates/imports/review.html
+msgid ""
+"One step per paragraph. Ingredients, times and temperatures are marked like "
+"this:"
+msgstr "Ein Schritt pro Absatz. Zutaten, Zeiten und Temperaturen werden so markiert:"
+
+#: imports/templates/imports/review.html
+#
+msgid "Save recipe"
+msgstr "Rezept speichern"
+
+#: imports/templates/imports/review.html
+msgid "Update the preview"
+msgstr "Vorschau aktualisieren"
+
+#: imports/templates/imports/review.html
+msgid "Delete this draft"
+msgstr "Diesen Entwurf löschen"
+
+#: imports/templates/imports/status.html recipes/templates/recipes/detail.html
+#: recipes/templates/recipes/index.html
+msgid "Recipes"
+msgstr "Rezepte"
+
+#: imports/views.py
+msgid "That link leads into a private network, so it cannot be read."
+msgstr "Dieser Link führt in ein privates Netzwerk und kann deshalb nicht gelesen werden."
+
+#: imports/views.py
+msgid ""
+"The page could not be loaded. Check the link, or paste the recipe’s text "
+"instead."
+msgstr "Die Seite konnte nicht geladen werden. Prüfe den Link oder füge stattdessen den Text des Rezepts ein."
+
+#: imports/views.py
+msgid "The page is too large to read."
+msgstr "Die Seite ist zu umfangreich zum Lesen."
+
+#: imports/views.py
+#
+msgid "No recipe was found in it."
+msgstr "Darin wurde kein Rezept gefunden."
+
+#: imports/views.py
+msgid "The recipe came back in a form that could not be read."
+msgstr "Das Rezept kam in einer Form zurück, die nicht gelesen werden konnte."
+
+#: imports/views.py
+msgid "The reader declined this one."
+msgstr "Das Einlesen wurde für diese Quelle abgelehnt."
+
+#: imports/views.py
+msgid "The reading service is busy. Try again in a minute."
+msgstr "Der Lesedienst ist ausgelastet. Versuche es in einer Minute nochmals."
+
+#: imports/views.py
+msgid "Reading failed. Try again in a moment."
+msgstr "Das Einlesen ist fehlgeschlagen. Versuche es gleich nochmals."
+
+#: imports/views.py
+msgid "Reading took too long and was stopped."
+msgstr "Das Einlesen hat zu lange gedauert und wurde abgebrochen."
+
+#: imports/views.py
+msgid "The draft was deleted."
+msgstr "Der Entwurf wurde gelöscht."
+
+#: imports/views.py
+msgid "That answer no longer fits the text. Edit the text instead."
+msgstr "Diese Antwort passt nicht mehr zum Text. Bearbeite stattdessen den Text."
+
+#: imports/views.py
+#
+msgid "Saved. Only you can see this recipe."
+msgstr "Gespeichert. Nur du siehst dieses Rezept."
+
+#: recipes/templates/recipes/_render.html
+msgid "Something in this recipe needs checking:"
+msgstr "Bei diesem Rezept muss etwas geprüft werden:"
+
+#: recipes/templates/recipes/_render.html
+msgid "Servings"
+msgstr "Portionen"
+
+#: recipes/templates/recipes/_render.html
+msgid "Amount"
+msgstr "Menge"
+
+#: recipes/templates/recipes/_render.html
+msgid "Fewer servings"
+msgstr "Weniger Portionen"
+
+#: recipes/templates/recipes/_render.html
+msgid "Less"
+msgstr "Weniger"
+
+#: recipes/templates/recipes/_render.html
+msgid "More servings"
+msgstr "Mehr Portionen"
+
+#: recipes/templates/recipes/_render.html
+msgid "More"
+msgstr "Mehr"
+
+#: recipes/templates/recipes/_render.html
+#, python-format
+msgid "for %(counter)s serving"
+msgid_plural "for %(counter)s servings"
+msgstr[0] "für %(counter)s Portion"
+msgstr[1] "für %(counter)s Portionen"
+
+#: recipes/templates/recipes/_render.html
+msgid "Not recognised: please check this ingredient"
+msgstr "Nicht erkannt: Bitte diese Zutat prüfen"
+
+#: recipes/templates/recipes/_render.html
+msgid "Save time:"
+msgstr "Zeit sparen:"
+
+#: recipes/templates/recipes/_render.html
+#, python-format
+msgid "Step %(number)s:"
+msgstr "Schritt %(number)s:"
+
+#: recipes/templates/recipes/_render.html
+msgid "Show as a flowchart"
+msgstr "Als Ablaufdiagramm anzeigen"
+
+#: recipes/templates/recipes/_render.html
+msgid ""
+"The same recipe as a diagram: rounded shapes are ingredients, boxes are what "
+"you have made so far, and the arrows are the steps."
+msgstr ""
+"Dasselbe Rezept als Diagramm: Abgerundete Formen sind Zutaten, Kästen sind, "
+"was du bisher zubereitet hast, und die Pfeile sind die Schritte."
+
+#: recipes/templates/recipes/_render.html
+msgid "Show as plain text"
+msgstr "Als reinen Text anzeigen"
+
+#: recipes/templates/recipes/base.html
+msgid "Your settings: language and units"
+msgstr "Deine Einstellungen: Sprache und Einheiten"
+
+#: recipes/templates/recipes/index.html
+msgid "Search recipes"
+msgstr "Rezepte suchen"
+
+#: recipes/templates/recipes/index.html
+msgid "Search"
+msgstr "Suchen"
+
+#: recipes/templates/recipes/index.html
+msgid "Waiting for you"
+msgstr "Wartet auf dich"
+
+#: recipes/templates/recipes/index.html
+#
+msgid "New recipe"
+msgstr "Neues Rezept"
+
+#: recipes/templates/recipes/index.html
+msgid "Ready to check"
+msgstr "Bereit zum Prüfen"
+
+#: recipes/templates/recipes/index.html
+msgid "Could not be read"
+msgstr "Konnte nicht gelesen werden"
+
+#: recipes/templates/recipes/index.html
+msgid "Reading…"
+msgstr "Wird gelesen…"
+
+#: recipes/templates/recipes/index.html
+#, python-format
+msgid "%(counter)s recipe"
+msgid_plural "%(counter)s recipes"
+msgstr[0] "%(counter)s Rezept"
+msgstr[1] "%(counter)s Rezepte"
+
+#: recipes/templates/recipes/index.html
+msgid "Only you can see this"
+msgstr "Nur du kannst das sehen"
+
+#: recipes/templates/recipes/index.html
+msgid "Anyone with the link can see this"
+msgstr "Alle mit dem Link können das sehen"
+
+#: recipes/templates/recipes/index.html
+#, python-format
+msgid "No recipe matches “%(query)s”."
+msgstr "Kein Rezept passt zu „%(query)s“."
+
+#: recipes/templates/recipes/index.html
+msgid "Show all recipes"
+msgstr "Alle Rezepte anzeigen"
+
+#: recipes/templates/recipes/index.html
+msgid "No recipes yet."
+msgstr "Noch keine Rezepte."
+
+#: recipes/templates/recipes/index.html
+msgid "Recipes appear here as soon as they are added."
+msgstr "Rezepte erscheinen hier, sobald sie hinzugefügt sind."
+
+#: recipes/templatetags/recipe_extras.py
+#, python-format
+msgid ""
+"Steps %(first)s and %(last)s don’t depend on each other, so you can do them "
+"side by side."
+msgstr ""
+"Die Schritte %(first)s und %(last)s hängen nicht voneinander ab, du kannst "
+"sie also gleichzeitig erledigen."
+
+#: recipes/templatetags/recipe_extras.py
+#, python-format
+msgid ""
+"Steps %(first)s to %(last)s don’t depend on each other, so you can do them "
+"side by side."
+msgstr ""
+"Die Schritte %(first)s bis %(last)s hängen nicht voneinander ab, du kannst "
+"sie also gleichzeitig erledigen."
+
+#: recipes/templatetags/recipe_extras.py
+#, python-format
+msgid "Uses what you made in step %(number)s."
+msgstr "Verwendet, was du in Schritt %(number)s zubereitet hast."
+
+#: recipes/templatetags/recipe_extras.py
+#, python-format
+msgid "%(list)s and %(last)s"
+msgstr "%(list)s und %(last)s"
+
+#: recipes/templatetags/recipe_extras.py
+#, python-format
+msgid "Uses what you made in steps %(numbers)s."
+msgstr "Verwendet, was du in den Schritten %(numbers)s zubereitet hast."
+
+#: recipes/views.py
+msgid "Show in US cups and ounces"
+msgstr "In US-Cups und Unzen anzeigen"
+
+#: recipes/views.py
+msgid "Show in grams and millilitres"
+msgstr "In Gramm und Millilitern anzeigen"

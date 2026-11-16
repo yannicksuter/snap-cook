@@ -23,7 +23,7 @@ class ApiTokenTests(TestCase):
     def test_plaintext_secret_is_never_stored(self) -> None:
         """A database dump must not yield usable tokens."""
         token, plaintext = ApiToken.issue(self.user, "laptop")
-        secret = plaintext.rsplit("_", 1)[-1]
+        secret = plaintext.split("_", 3)[-1]  # the secret itself may contain "_"
         self.assertNotIn(secret, token.token_hash)
         self.assertNotEqual(token.token_hash, secret)
 

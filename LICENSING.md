@@ -145,5 +145,6 @@ is individually unprotected, and in the EU the **sui generis database right**
 plus contractually enforceable scraping terms of service.
 
 On import, snap-cook keeps ingredients, quantities and functional step text;
-drops headnotes, narrative and images by default; and always records the source
-URL for attribution.
+drops headnotes and narrative; and always records the source URL for
+attribution. A photo of the dish is kept only with its source recorded, and a
+photo someone else took is shown on private recipes only.

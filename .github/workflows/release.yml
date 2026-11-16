@@ -2,9 +2,10 @@ name: Publish release
 
 # A release published by hand, e.g. an older draft, tags that commit's image
 # v<version>, stable and latest, so Unraid's auto-update and Docker Compose
-# deploy it. Nothing is built again. The releases ci.yml publishes on a push
-# to stable tag their image there: a release made with the workflow's token
-# starts no workflow.
+# deploy it, and gets the title format every release has: "v<version> –
+# <title>". Nothing is built again. The releases ci.yml publishes on a push
+# to stable are tagged and titled there: a release made with the workflow's
+# token starts no workflow.
 on:
   release:
     types: [published]
@@ -51,3 +52,27 @@ jobs:
           docker buildx imagetools create --tag "$image:$TAG" --tag "$image:stable" --tag "$image:latest" \
             "$image:sha-$commit"
           echo "Tagged \`$image:sha-$commit\` as \`$TAG\`, \`stable\` and \`latest\`" >> "$GITHUB_STEP_SUMMARY"
+
+  title:
+    # Every release is titled "v<version> – <title>", one published by hand
+    # included. Retitling raises `edited`, not `published`, so this runs once.
+    name: title the release
+    if: startsWith(github.event.release.tag_name, 'v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: ${{ github.event.release.tag_name }}
+      NAME: ${{ github.event.release.name }}
+    steps:
+      - name: Put the version in front of the title
+        run: |
+          title=$(jq -rn --arg t "$NAME" --arg v "${TAG#v}" \
+            '$t | sub("^\\s*v?" + ($v | gsub("\\."; "\\.")) + "(\\s*[-–—:·]\\s*|\\s+|$)"; "")')
+          title="$TAG${title:+ – $title}"
+          if [ "$title" != "$NAME" ]; then
+            gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --title "$title"
+            echo "Retitled the release \`$title\`" >> "$GITHUB_STEP_SUMMARY"
+          fi

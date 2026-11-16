@@ -1,0 +1,56 @@
+{% extends "recipes/base.html" %}
+{% comment %}
+SPDX-License-Identifier: AGPL-3.0-or-later
+
+Language and units, set once per person. The language governs the interface
+and the language recipes open in; a recipe page can still show one recipe in
+another language without changing this.
+{% endcomment %}
+{% load i18n %}
+
+{% block title %}{% translate "Settings" %} · snap-cook{% endblock %}
+
+{% block content %}
+  <div class="px-5 pt-5 pb-10">
+    <h1 class="text-[28px] font-extrabold tracking-tight">{% translate "Settings" %}</h1>
+
+    <form method="post" class="mt-6 flex flex-col gap-8">
+      {% csrf_token %}
+
+      <fieldset>
+        <legend class="text-[20px] font-extrabold">{{ form.language.label }}</legend>
+        <p class="mt-1 text-[16px] text-ink-2">{% translate "For menus and buttons, and the language recipes open in." %}</p>
+        <div class="mt-3 flex flex-col gap-2">
+          {% for choice in form.language %}
+            <label for="{{ choice.id_for_label }}" class="flex items-center gap-3 min-h-14 px-4 rounded-[14px] border-2 border-line-strong cursor-pointer has-[:checked]:border-herb has-[:checked]:bg-herb-tint">
+              {{ choice.tag }}
+              <span lang="{{ choice.data.value }}" class="text-[18px]">{{ choice.choice_label }}</span>
+            </label>
+          {% endfor %}
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend class="text-[20px] font-extrabold">{{ form.unit_system.label }}</legend>
+        <div class="mt-3 flex flex-col gap-2">
+          {% for choice in form.unit_system %}
+            <label for="{{ choice.id_for_label }}" class="flex items-center gap-3 min-h-14 px-4 rounded-[14px] border-2 border-line-strong cursor-pointer has-[:checked]:border-herb has-[:checked]:bg-herb-tint">
+              {{ choice.tag }}
+              <span class="text-[18px]">{{ choice.choice_label }}</span>
+            </label>
+          {% endfor %}
+        </div>
+      </fieldset>
+
+      <button type="submit" class="h-14 rounded-2xl bg-herb text-white text-[19px] font-extrabold hover:bg-herb-dark">{% translate "Save" %}</button>
+    </form>
+
+    <div class="mt-10 pt-6 border-t border-line">
+      <p class="text-[16px] text-ink-2">{% blocktranslate trimmed with email=user.email|default:user.username %}Signed in as {{ email }}{% endblocktranslate %}</p>
+      <form method="post" action="{% url 'account_logout' %}" class="mt-3">
+        {% csrf_token %}
+        <button type="submit" class="h-12 px-5 rounded-[14px] border-2 border-line-strong text-[17px] font-bold hover:border-ink-3">{% translate "Sign out" %}</button>
+      </form>
+    </div>
+  </div>
+{% endblock %}

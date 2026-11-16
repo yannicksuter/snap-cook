@@ -36,8 +36,10 @@ class PatAuth(HttpBearer):
     """
 
     def authenticate(self, request: HttpRequest, token: str) -> object | None:
-        parts = token.split("_")
-        # snck_pat_<prefix>_<secret>
+        # snck_pat_<prefix>_<secret>. At most three splits: the secret comes
+        # from token_urlsafe, whose alphabet includes "_", so about half of all
+        # secrets contain one. The hex prefix never does.
+        parts = token.split("_", 3)
         if len(parts) != 4 or f"{parts[0]}_{parts[1]}" != PAT_PREFIX:
             return None
 

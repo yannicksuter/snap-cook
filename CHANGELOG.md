@@ -19,6 +19,42 @@ change** and says so explicitly here.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-16
+
+### Added — adding a recipe from a photo, a link or text
+
+- "Add a recipe" takes a photo of a cookbook page, photos or a PDF, a link or
+  pasted text. The worker reads it with Claude (`SNAPCOOK_LLM_API_KEY`) and
+  keeps only the recipe; the reader answers open questions, checks the draft
+  and saves it, private. Drafts wait on Home.
+- Links are fetched from the public internet only, never from the server's own
+  network.
+
+### Added — reading pages for the phone, in English and German
+
+- The recipe list and the recipe page are rebuilt for reading on a phone: dark
+  text on white, 18 px and larger type in Atkinson Hyperlegible Next, amounts
+  before ingredient names, and a servings stepper in place of `½× 1× 2× 3×`.
+  Hints say which steps build on earlier ones and which can be done side by
+  side, from the new `RenderedStep.after` and `RenderModel.side_by_side` in
+  core.
+- The recipe list has a search for words in titles and descriptions.
+- The interface speaks English and German. A settings page (`/settings/`)
+  stores language and units once per person; without saved settings the
+  browser's language applies, and recipes open in the same language.
+
+### Changed
+
+- GitHub releases are titled `v<version> – <pull request title>`, also
+  when published by hand.
+
+### Fixed
+
+- Product API tokens whose secret contains `_`, about half of all tokens
+  issued, were rejected: the token was split at every `_`.
+
+## [0.1.0] - 2026-11-16
+
 ### Added — the published image
 
 - CI publishes the image as `ghcr.io/yannicksuter/snap-cook` for Unraid and
@@ -83,4 +119,6 @@ under the existing canonical form, not a new wire contract.
 - Documentation: README, AGENTS, CLAUDE, CONTRIBUTING, LICENSING,
   THIRD_PARTY_DATA, SECURITY, RECIPE_SPEC
 
-[Unreleased]: https://github.com/yannicksuter/snap-cook/commits/main
+[Unreleased]: https://github.com/yannicksuter/snap-cook/compare/v0.2.0...main
+[0.2.0]: https://github.com/yannicksuter/snap-cook/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/yannicksuter/snap-cook/releases/tag/v0.1.0

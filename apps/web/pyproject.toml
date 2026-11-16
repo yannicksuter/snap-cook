@@ -9,7 +9,7 @@
 
 [project]
 name = "snapcook-web"
-version = "0.1.0"
+version = "0.2.0"
 description = "snap-cook Django web application"
 requires-python = ">=3.12"
 license = "AGPL-3.0-or-later"
@@ -23,6 +23,7 @@ dependencies = [
     "gunicorn>=23.0",
     "whitenoise>=6.7",
     "python-dotenv>=1.0",
+    "anthropic>=2.9.0",
 ]
 
 [project.optional-dependencies]

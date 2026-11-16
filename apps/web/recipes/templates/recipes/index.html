@@ -1,44 +1,88 @@
 {% extends "recipes/base.html" %}
 {% comment %}SPDX-License-Identifier: AGPL-3.0-or-later{% endcomment %}
+{% load i18n %}
 
-{% block title %}Recipes &mdash; snap-cook{% endblock %}
+{% block title %}{% translate "Recipes" %} · snap-cook{% endblock %}
 
 {% block content %}
-  <div class="flex items-baseline justify-between mb-8">
-    <h1 class="text-2xl font-semibold text-neutral-100">Recipes</h1>
-    <span class="text-sm text-neutral-500">{{ recipes|length }} visible</span>
+  <form method="get" action="{% url 'recipes:index' %}" role="search" class="px-5 pt-4 flex gap-2">
+    <label for="q" class="sr-only">{% translate "Search recipes" %}</label>
+    <div class="flex-1 min-w-0 flex items-center gap-2.5 h-[52px] px-4 rounded-[14px] border-2 border-line-strong text-ink-2 focus-within:border-herb">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="flex-none"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" name="q" type="search" value="{{ query }}" placeholder="{% translate 'Search recipes' %}"
+             class="flex-1 min-w-0 bg-transparent text-[18px] text-ink outline-none placeholder:text-ink-3">
+    </div>
+    <button type="submit" class="flex-none h-[52px] px-5 rounded-[14px] bg-herb text-white text-[18px] font-bold hover:bg-herb-dark">{% translate "Search" %}</button>
+  </form>
+
+  {% if drafts %}
+    <section class="px-5 pt-5" aria-labelledby="drafts">
+      <h2 id="drafts" class="text-[20px] font-extrabold">{% translate "Waiting for you" %}</h2>
+      <ul class="mt-2 flex flex-col gap-2">
+        {% for draft in drafts %}
+          <li>
+            <a href="{% if draft.status == 'ready' %}{% url 'imports:review' draft.pk %}{% else %}{% url 'imports:status' draft.pk %}{% endif %}"
+               class="flex items-center justify-between gap-3 min-h-14 px-4 py-2 rounded-2xl {% if draft.status == 'failed' %}bg-ember-tint{% else %}bg-herb-tint{% endif %}">
+              <span class="min-w-0 flex flex-col">
+                <span class="text-[18px] font-bold truncate">{{ draft.title|default:_("New recipe") }}</span>
+                <span class="text-[15px] text-ink-2">
+                  {% if draft.status == "ready" %}{% translate "Ready to check" %}{% elif draft.status == "failed" %}{% translate "Could not be read" %}{% else %}{% translate "Reading…" %}{% endif %}
+                </span>
+              </span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="flex-none"><path d="m9 6 6 6-6 6"/></svg>
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+
+  <div class="flex items-baseline justify-between gap-3 px-5 pt-5">
+    <h1 class="text-[26px] font-extrabold tracking-tight">{% translate "Recipes" %}</h1>
+    <span class="text-[16px] text-ink-3">{% blocktranslate trimmed count counter=recipes|length %}
+      {{ counter }} recipe
+    {% plural %}
+      {{ counter }} recipes
+    {% endblocktranslate %}</span>
   </div>
 
   {% if recipes %}
-    <ul class="grid gap-3 sm:grid-cols-2">
+    <ul class="px-5 pt-3 pb-8 grid gap-3 sm:grid-cols-2">
       {% for recipe in recipes %}
         <li>
-          <a href="{% url 'recipes:detail' recipe.slug %}" class="block rounded-lg border border-sc-edge bg-sc-card p-4 hover:border-neutral-600 transition-colors">
-            <div class="flex items-start justify-between gap-3">
-              <h2 class="font-medium text-neutral-100">{{ recipe.title }}</h2>
-              <span class="shrink-0 text-[10px] uppercase tracking-wider text-neutral-500 border border-sc-edge rounded px-1.5 py-0.5">
-                {{ recipe.get_visibility_display }}
-              </span>
-            </div>
-            {% if recipe.description %}
-              <p class="mt-2 text-sm text-neutral-400 line-clamp-2">{{ recipe.description }}</p>
-            {% endif %}
-            <p class="mt-3 text-xs text-neutral-500 font-mono">{{ recipe.lang }} &middot; {{ recipe.updated_at|date:"Y-m-d" }}</p>
+          <a href="{% url 'recipes:detail' recipe.slug %}" class="h-full flex items-center gap-3.5 p-3 rounded-2xl border border-line hover:border-ink-3">
+            <span aria-hidden="true" class="flex-none w-[72px] h-[72px] rounded-xl flex items-center justify-center text-[30px] font-extrabold {% cycle 'bg-ember-tint text-ember' 'bg-herb-tint text-herb' %}">{{ recipe.title|slice:":1"|upper }}</span>
+            <span class="min-w-0 flex flex-col gap-1">
+              <span class="text-[20px] font-bold leading-tight">{{ recipe.title }}</span>
+              {% if recipe.description %}
+                <span class="text-[16px] leading-snug text-ink-2 line-clamp-2">{{ recipe.description }}</span>
+              {% endif %}
+              {% if recipe.visibility == "private" %}
+                <span class="text-[15px] text-ink-3">{% translate "Only you can see this" %}</span>
+              {% elif recipe.visibility == "unlisted" %}
+                <span class="text-[15px] text-ink-3">{% translate "Anyone with the link can see this" %}</span>
+              {% endif %}
+            </span>
           </a>
         </li>
       {% endfor %}
     </ul>
+  {% elif query %}
+    <p class="mx-5 mt-4 mb-10 rounded-2xl bg-surface px-5 py-6 text-[18px]">
+      {% blocktranslate trimmed %}No recipe matches “{{ query }}”.{% endblocktranslate %}
+      <a href="{% url 'recipes:index' %}" class="font-bold text-herb underline">{% translate "Show all recipes" %}</a>
+    </p>
   {% else %}
-    {% comment %}
-      M0 lands here: auth works, the projection is queryable, nothing is stored
-      yet. The recipe store reader arrives with M1.
-    {% endcomment %}
-    <div class="rounded-lg border border-dashed border-sc-edge p-12 text-center">
-      <p class="text-neutral-300 font-medium">No recipes yet.</p>
-      <p class="mt-2 text-sm text-neutral-500 max-w-md mx-auto">
-        Recipes live as files under the store directory, and Postgres only indexes them.
-        Once the version store lands, anything committed there will appear here.
-      </p>
+    <div class="mx-5 mt-4 mb-10 rounded-2xl border-2 border-dashed border-line-strong px-6 py-12 text-center">
+      <p class="text-[20px] font-bold">{% translate "No recipes yet." %}</p>
+      <p class="mt-2 text-[17px] text-ink-2">{% translate "Recipes appear here as soon as they are added." %}</p>
     </div>
   {% endif %}
+
+  <div class="sticky bottom-0 px-5 py-3 border-t border-line bg-white">
+    <a href="{% url 'imports:add' %}" class="flex items-center justify-center gap-2.5 h-14 rounded-2xl bg-herb text-white text-[19px] font-bold hover:bg-herb-dark">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+      {% translate "Add a recipe" %}
+    </a>
+  </div>
 {% endblock %}

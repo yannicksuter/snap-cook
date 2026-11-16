@@ -98,11 +98,15 @@ def build_render_model(recipe: Recipe, options: RenderOptions | None = None) -> 
 
     ordered = topological_actions(recipe)
     state_names = _state_labels(recipe, ordered, opts, registry)
+    # Every action produces exactly one state, so a state names its step.
+    step_of_state = {action.produces.id: index for index, action in enumerate(ordered, start=1)}
 
     steps: list[RenderedStep] = []
     all_ingredient_lines: list[RenderedIngredient] = []
     for index, action in enumerate(ordered, start=1):
-        step = _render_step(action, index, recipe, opts, registry, issues, state_names)
+        step = _render_step(
+            action, index, recipe, opts, registry, issues, state_names, step_of_state
+        )
         steps.append(step)
         all_ingredient_lines.extend(step.ingredients)
     steps_by_action = {step.action_id: step for step in steps}
@@ -122,6 +126,7 @@ def build_render_model(recipe: Recipe, options: RenderOptions | None = None) -> 
         servings=_scaled_servings(recipe.servings, opts.scale),
         ingredients=tuple(all_ingredient_lines),
         steps=tuple(steps),
+        side_by_side=_side_by_side(steps),
         graph=_build_graph(recipe, ordered, steps_by_action, state_names),
         warnings=tuple(issues.issues),
     )
@@ -138,6 +143,7 @@ def _render_step(
     registry: IngredientRegistry,
     issues: IssueCollector,
     state_names: dict[str, str],
+    step_of_state: dict[str, int],
 ) -> RenderedStep:
     rendered_ings = {
         use.id: _render_ingredient(use, recipe, opts, registry, issues)
@@ -172,7 +178,35 @@ def _render_step(
         temperatures=tuple(rendered_temps),
         produces=state_names.get(action.produces.id),
         uses=tuple(state_names.get(sid, sid) for sid in action.uses),
+        after=tuple(sorted({step_of_state[sid] for sid in action.uses if sid in step_of_state})),
     )
+
+
+def _side_by_side(steps: list[RenderedStep]) -> tuple[tuple[int, ...], ...]:
+    """Group consecutive steps that share no dependency path.
+
+    Walks the steps in order, growing a run while the next step depends on
+    none of the run's steps, directly or through intermediate steps. A run of
+    one is no information, so only runs of two or more are returned.
+    """
+    ancestors: dict[int, set[int]] = {}
+    for step in steps:
+        reached = set(step.after)
+        for earlier in step.after:
+            reached |= ancestors[earlier]
+        ancestors[step.index] = reached
+
+    runs: list[tuple[int, ...]] = []
+    run: list[int] = []
+    for step in steps:
+        if run and any(member in ancestors[step.index] for member in run):
+            if len(run) > 1:
+                runs.append(tuple(run))
+            run = []
+        run.append(step.index)
+    if len(run) > 1:
+        runs.append(tuple(run))
+    return tuple(runs)
 
 
 def _render_text(

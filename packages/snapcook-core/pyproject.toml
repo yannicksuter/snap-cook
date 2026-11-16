@@ -11,7 +11,7 @@
 
 [project]
 name = "snapcook-core"
-version = "0.1.0"
+version = "0.2.0"
 description = "Structured recipe model: schema, content-addressed store, units, renderers"
 readme = "README.md"
 requires-python = ">=3.12"

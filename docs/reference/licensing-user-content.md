@@ -41,5 +41,8 @@ norms, not to assert that the underlying recipe is a protected work.
   qualify.
 - **Terms of service.** Contractually enforceable independently of copyright.
 
-Hence: imports land private, attribution is always recorded, headnotes and
-images are dropped, and bulk ingestion is not a supported workflow.
+Hence: imports land private, attribution is always recorded, headnotes are
+dropped, and bulk ingestion is not a supported workflow. Photos, which are
+protected without doubt, are kept only with their source recorded, and a photo
+someone else took is never shown on a public recipe (see Photos in
+[`import-pipeline.md`](../architecture/import-pipeline.md#photos)).

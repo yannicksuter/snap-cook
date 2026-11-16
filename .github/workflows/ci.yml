@@ -269,8 +269,9 @@ jobs:
           fi
 
   release:
-    # Publishes the release right away, named and described like the release
-    # pull request this push merged. A release made with the workflow's token
+    # Publishes the release right away, titled "v<version> – <title of the
+    # release pull request this push merged>" and described by that pull
+    # request's body. A release made with the workflow's token
     # starts no workflow, so this job tags the image itself, not release.yml.
     name: publish release
     if: needs.version.outputs.release == 'true'
@@ -291,15 +292,19 @@ jobs:
           image="ghcr.io/${GITHUB_REPOSITORY,,}"
           gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/pulls" \
             --jq '[.[] | select(.base.ref == "stable" and .merged_at != null)][0] // empty' > pull.json
+          # Every release is titled "v<version> – <pull request title>". A title
+          # that already starts with the version loses it, so it never shows twice.
           if [ -s pull.json ]; then
-            title=$(jq -r .title pull.json)
+            title=$(jq -r --arg v "$VERSION" \
+              '.title | sub("^\\s*v?" + ($v | gsub("\\."; "\\.")) + "(\\s*[-–—:·]\\s*|\\s+|$)"; "")' pull.json)
             jq -r '.body // ""' pull.json | tr -d '\r' > notes.md
           else
             echo "::warning::No merged pull request into stable has $GITHUB_SHA; the release gets generated notes."
-            title="${GITHUB_REPOSITORY#*/} $VERSION"
+            title=""
             gh api "repos/$GITHUB_REPOSITORY/releases/generate-notes" -f tag_name="v$VERSION" \
               -f target_commitish="$GITHUB_SHA" --jq .body > notes.md
           fi
+          title="v$VERSION${title:+ – $title}"
           cat >> notes.md <<EOF
 
           ---

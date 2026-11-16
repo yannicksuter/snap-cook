@@ -50,13 +50,66 @@ That reprioritises it well above where a feature list would put it.
 | Kept | Dropped |
 |---|---|
 | ingredients, quantities, units | headnotes and narrative |
-| functional step text | photographs |
-| times, temperatures, yield | author's stylistic asides |
+| functional step text | author's stylistic asides |
+| times, temperatures, yield | ads, comments, other recipes on the page |
 | source URL for attribution | |
+| a photo of the dish, **with its source** | |
 
 Ingredient lists are uncopyrightable facts; prose and images are not. Parsing
 prose into a graph is a re-expression of fact and procedure rather than a copy —
 a materially stronger position than storing verbatim text.
+
+## Photos
+
+A recipe may carry a photo of the finished dish. Photos are protected works, so
+unlike the recipe itself they are kept only with a record of where they came
+from.
+
+1. **Every photo has a source.** Either it is the household's own (who took
+   it), or it names where it came from: the page URL, or the book's title,
+   author and page.
+2. **No source, no photo.** The review screen asks for the source of a photo
+   someone else took; a photo without one is not saved.
+3. **Someone else's photo stays private.** It shows only on recipes that are
+   private, and the page shows its source under it. Publishing a recipe shows
+   only the household's own photos.
+4. **A crop is a suggestion.** On a cookbook page the extraction proposes the
+   region that shows the dish. Image coordinates from a model are approximate,
+   so the reader confirms the crop or removes the photo.
+
+## How it is built
+
+```
+/add/ ── a job ──► worker: imports.tasks.read_recipe
+                     ├─ page:  imports.fetch (public internet only) → imports.page
+                     │         (JSON-LD recipes + readable text)
+                     ├─ files: the photos or PDF as uploaded
+                     └─ text:  as pasted
+                     ▼
+              provider.extract(source) → RawExtraction
+                     ▼
+              snapcook_core.importing.normalize → Draft (Cooklang text + recipe)
+                     ▼
+/drafts/<id>/check/ ── answer, edit, save → store (private) → catalog
+```
+
+- **The model writes Cooklang.** `RawExtraction.cooklang` is snap-cook's own
+  dialect, the one `cooklang.parse_cook` reads and `print_cook` writes. The
+  parser then builds and validates the graph in code, so the model never has to
+  produce ids or edges. Around the text the extraction carries what a person
+  must see: open questions with one-tap answers, what was left out, the
+  source's name, which cup it means, and where the dish photo is.
+- **The prompt lives in core** (`snapcook_core.importing.prompt`), with corpus
+  recipes as its examples, and a test parses every example. A local model
+  gets the same words.
+- **The draft is text.** Answers, edits and the details form all change the
+  Cooklang text, which is parsed again on every change. Only saving commits.
+- **Fetching is guarded.** Any signed-in reader picks the URL, so the worker
+  connects only to public addresses, checks every redirect, and connects to
+  the address it checked (`imports/fetch.py`).
+- **Failures are words.** Every way an import can end has a code and a sentence
+  on the waiting page; nothing raises out of the task, so django-q never reads
+  a job twice.
 
 ## Testing
 

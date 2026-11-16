@@ -4,9 +4,14 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 Tailwind and HTMX come from a CDN. There is deliberately no npm build step --
 see the Conventions list in AGENTS.md. The cost is a CDN dependency at runtime;
 the benefit is that `docker compose up` is the entire toolchain.
-{% endcomment %}
-<!doctype html>
-<html lang="en" class="h-full">
+
+The look is built for reading at arm's length in a kitchen, often on a phone:
+dark text on white, body text of 18 px and up, touch targets of 44 px and up,
+and Atkinson Hyperlegible Next, a face drawn for low-vision readers. Every
+string a reader sees goes through the translate tags; see
+docs/architecture/units-and-i18n.md.
+{% endcomment %}{% load i18n %}{% get_current_language as LANGUAGE_CODE %}<!doctype html>
+<html lang="{{ LANGUAGE_CODE }}" class="h-full">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -15,19 +20,19 @@ the benefit is that `docker compose up` is the entire toolchain.
   <script src="https://unpkg.com/htmx.org@2.0.4"></script>
   <script>
     tailwind.config = {
-      darkMode: 'class',
       theme: {
         extend: {
           colors: {
-            'sc-bg':     '#0f1115',
-            'sc-card':   '#171a21',
-            'sc-edge':   '#252a34',
-            'sc-accent': '#f0a04b',
-            'sc-leaf':   '#7bc47f',
+            // Text greys all keep 4.5:1 or better on white and on `surface`.
+            ink:     { DEFAULT: '#1C1F1D', 2: '#4B524D', 3: '#5F6762' },
+            line:    { DEFAULT: '#DCE1DD', soft: '#E4E8E5', strong: '#C9D0CB' },
+            surface: '#F3F5F3',
+            herb:    { DEFAULT: '#2F6B3A', dark: '#24552D', tint: '#E7F0E9' },
+            ember:   { DEFAULT: '#9A4A12', edge: '#B5652A', tint: '#FBEEE3' },
           },
           fontFamily: {
-            sans: ['Inter', 'system-ui', 'sans-serif'],
-            mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+            sans: ['"Atkinson Hyperlegible Next"', 'system-ui', '-apple-system', '"Segoe UI"', 'sans-serif'],
+            mono: ['ui-monospace', 'monospace'],
           },
         },
       },
@@ -35,45 +40,46 @@ the benefit is that `docker compose up` is the entire toolchain.
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700;800&display=swap" rel="stylesheet">
 </head>
-<body class="h-full bg-sc-bg text-neutral-200 font-sans antialiased flex flex-col">
+<body class="min-h-full bg-white text-ink font-sans antialiased flex flex-col">
 
-  <header class="border-b border-sc-edge">
-    <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-      <a href="{% url 'recipes:index' %}" class="flex items-center gap-2 group">
-        <span class="text-xl font-semibold tracking-tight text-neutral-100 group-hover:text-sc-accent transition-colors">snap-cook</span>
-        <span class="text-[10px] uppercase tracking-widest text-neutral-500 border border-sc-edge rounded px-1.5 py-0.5">alpha</span>
-      </a>
-      <nav class="flex items-center gap-4 text-sm">
-        {% if user.is_authenticated %}
-          <span class="text-neutral-400">{{ user.email|default:user.username }}</span>
-          <a href="{% url 'account_logout' %}" class="text-neutral-400 hover:text-neutral-100 transition-colors">Sign out</a>
-        {% else %}
-          <a href="{% url 'account_login' %}" class="text-sc-accent hover:underline">Sign in</a>
-        {% endif %}
-      </nav>
+  <header class="border-b border-line">
+    <div class="max-w-3xl mx-auto px-5 py-3 flex items-center justify-between gap-3">
+      <a href="{% url 'recipes:index' %}" class="text-[23px] font-extrabold tracking-tight text-ink hover:text-herb">snap-cook</a>
+      {% if user.is_authenticated %}
+        <a href="{% url 'accounts:settings' %}" aria-label="{% translate 'Your settings: language and units' %}"
+           class="w-12 h-12 rounded-full border border-line-strong bg-surface text-ink flex items-center justify-center hover:border-ink-3">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        </a>
+      {% endif %}
     </div>
   </header>
 
-  <main class="flex-1 max-w-5xl w-full mx-auto px-6 py-10">
+  {% if messages %}
+    <div class="max-w-3xl w-full mx-auto px-5 pt-4" role="status">
+      {% for message in messages %}
+        <p class="rounded-2xl bg-herb-tint px-4 py-3 text-[17px]">{{ message }}</p>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <main class="flex-1 w-full max-w-3xl mx-auto">
     {% block content %}{% endblock %}
   </main>
 
-  <footer class="border-t border-sc-edge">
-    <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between text-xs text-neutral-500">
-      <span>Recipes as structured data &mdash; not documents.</span>
+  <footer class="border-t border-line">
+    <div class="max-w-3xl mx-auto px-5 py-4 text-[15px] text-ink-3">
       {% comment %}
         The build commit, so "which version am I looking at?" is answerable
         from the browser. Matches what /up reports.
       {% endcomment %}
-      <span class="font-mono">
-        {% if deployed_commit_url %}
-          <a href="{{ deployed_commit_url }}" class="hover:text-neutral-300 transition-colors">{{ deployed_commit_short }}</a>
-        {% else %}
-          {{ deployed_commit_short }}
-        {% endif %}
-      </span>
+      snap-cook ·
+      {% if deployed_commit_url %}
+        <a href="{{ deployed_commit_url }}" class="font-mono underline hover:text-ink">{{ deployed_commit_short }}</a>
+      {% else %}
+        <span class="font-mono">{{ deployed_commit_short }}</span>
+      {% endif %}
     </div>
   </footer>
 

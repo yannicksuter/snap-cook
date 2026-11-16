@@ -105,6 +105,7 @@ packages/snapcook-core/src/snapcook_core/
 ├── canonical/hashing.py    # content_hash + version_id. The frozen contract.
 ├── schema/base.py          # SnapcookModel: frozen, extra=forbid, NonSemantic
 ├── ids.py                  # prefixed ULIDs; stable across edits, so diff can match
+├── importing/normalize.py  # a model's reading -> a draft; trusts none of it
 └── errors.py               # error tree + ValidationIssue (non-fatal diagnostics)
 
 apps/web/
@@ -117,7 +118,9 @@ apps/web/
 ├── catalog/management/commands/reindex.py   # proof that Postgres is a cache
 ├── api/auth.py             # PatAuth + require_ops_access
 ├── api/product.py          # /api/v1/  -- per-user scoped
-└── api/ops.py              # /ops/api/ -- ignores ownership. Read the danger note.
+├── api/ops.py              # /ops/api/ -- ignores ownership. Read the danger note.
+├── imports/fetch.py        # fetches only from the public internet; read before touching
+└── imports/tasks.py        # the worker's half of an import: fetch, read, normalise
 ```
 
 ## Commands
@@ -139,6 +142,11 @@ uv run ruff format --check .
 
 # Golden files
 ./scripts/update-golden.sh          # regenerate, then READ the diff
+
+# Interface strings (needs GNU gettext). After changing any text a reader sees:
+# extract, translate the new German entries, compile, and commit .po and .mo.
+cd apps/web && uv run python manage.py makemessages -l de --add-location file --no-obsolete --ignore 'staticfiles/*'
+cd apps/web && uv run python manage.py compilemessages -l de --ignore 'staticfiles/*'
 
 # Local stack
 ./scripts/local_start.sh            # compose up + wait for /up
@@ -181,4 +189,6 @@ Negative space is as informative as what we do use:
   has no identity and therefore cannot scope private content
 - **No inline LLM calls** — always a background job
 - **No `float` anywhere in a schema** — `Decimal`, always
+- **No hard-coded interface text** — every string a reader sees goes through
+  gettext; English is the source, and German must stay complete (a test checks)
 - **All times stored as UTC**

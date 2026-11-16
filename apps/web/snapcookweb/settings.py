@@ -41,9 +41,11 @@ Ops API -- see the warning below
     SNAPCOOK_OPS_API_WRITE      "1" allows the mutating ops endpoints
 
 LLM import
-    SNAPCOOK_LLM_PROVIDER   anthropic | openai | local
-    SNAPCOOK_LLM_API_KEY
-    SNAPCOOK_LLM_BASE_URL   For a self-hosted inference service
+    SNAPCOOK_LLM_PROVIDER   anthropic (default) | fake (development only)
+    SNAPCOOK_LLM_API_KEY    Needed on the worker, which does the reading
+    SNAPCOOK_LLM_MODEL      Default claude-opus-5-5
+    SNAPCOOK_LLM_EFFORT     low | medium (default) | high
+    SNAPCOOK_LLM_BASE_URL   Only to route the provider through a proxy
 
 Seed data
     SNAPCOOK_ALLOW_SHARE_ALIKE_DATA
@@ -132,9 +134,14 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    # Picks the interface language from the browser's Accept-Language. Before
+    # CommonMiddleware, after sessions, as Django requires.
+    "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    # A signed-in reader's saved language outranks the browser's. Needs the user.
+    "accounts.middleware.UserLanguageMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
@@ -281,8 +288,13 @@ Q_CLUSTER = {
 
 # ---------------------------------------------------------------- LLM
 
+# Reading a recipe from a page, photos or text runs on the worker, never in a
+# request (imports/tasks.py). Without a provider and key, the web app still
+# runs; adding a recipe says it is not set up.
 SNAPCOOK_LLM_PROVIDER = os.environ.get("SNAPCOOK_LLM_PROVIDER", "anthropic")
 SNAPCOOK_LLM_API_KEY = os.environ.get("SNAPCOOK_LLM_API_KEY", "")
+SNAPCOOK_LLM_MODEL = os.environ.get("SNAPCOOK_LLM_MODEL", "claude-opus-5-5")
+SNAPCOOK_LLM_EFFORT = os.environ.get("SNAPCOOK_LLM_EFFORT", "medium")
 SNAPCOOK_LLM_BASE_URL = os.environ.get("SNAPCOOK_LLM_BASE_URL", "")
 
 # ---------------------------------------------------------------- seed data
@@ -300,7 +312,15 @@ STORAGES = {
 
 # ---------------------------------------------------------------- i18n
 
-LANGUAGE_CODE = "en-us"
+# The interface languages. English is the source language of every string;
+# each other entry needs a complete catalogue under locale/ (a test checks it).
+# Names are in their own language, because that is how a reader finds theirs.
+LANGUAGE_CODE = "en"
+LANGUAGES = [
+    ("en", "English"),
+    ("de", "Deutsch"),
+]
+LOCALE_PATHS = [BASE_DIR / "locale"]
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True

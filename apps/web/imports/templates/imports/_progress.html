@@ -1,0 +1,49 @@
+{% comment %}
+SPDX-License-Identifier: AGPL-3.0-or-later
+
+The part of the waiting page that HTMX polls. While the job is pending it asks
+again every two seconds; when the draft is ready the view answers with an
+HX-Redirect to the check page instead, and when it failed the polling stops.
+{% endcomment %}{% load i18n %}
+<div id="progress"{% if job.is_pending %} hx-get="{% url 'imports:status' job.pk %}" hx-trigger="every 2s" hx-swap="outerHTML"{% endif %}>
+  {% if job.is_pending %}
+    <h1 class="text-[28px] font-extrabold tracking-tight">{% translate "Reading your recipe…" %}</h1>
+    <ol class="mt-5 flex flex-col gap-[18px] text-[18px]">
+      <li class="flex items-center gap-3.5">
+        <span aria-hidden="true" class="flex-none w-8 h-8 rounded-full bg-herb text-white flex items-center justify-center">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>
+        </span>
+        {% if job.kind == "files" %}{% translate "Photos received" %}{% elif job.kind == "page" %}{% translate "Link received" %}{% else %}{% translate "Text received" %}{% endif %}
+      </li>
+      <li class="flex items-center gap-3.5 font-extrabold">
+        <span aria-hidden="true" class="flex-none w-8 h-8 flex items-center justify-center text-ember">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke-linecap="round" class="animate-spin"><circle cx="12" cy="12" r="9" stroke="#F3D9C4" stroke-width="3"/><path d="M12 3a9 9 0 0 1 9 9" stroke="currentColor" stroke-width="3"/></svg>
+        </span>
+        {% translate "Finding the ingredients and steps" %}
+      </li>
+      <li class="flex items-center gap-3.5 text-ink-3">
+        <span aria-hidden="true" class="flex-none w-8 h-8 rounded-full border-[3px] border-line-strong"></span>
+        {% translate "Ready for you to check" %}
+      </li>
+    </ol>
+    <p class="mt-7 text-[17px] leading-relaxed text-ink-2">{% translate "This usually takes under a minute. You can leave this page: the draft waits for you on Home." %}</p>
+  {% else %}
+    <h1 class="text-[28px] font-extrabold tracking-tight">{% translate "That did not work" %}</h1>
+    <p class="mt-4 rounded-2xl border-2 border-ember-edge bg-ember-tint px-4 py-3 text-[17px] leading-relaxed" role="alert">{{ problem }}</p>
+    <div class="mt-6 flex flex-col gap-3">
+      {% if job.cooklang %}
+        <a href="{% url 'imports:review' job.pk %}" class="flex items-center justify-center h-14 rounded-2xl bg-herb text-white text-[19px] font-extrabold hover:bg-herb-dark">{% translate "Look at what was read" %}</a>
+      {% endif %}
+      {% if job.problem != "not_allowed" and job.problem != "not_a_recipe" %}
+        <form method="post" action="{% url 'imports:retry' job.pk %}">
+          {% csrf_token %}
+          <button type="submit" class="w-full h-14 rounded-2xl border-2 border-herb text-herb text-[19px] font-extrabold hover:bg-herb-tint">{% translate "Try again" %}</button>
+        </form>
+      {% endif %}
+      <form method="post" action="{% url 'imports:delete' job.pk %}">
+        {% csrf_token %}
+        <button type="submit" class="w-full h-12 text-[17px] font-bold text-ink-2 hover:text-ink">{% translate "Delete" %}</button>
+      </form>
+    </div>
+  {% endif %}
+</div>
