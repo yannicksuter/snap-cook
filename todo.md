@@ -82,5 +82,11 @@ These are cosmetic or scoped-down, not bugs. Each has a pointer.
       keyed on the stable element ids that `ids.py` exists to provide.
 - [ ] **Fork** with the licence lattice (`LICENSING.md`); forks start private.
 - [ ] **Ops API** (`/ops/api/`) read-only endpoints first — jobs, consistency.
-      The store reader and `history()` it needs already exist.
+      The store reader and `history()` it needs already exist. Give the
+      consistency check a `check_consistency` command too; the reindex and
+      restore runbooks point at it as planned.
+- [ ] **`verify_store`**: re-hash every version in a store (content hash and
+      version id) and report mismatches and missing parents, so a backup can be
+      verified without restoring it. `history()` skips missing records silently,
+      so this must walk the parents itself.
 - [ ] Version-history UI over `catalog.RecipeVersion`.

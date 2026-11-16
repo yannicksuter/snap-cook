@@ -24,6 +24,18 @@ docker compose up -d db
 uv run python apps/web/manage.py migrate
 ```
 
+To run the whole stack as it deploys (Postgres, `web` and `worker`, built from
+your checkout), fill in `POSTGRES_PASSWORD` and the Google keys in `.env`, then:
+
+```bash
+./scripts/local_start.sh      # build, start, and wait for /up
+./scripts/local_stop.sh
+```
+
+Then open <http://localhost:8931>; `curl -s http://localhost:8931/up` answers
+`{"status": "ok", "commit": "…"}`. Signing in needs a Google OAuth client with
+the local redirect URI ([docs/install.md](docs/install.md#google-sign-in)).
+
 ## Test tiers
 
 The suite is tiered so the inner loop stays fast. `packages/snapcook-core` has

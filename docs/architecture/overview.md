@@ -1,5 +1,32 @@
 # Architecture overview
 
+## The ideas
+
+**Recipes are files, not database rows.** The authoritative store is a
+content-addressed directory tree. Postgres is a *derived index* — delete it and
+`reindex --full` rebuilds it. You can host the store on GitHub, read it with any
+client, or walk away with it entirely.
+
+**Steps form a graph, not a list.** Nodes are food-states — "the dough", "the
+roux" — and edges are actions carrying a verb, duration, temperature and tools.
+An ordered step list is a topological sort of that graph. A flowchart is a
+drawing of it. Both come from one model rather than two implementations that
+drift apart.
+
+**Units and language are render options.** The same stored recipe reads in
+French with metric units for one person and English with US customary for
+another. Volume↔mass conversion is per-ingredient, because 250 g of flour is not
+250 ml of flour.
+
+**Recipes have lineage.** Fork one, change it, and the ancestry is preserved.
+The diff is structural — "replaced cream with coconut milk", not a wall of
+changed lines.
+
+**Identity is meaning, not bytes.** Reformat a recipe file and its hash does not
+change; only the content matters.
+
+## The shape
+
 ```
                     ┌──────────────────────────────────────┐
                     │  packages/snapcook-core (Apache-2.0) │

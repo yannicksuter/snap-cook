@@ -14,7 +14,10 @@ docker compose up -d web worker      # restart picks up the new value
 
 No user-visible impact — nothing else authenticates with it.
 
-Then check `/data/logs/ops-access.log` for requests you did not make.
+Then check the `ops-access` lines in the web container's log for requests you
+did not make: `docker compose logs web | grep ops-access` (on Unraid,
+`docker logs snap-cook-web 2>&1 | grep ops-access`). Docker drops that log when
+the container is recreated, so look before updating it.
 
 ## API token pepper
 
@@ -46,7 +49,7 @@ docker compose up -d
 ## After any suspected leak
 
 1. Rotate the affected secret first, investigate second
-2. Check `/data/logs/ops-access.log`
+2. Check the `ops-access` lines in the web container's log (see above)
 3. If it was committed, rotation is not enough — the value is in the history and
    in every clone. Rotate, then scrub.
 4. Report per `SECURITY.md`

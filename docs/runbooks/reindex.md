@@ -6,7 +6,7 @@ Postgres is a derived index. This rebuilds it from the authoritative store.
 
 - After restoring `/data` from backup
 - After editing the store outside the app (a pull, a hand edit)
-- When `/ops/api/consistency` reports drift
+- When a recipe page disagrees with the store
 - After a `FORMAT_VERSION` migration
 
 ## Safe by construction
@@ -21,6 +21,8 @@ in production.
 docker compose exec web python manage.py reindex --full --yes
 ```
 
+On Unraid: `docker exec snap-cook-web python manage.py reindex --full --yes`.
+
 ## Single recipe
 
 ```bash
@@ -29,12 +31,19 @@ docker compose exec web python manage.py reindex --recipe rcp_01J8ZQ...
 
 ## Verify
 
-```bash
-docker compose exec web python manage.py check_consistency --deep
+`reindex` reports what it rebuilt and what the projection held before:
+
+```
+reindexed 6 recipe(s) from /data/store (projection held 6)
 ```
 
-Should report zero drift. `--deep` re-hashes every object, so it is slow but
-authoritative.
+The two counts should match unless recipes were added to or removed from the
+store outside the app. A recipe whose author matches no account in this
+database, by username or email, is left out with a warning, `skipped N
+recipe(s) with no matching local owner`; once that account exists, run
+`reindex` again. A drift check that compares
+the projection with the store without rebuilding it (`/ops/api/consistency`) is
+planned for M2.
 
 ## If it fails
 
