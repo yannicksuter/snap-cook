@@ -3,9 +3,12 @@
 # Three services. Postgres is a derived projection -- losing pgdata costs social
 # data only, and `manage.py reindex --full` rebuilds the rest from ./data/store.
 #
-# Build with the commit stamped in so /up can report it:
+# Run the published image (docs/install.md):
+#   docker compose pull && docker compose up -d --no-build --wait
+# or build it here with the commit stamped in so /up can report it:
 #   GIT_COMMIT=$(git rev-parse HEAD) docker compose up -d --build
-# or just run ./scripts/build.sh, which does that for you.
+# which ./scripts/build.sh and ./scripts/local_start.sh do for you. A local
+# build takes the name SNAPCOOK_IMAGE, so the worker runs the same image.
 
 services:
   db:
@@ -30,7 +33,7 @@ services:
       context: .
       args:
         GIT_COMMIT: ${GIT_COMMIT:-unknown}
-    image: snap-cook:0.1.0
+    image: ${SNAPCOOK_IMAGE:-ghcr.io/yannicksuter/snap-cook:stable}
     container_name: snap-cook-web
     restart: unless-stopped
     command: ["web"]
@@ -48,16 +51,11 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD", "python", "-c",
-             "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8931/up')"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 20s
+    # Health comes from the image's HEALTHCHECK (Dockerfile): /up, as Unraid
+    # sees it too.
 
   worker:
-    image: snap-cook:0.1.0
+    image: ${SNAPCOOK_IMAGE:-ghcr.io/yannicksuter/snap-cook:stable}
     container_name: snap-cook-worker
     restart: unless-stopped
     command: ["worker"]

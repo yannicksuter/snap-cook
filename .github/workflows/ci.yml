@@ -1,17 +1,33 @@
 name: CI
 
+# Every push and pull request runs the checks, then builds the image and runs
+# it the way Unraid does (scripts/test-container.py). Only releases publish it,
+# to ghcr.io/yannicksuter/snap-cook (docs/runbooks/release.md):
+#
+# - A pull request into stable (a release) publishes its test image
+#   test-pr<N>, which test-images.yml removes when the pull request closes, and
+#   moves the tag `test` to it for test servers that follow every release.
+# - A push to stable (the merged release) publishes the image sha-<commit>
+#   once, tags it v<version>, stable and latest, and publishes the GitHub
+#   release of its version with the title and description of the release pull
+#   request.
 on:
   push:
-    branches: [main]
+    branches: [main, stable]
   pull_request:
+  workflow_dispatch:
 
-# A new push supersedes an in-flight run on the same ref.
+# A new push supersedes an in-flight run on the same ref -- except on stable,
+# where the run it would cancel may be a release half-way through tagging.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref != 'refs/heads/stable' }}
 
 env:
   UV_VERSION: "0.11.29"
+  # A pull request's image is built from its head, the commit that is
+  # released, not from GitHub's merge commit.
+  REVISION: ${{ github.event.pull_request.head.sha || github.sha }}
 
 jobs:
   # Fails in ~10 seconds, so a formatting slip never burns a Postgres job.
@@ -139,3 +155,180 @@ jobs:
           uv sync --frozen
           uv run --with pip-audit pip-audit --strict || \
             echo "::warning::pip-audit reported findings; review them"
+
+  # The image Unraid pulls. It waits for every check because on a release it
+  # publishes the very image it verified, not a second build.
+  image:
+    needs: [lint, core, contract, web, security]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.REVISION }}
+
+      - name: Choose the image tags
+        id: image
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE: ${{ github.base_ref }}
+          SAME_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          image="ghcr.io/${GITHUB_REPOSITORY,,}"
+          tags=""
+          if [ "$EVENT" = pull_request ] && [ "$BASE" = stable ] && [ "$SAME_REPOSITORY" = true ]; then
+            # A release pull request: its newest test image, one per commit, and
+            # test, the newest of all release pull requests.
+            tags="$image:test $image:test-pr$PR_NUMBER $image:test-pr$PR_NUMBER-${REVISION:0:12}"
+          elif [ "$EVENT" = push ] && [ "$GITHUB_REF" = refs/heads/stable ]; then
+            # The merged release; the release job tags it.
+            tags="$image:sha-$REVISION"
+          fi
+          version=$(sed -n 's/^version = "\(.*\)"$/\1/p' apps/web/pyproject.toml | head -n 1)
+          test -n "$version"
+          echo "tags=$tags" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@v4
+
+      - name: Build image for verification
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          # Unraid servers are x86-64.
+          platforms: linux/amd64
+          load: true
+          tags: snap-cook:test
+          build-args: GIT_COMMIT=${{ env.REVISION }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ env.REVISION }}
+            org.opencontainers.image.version=${{ steps.image.outputs.version }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Run the image as Unraid does, without internet
+        run: python3 scripts/test-container.py snap-cook:test "$REVISION"
+
+      - name: Log in to GitHub Container Registry
+        if: steps.image.outputs.tags != ''
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish the verified image
+        if: steps.image.outputs.tags != ''
+        env:
+          TAGS: ${{ steps.image.outputs.tags }}
+        run: |
+          for tag in $TAGS; do
+            docker tag snap-cook:test "$tag"
+            docker push "$tag"
+            echo "Published \`$tag\`" >> "$GITHUB_STEP_SUMMARY"
+          done
+
+  version:
+    # The version a stable build releases, unless it has a tag v<version> or a
+    # (draft) release already.
+    name: find version
+    if: github.event_name == 'push' && github.ref == 'refs/heads/stable'
+    needs: image
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      # Draft releases are only listed to writers.
+      contents: write
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      release: ${{ steps.version.outputs.release }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Find the version to release
+        id: version
+        run: |
+          version=$(sed -n 's/^version = "\(.*\)"$/\1/p' apps/web/pyproject.toml | head -n 1)
+          test -n "$version"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if git ls-remote --exit-code --tags "https://github.com/$GITHUB_REPOSITORY.git" "refs/tags/v$version" >/dev/null ||
+             gh release list --repo "$GITHUB_REPOSITORY" --limit 100 --json tagName --jq '.[].tagName' | grep -qx "v$version"; then
+            echo "::notice::Version $version is already released or drafted; raise it in apps/web/pyproject.toml for a new release."
+            echo "release=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "release=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  release:
+    # Publishes the release right away, named and described like the release
+    # pull request this push merged. A release made with the workflow's token
+    # starts no workflow, so this job tags the image itself, not release.yml.
+    name: publish release
+    if: needs.version.outputs.release == 'true'
+    needs: version
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      packages: write
+      pull-requests: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      VERSION: ${{ needs.version.outputs.version }}
+    steps:
+      - name: Take the title and notes from the release pull request
+        id: notes
+        run: |
+          image="ghcr.io/${GITHUB_REPOSITORY,,}"
+          gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/pulls" \
+            --jq '[.[] | select(.base.ref == "stable" and .merged_at != null)][0] // empty' > pull.json
+          if [ -s pull.json ]; then
+            title=$(jq -r .title pull.json)
+            jq -r '.body // ""' pull.json | tr -d '\r' > notes.md
+          else
+            echo "::warning::No merged pull request into stable has $GITHUB_SHA; the release gets generated notes."
+            title="${GITHUB_REPOSITORY#*/} $VERSION"
+            gh api "repos/$GITHUB_REPOSITORY/releases/generate-notes" -f tag_name="v$VERSION" \
+              -f target_commitish="$GITHUB_SHA" --jq .body > notes.md
+          fi
+          cat >> notes.md <<EOF
+
+          ---
+
+          Image: \`$image:v$VERSION\`, also \`stable\` and \`latest\` while this is the newest release. Unraid's auto-update follows \`stable\` (docs/install.md).
+          EOF
+          echo "title=$title" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Before the release, so the image its notes name is there when it
+      # appears; a rerun after a failed release tags the same image again.
+      - name: Tag the release image
+        run: |
+          image="ghcr.io/${GITHUB_REPOSITORY,,}"
+          docker buildx imagetools create --tag "$image:v$VERSION" --tag "$image:stable" --tag "$image:latest" \
+            "$image:sha-$GITHUB_SHA"
+          echo "Tagged \`$image:sha-$GITHUB_SHA\` as \`v$VERSION\`, \`stable\` and \`latest\`" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publish the release
+        env:
+          TITLE: ${{ steps.notes.outputs.title }}
+        run: |
+          gh release create "v$VERSION" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "$TITLE" --notes-file notes.md

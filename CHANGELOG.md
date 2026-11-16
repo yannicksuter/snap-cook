@@ -19,6 +19,25 @@ change** and says so explicitly here.
 
 ## [Unreleased]
 
+### Added — the published image
+
+- CI publishes the image as `ghcr.io/yannicksuter/snap-cook` for Unraid and
+  Docker Compose: release pull requests into `stable` publish test images, and
+  merging tags `v<version>`, `stable` and `latest` and publishes the GitHub
+  release (`docs/runbooks/release.md`). `docs/install.md` covers installing.
+- `scripts/test-container.py`, run by the new `image` check: Postgres, `web`
+  and `worker` on a network with no route out, covering migrations, `/up`,
+  static files, the worker cluster, the shared store and clean shutdown.
+- The image has a `HEALTHCHECK`, runs `docker exec … python manage.py` from the
+  app directory, runs a command given in place of a role (`docker compose run
+  --rm web python manage.py migrate`), and defaults to `DJANGO_DEBUG=0`.
+
+### Fixed
+
+- The image no longer needs the internet to start. `uv run` re-synced the
+  environment on every start and fetched hatchling from PyPI; the image now
+  runs its virtualenv directly, and no longer ships the dev dependencies.
+
 ### Added — Milestone 1, the vertical slice
 
 The thesis test: one recipe, rendered three ways, in two languages and two unit

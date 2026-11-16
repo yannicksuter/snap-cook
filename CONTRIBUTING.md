@@ -112,7 +112,12 @@ In the PR body, state:
 - whether `RECIPE_SPEC.md` needed updating — schema changes must update it in
   the same change set, since it is the contract clients read
 
-Required CI checks: `lint`, `core`, `contract`, `web`, `security`.
+Open pull requests against `main`; `stable` only takes release pull requests
+([`docs/runbooks/release.md`](docs/runbooks/release.md)).
+
+Required CI checks: `lint`, `core`, `contract`, `web`, `security`, `image`.
+`image` builds the Docker image and runs it with no route to the internet
+(`scripts/test-container.py`); see the release runbook for running it locally.
 
 ## Proposing a schema change
 

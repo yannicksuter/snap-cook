@@ -4,4 +4,4 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 GIT_COMMIT="$(git rev-parse HEAD)" docker compose build "$@"
-echo "built snap-cook:0.1.0 @ $(git rev-parse --short HEAD)"
+echo "built ${SNAPCOOK_IMAGE:-ghcr.io/yannicksuter/snap-cook:stable} @ $(git rev-parse --short HEAD)"

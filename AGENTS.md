@@ -82,6 +82,11 @@ sort of that graph; a flowchart is a drawing of it. One model, many views.
 > Never build a queryset from `Recipe.objects` in a view or endpoint. One funnel
 > means visibility is enforced in one reviewable place.
 
+> **The image never runs `uv run`.** It re-syncs the environment on every start
+> and fetches build dependencies from PyPI, so a container without internet
+> access never starts. The Dockerfile puts the virtualenv on `PATH` instead;
+> `scripts/test-container.py` runs the image on a network with no route out.
+
 > **Recipe import never runs in the request cycle.** It is always a background
 > job returning `202` and a job id. LLM extraction takes tens of seconds.
 
@@ -138,6 +143,10 @@ uv run ruff format --check .
 # Local stack
 ./scripts/local_start.sh            # compose up + wait for /up
 ./scripts/local_stop.sh
+
+# Image: what CI's `image` job runs before publishing (docs/runbooks/release.md)
+docker build -t snap-cook:test --build-arg GIT_COMMIT="$(git rev-parse HEAD)" .
+python3 scripts/test-container.py snap-cook:test "$(git rev-parse HEAD)"
 
 # Operations
 uv run python apps/web/manage.py reindex --full --yes
