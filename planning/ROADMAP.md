@@ -70,6 +70,13 @@ capture, the `pytest-socket` ban, and the eval harness. Pasted text may be a
 full, noisy webpage selection; extraction must isolate the recipe rather than
 requiring the user to clean it first.
 
+The phone is the main way in: take a photo of a cookbook page, choose photos or
+screenshots, paste a link, or paste text, then check the draft before saving.
+A photo of the dish is kept with its source (see Photos in
+`docs/architecture/import-pipeline.md`). The first provider is the hosted
+Anthropic API (`SNAPCOOK_LLM_PROVIDER=anthropic`), with the key set on the
+worker only, since only the worker calls it.
+
 Worth stating plainly: **structure is a tax on the author, and nobody will hand-
 author a graph.** The importer is not a convenience feature — it is the primary
 data-entry path, and the editor for correcting an extracted draft is the real

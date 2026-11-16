@@ -50,13 +50,32 @@ That reprioritises it well above where a feature list would put it.
 | Kept | Dropped |
 |---|---|
 | ingredients, quantities, units | headnotes and narrative |
-| functional step text | photographs |
-| times, temperatures, yield | author's stylistic asides |
+| functional step text | author's stylistic asides |
+| times, temperatures, yield | ads, comments, other recipes on the page |
 | source URL for attribution | |
+| a photo of the dish, **with its source** | |
 
 Ingredient lists are uncopyrightable facts; prose and images are not. Parsing
 prose into a graph is a re-expression of fact and procedure rather than a copy —
 a materially stronger position than storing verbatim text.
+
+## Photos
+
+A recipe may carry a photo of the finished dish. Photos are protected works, so
+unlike the recipe itself they are kept only with a record of where they came
+from.
+
+1. **Every photo has a source.** Either it is the household's own (who took
+   it), or it names where it came from: the page URL, or the book's title,
+   author and page.
+2. **No source, no photo.** The review screen asks for the source of a photo
+   someone else took; a photo without one is not saved.
+3. **Someone else's photo stays private.** It shows only on recipes that are
+   private, and the page shows its source under it. Publishing a recipe shows
+   only the household's own photos.
+4. **A crop is a suggestion.** On a cookbook page the extraction proposes the
+   region that shows the dish. Image coordinates from a model are approximate,
+   so the reader confirms the crop or removes the photo.
 
 ## Testing
 

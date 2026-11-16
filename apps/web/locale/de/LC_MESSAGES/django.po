@@ -1,0 +1,216 @@
+# German interface strings for snap-cook.
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: snap-cook\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-16 20:24+0000\n"
+"PO-Revision-Date: 2026-11-16 21:30+0100\n"
+"Last-Translator: snap-cook\n"
+"Language-Team: German\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: accounts/forms.py
+msgid "Language"
+msgstr "Sprache"
+
+#: accounts/forms.py
+msgid "Metric: grams and millilitres"
+msgstr "Metrisch: Gramm und Milliliter"
+
+#: accounts/forms.py
+msgid "US: cups and ounces"
+msgstr "US: Cups und Unzen"
+
+#: accounts/forms.py
+msgid "Units"
+msgstr "Einheiten"
+
+#: accounts/templates/accounts/settings.html
+msgid "Settings"
+msgstr "Einstellungen"
+
+#: accounts/templates/accounts/settings.html
+msgid "For menus and buttons, and the language recipes open in."
+msgstr "Für Menüs und Schaltflächen. Rezepte öffnen sich ebenfalls in dieser Sprache."
+
+#: accounts/templates/accounts/settings.html
+msgid "Save"
+msgstr "Speichern"
+
+#: accounts/templates/accounts/settings.html
+#, python-format
+msgid "Signed in as %(email)s"
+msgstr "Angemeldet als %(email)s"
+
+#: accounts/templates/accounts/settings.html
+msgid "Sign out"
+msgstr "Abmelden"
+
+#: accounts/views.py
+msgid "Saved."
+msgstr "Gespeichert."
+
+#: recipes/templates/recipes/_render.html
+msgid "Something in this recipe needs checking:"
+msgstr "Bei diesem Rezept muss etwas geprüft werden:"
+
+#: recipes/templates/recipes/_render.html
+msgid "Servings"
+msgstr "Portionen"
+
+#: recipes/templates/recipes/_render.html
+msgid "Amount"
+msgstr "Menge"
+
+#: recipes/templates/recipes/_render.html
+msgid "Fewer servings"
+msgstr "Weniger Portionen"
+
+#: recipes/templates/recipes/_render.html
+msgid "Less"
+msgstr "Weniger"
+
+#: recipes/templates/recipes/_render.html
+msgid "More servings"
+msgstr "Mehr Portionen"
+
+#: recipes/templates/recipes/_render.html
+msgid "More"
+msgstr "Mehr"
+
+#: recipes/templates/recipes/_render.html
+msgid "Ingredients"
+msgstr "Zutaten"
+
+#: recipes/templates/recipes/_render.html
+#, python-format
+msgid "for %(counter)s serving"
+msgid_plural "for %(counter)s servings"
+msgstr[0] "für %(counter)s Portion"
+msgstr[1] "für %(counter)s Portionen"
+
+#: recipes/templates/recipes/_render.html
+msgid "optional"
+msgstr "optional"
+
+#: recipes/templates/recipes/_render.html
+msgid "Not recognised: please check this ingredient"
+msgstr "Nicht erkannt: Bitte diese Zutat prüfen"
+
+#: recipes/templates/recipes/_render.html
+msgid "Steps"
+msgstr "Schritte"
+
+#: recipes/templates/recipes/_render.html
+msgid "Save time:"
+msgstr "Zeit sparen:"
+
+#: recipes/templates/recipes/_render.html
+#, python-format
+msgid "Step %(number)s:"
+msgstr "Schritt %(number)s:"
+
+#: recipes/templates/recipes/_render.html
+msgid "Show as a flowchart"
+msgstr "Als Ablaufdiagramm anzeigen"
+
+#: recipes/templates/recipes/_render.html
+msgid ""
+"The same recipe as a diagram: rounded shapes are ingredients, boxes are what "
+"you have made so far, and the arrows are the steps."
+msgstr "Dasselbe Rezept als Diagramm: Abgerundete Formen sind Zutaten, Kästen sind, was du bisher zubereitet hast, und die Pfeile sind die Schritte."
+
+#: recipes/templates/recipes/_render.html
+msgid "Show as plain text"
+msgstr "Als reinen Text anzeigen"
+
+#: recipes/templates/recipes/base.html
+msgid "Your settings: language and units"
+msgstr "Deine Einstellungen: Sprache und Einheiten"
+
+#: recipes/templates/recipes/detail.html recipes/templates/recipes/index.html
+msgid "Recipes"
+msgstr "Rezepte"
+
+#: recipes/templates/recipes/index.html
+msgid "Search recipes"
+msgstr "Rezepte suchen"
+
+#: recipes/templates/recipes/index.html
+msgid "Search"
+msgstr "Suchen"
+
+#: recipes/templates/recipes/index.html
+#, python-format
+msgid "%(counter)s recipe"
+msgid_plural "%(counter)s recipes"
+msgstr[0] "%(counter)s Rezept"
+msgstr[1] "%(counter)s Rezepte"
+
+#: recipes/templates/recipes/index.html
+msgid "Only you can see this"
+msgstr "Nur du kannst das sehen"
+
+#: recipes/templates/recipes/index.html
+msgid "Anyone with the link can see this"
+msgstr "Alle mit dem Link können das sehen"
+
+#: recipes/templates/recipes/index.html
+#, python-format
+msgid "No recipe matches “%(query)s”."
+msgstr "Kein Rezept passt zu „%(query)s“."
+
+#: recipes/templates/recipes/index.html
+msgid "Show all recipes"
+msgstr "Alle Rezepte anzeigen"
+
+#: recipes/templates/recipes/index.html
+msgid "No recipes yet."
+msgstr "Noch keine Rezepte."
+
+#: recipes/templates/recipes/index.html
+msgid "Recipes appear here as soon as they are added."
+msgstr "Rezepte erscheinen hier, sobald sie hinzugefügt sind."
+
+#: recipes/templatetags/recipe_extras.py
+#, python-format
+msgid ""
+"Steps %(first)s and %(last)s don’t depend on each other, so you can do them "
+"side by side."
+msgstr "Die Schritte %(first)s und %(last)s hängen nicht voneinander ab, du kannst sie also gleichzeitig erledigen."
+
+#: recipes/templatetags/recipe_extras.py
+#, python-format
+msgid ""
+"Steps %(first)s to %(last)s don’t depend on each other, so you can do them "
+"side by side."
+msgstr "Die Schritte %(first)s bis %(last)s hängen nicht voneinander ab, du kannst sie also gleichzeitig erledigen."
+
+#: recipes/templatetags/recipe_extras.py
+#, python-format
+msgid "Uses what you made in step %(number)s."
+msgstr "Verwendet, was du in Schritt %(number)s zubereitet hast."
+
+#: recipes/templatetags/recipe_extras.py
+#, python-format
+msgid "%(list)s and %(last)s"
+msgstr "%(list)s und %(last)s"
+
+#: recipes/templatetags/recipe_extras.py
+#, python-format
+msgid "Uses what you made in steps %(numbers)s."
+msgstr "Verwendet, was du in den Schritten %(numbers)s zubereitet hast."
+
+#: recipes/views.py
+msgid "Show in US cups and ounces"
+msgstr "In US-Cups und Unzen anzeigen"
+
+#: recipes/views.py
+msgid "Show in grams and millilitres"
+msgstr "In Gramm und Millilitern anzeigen"

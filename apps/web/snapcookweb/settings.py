@@ -132,9 +132,14 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    # Picks the interface language from the browser's Accept-Language. Before
+    # CommonMiddleware, after sessions, as Django requires.
+    "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    # A signed-in reader's saved language outranks the browser's. Needs the user.
+    "accounts.middleware.UserLanguageMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
@@ -300,7 +305,15 @@ STORAGES = {
 
 # ---------------------------------------------------------------- i18n
 
-LANGUAGE_CODE = "en-us"
+# The interface languages. English is the source language of every string;
+# each other entry needs a complete catalogue under locale/ (a test checks it).
+# Names are in their own language, because that is how a reader finds theirs.
+LANGUAGE_CODE = "en"
+LANGUAGES = [
+    ("en", "English"),
+    ("de", "Deutsch"),
+]
+LOCALE_PATHS = [BASE_DIR / "locale"]
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True

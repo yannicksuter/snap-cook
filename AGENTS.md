@@ -140,6 +140,11 @@ uv run ruff format --check .
 # Golden files
 ./scripts/update-golden.sh          # regenerate, then READ the diff
 
+# Interface strings (needs GNU gettext). After changing any text a reader sees:
+# extract, translate the new German entries, compile, and commit .po and .mo.
+cd apps/web && uv run python manage.py makemessages -l de --add-location file --no-obsolete --ignore 'staticfiles/*'
+cd apps/web && uv run python manage.py compilemessages -l de --ignore 'staticfiles/*'
+
 # Local stack
 ./scripts/local_start.sh            # compose up + wait for /up
 ./scripts/local_stop.sh
@@ -181,4 +186,6 @@ Negative space is as informative as what we do use:
   has no identity and therefore cannot scope private content
 - **No inline LLM calls** — always a background job
 - **No `float` anywhere in a schema** — `Decimal`, always
+- **No hard-coded interface text** — every string a reader sees goes through
+  gettext; English is the source, and German must stay complete (a test checks)
 - **All times stored as UTC**

@@ -19,6 +19,19 @@ change** and says so explicitly here.
 
 ## [Unreleased]
 
+### Added — reading pages for the phone, in English and German
+
+- The recipe list and the recipe page are rebuilt for reading on a phone: dark
+  text on white, 18 px and larger type in Atkinson Hyperlegible Next, amounts
+  before ingredient names, and a servings stepper in place of `½× 1× 2× 3×`.
+  Hints say which steps build on earlier ones and which can be done side by
+  side, from the new `RenderedStep.after` and `RenderModel.side_by_side` in
+  core.
+- The recipe list has a search for words in titles and descriptions.
+- The interface speaks English and German. A settings page (`/settings/`)
+  stores language and units once per person; without saved settings the
+  browser's language applies, and recipes open in the same language.
+
 ### Added — the published image
 
 - CI publishes the image as `ghcr.io/yannicksuter/snap-cook` for Unraid and
@@ -35,6 +48,8 @@ change** and says so explicitly here.
 
 ### Fixed
 
+- Product API tokens whose secret contains `_`, about half of all tokens
+  issued, were rejected: the token was split at every `_`.
 - The image no longer needs the internet to start. `uv run` re-synced the
   environment on every start and fetched hatchling from PyPI; the image now
   runs its virtualenv directly, and no longer ships the dev dependencies.

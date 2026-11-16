@@ -91,6 +91,13 @@ class RenderedStep:
     temperatures: tuple[RenderedTemperature, ...] = ()
     produces: str | None = None
     uses: tuple[str, ...] = ()
+    after: tuple[int, ...] = ()
+    """Indices of the earlier steps whose results this step uses, ascending.
+
+    The graph's edges in a reader's terms: step 3 of a tomato sauce combines
+    what steps 1 and 2 made, so ``after == (1, 2)``. Indices rather than state
+    labels, because two states may share a label and a step number is what a
+    page can show."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -126,5 +133,12 @@ class RenderModel:
     servings: str | None = None
     ingredients: tuple[RenderedIngredient, ...] = ()
     steps: tuple[RenderedStep, ...] = ()
+    side_by_side: tuple[tuple[int, ...], ...] = ()
+    """Runs of consecutive steps that do not depend on one another.
+
+    Each run lists step indices that a cook can work on in parallel, such as
+    ``(1, 2)`` when the onions soften while the tomatoes are crushed. A linear
+    recipe has none. Only consecutive steps are grouped, because "steps 1 and
+    4 are independent" is true of many recipes and useful in none."""
     graph: RenderGraph = field(default_factory=RenderGraph)
     warnings: tuple[ValidationIssue, ...] = ()
