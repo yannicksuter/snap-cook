@@ -9,12 +9,16 @@ class RecipeImporter(Protocol):
     def extract(self, source: ImportSource) -> RawExtraction: ...
 ```
 
-`ImportSource` is an image, a PDF, a URL, or plain text.
+`ImportSource` is photos or a PDF, a page already fetched and read, or plain
+text. The provider never fetches anything itself. Both types, and the prompt
+every provider sends (`snapcook_core.importing.prompt`), live in core.
 
 ## RawExtraction
 
 Deliberately **not** a `Recipe`. It is the model's best effort, and it may be
-wrong, incomplete or internally inconsistent. Converting it into a valid recipe
+wrong, incomplete or internally inconsistent. The recipe in it is text in
+snap-cook's Cooklang dialect, beside notes for the reviewer: questions, what
+was left out, the source's name, which cup it means. Converting it into a valid recipe
 graph is `snapcook_core.importing.normalize`, which is pure and fully testable
 without a model.
 

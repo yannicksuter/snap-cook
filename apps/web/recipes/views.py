@@ -32,6 +32,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from catalog.access import get_recipe_or_404, visible_recipes
+from imports.models import ImportJob
 from snapcook_core.render import (
     RenderOptions,
     build_render_model,
@@ -82,7 +83,11 @@ def index(request: HttpRequest) -> HttpResponse:
     recipes = visible_recipes(request.user).select_related("owner")
     if query:
         recipes = recipes.filter(Q(title__icontains=query) | Q(description__icontains=query))
-    return render(request, "recipes/index.html", {"recipes": recipes[:50], "query": query})
+    # The reader's own unsaved imports: where a draft waits after they left the
+    # page that was reading it.
+    drafts = ImportJob.objects.filter(owner=request.user).exclude(status=ImportJob.Status.SAVED)
+    context = {"recipes": recipes[:50], "query": query, "drafts": drafts[:10]}
+    return render(request, "recipes/index.html", context)
 
 
 def detail(request: HttpRequest, slug: str) -> HttpResponse:

@@ -74,8 +74,11 @@ The phone is the main way in: take a photo of a cookbook page, choose photos or
 screenshots, paste a link, or paste text, then check the draft before saving.
 A photo of the dish is kept with its source (see Photos in
 `docs/architecture/import-pipeline.md`). The first provider is the hosted
-Anthropic API (`SNAPCOOK_LLM_PROVIDER=anthropic`), with the key set on the
-worker only, since only the worker calls it.
+Anthropic API (`SNAPCOOK_LLM_PROVIDER=anthropic`); the worker makes the calls.
+
+First slice built: photos, PDFs, links and pasted text become a draft that is
+checked and saved private. Not yet: keeping the photo of the dish, a
+`pytest-socket` ban, the eval harness.
 
 Worth stating plainly: **structure is a tax on the author, and nobody will hand-
 author a graph.** The importer is not a convenience feature — it is the primary

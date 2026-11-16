@@ -32,6 +32,16 @@ convenience copy — if they disagree, the docstring wins.
 The app rejects an ops token that is too short, contains a placeholder marker
 (`change-me`, `example`, `insecure`), or has fewer than 8 distinct characters.
 
+## Adding recipes
+
+| Variable | Default | Notes |
+|---|---|---|
+| `SNAPCOOK_LLM_PROVIDER` | `anthropic` | `fake` reads every source as the corpus tomato sauce: development only |
+| `SNAPCOOK_LLM_API_KEY` | — | On web and worker. Without it, adding recipes says it is not set up |
+| `SNAPCOOK_LLM_MODEL` | `claude-opus-5-5` | |
+| `SNAPCOOK_LLM_EFFORT` | `medium` | `low`, `medium`, `high`, `xhigh` or `max` |
+| `SNAPCOOK_LLM_BASE_URL` | — | Route the provider through a proxy |
+
 ## Seed data
 
 | Variable | Default | Notes |

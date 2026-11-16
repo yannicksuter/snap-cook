@@ -110,9 +110,11 @@ settings, and the worker template above copies them.
 | `GOOGLE_CLIENT_ID` | yes | From [Google sign-in](#google-sign-in) |
 | `GOOGLE_CLIENT_SECRET` | yes | Password Mask |
 | `SNAPCOOK_API_TOKEN_PEPPER` | yes | `openssl rand -hex 32`. Password Mask. Changing it invalidates every Personal Access Token users have made. |
-| `SNAPCOOK_LLM_PROVIDER` | for imports | `anthropic` (default), `openai` or `local` |
-| `SNAPCOOK_LLM_API_KEY` | for imports | Password Mask. Imports run on the worker, so it needs this one. |
-| `SNAPCOOK_LLM_BASE_URL` | no | A self-hosted inference service |
+| `SNAPCOOK_LLM_PROVIDER` | for adding recipes | `anthropic` (default) |
+| `SNAPCOOK_LLM_API_KEY` | for adding recipes | An API key from the [Claude Console](https://platform.claude.com/), billed separately from a Claude subscription. Password Mask. Both containers need it: the worker reads recipes with it, and web offers "Add a recipe" only when it is set. |
+| `SNAPCOOK_LLM_MODEL` | no | Default `claude-opus-5-5` |
+| `SNAPCOOK_LLM_EFFORT` | no | `low`, `medium` (default) or `high`. More effort reads hard sources better and costs more. |
+| `SNAPCOOK_LLM_BASE_URL` | no | Only to send the provider's requests through a proxy |
 | `SNAPCOOK_API_ENABLED` | no | `1` (default) serves the product API at `/api/v1/` |
 | `SNAPCOOK_OPS_API_ENABLED` | no | `0` (default). Read the [ops API's warning](reference/api-ops.md) before turning it on. |
 | `SNAPCOOK_OPS_API_TOKEN` | with the ops API | 32 characters or more, `python -c 'import secrets; print(secrets.token_urlsafe(48))'`. Password Mask. The app refuses to start with a weak one. |

@@ -23,6 +23,7 @@ dependencies = [
     "gunicorn>=23.0",
     "whitenoise>=6.7",
     "python-dotenv>=1.0",
+    "anthropic>=2.9.0",
 ]
 
 [project.optional-dependencies]

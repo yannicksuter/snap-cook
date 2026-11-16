@@ -41,9 +41,11 @@ Ops API -- see the warning below
     SNAPCOOK_OPS_API_WRITE      "1" allows the mutating ops endpoints
 
 LLM import
-    SNAPCOOK_LLM_PROVIDER   anthropic | openai | local
-    SNAPCOOK_LLM_API_KEY
-    SNAPCOOK_LLM_BASE_URL   For a self-hosted inference service
+    SNAPCOOK_LLM_PROVIDER   anthropic (default) | fake (development only)
+    SNAPCOOK_LLM_API_KEY    Needed on the worker, which does the reading
+    SNAPCOOK_LLM_MODEL      Default claude-opus-5-5
+    SNAPCOOK_LLM_EFFORT     low | medium (default) | high
+    SNAPCOOK_LLM_BASE_URL   Only to route the provider through a proxy
 
 Seed data
     SNAPCOOK_ALLOW_SHARE_ALIKE_DATA
@@ -286,8 +288,13 @@ Q_CLUSTER = {
 
 # ---------------------------------------------------------------- LLM
 
+# Reading a recipe from a page, photos or text runs on the worker, never in a
+# request (imports/tasks.py). Without a provider and key, the web app still
+# runs; adding a recipe says it is not set up.
 SNAPCOOK_LLM_PROVIDER = os.environ.get("SNAPCOOK_LLM_PROVIDER", "anthropic")
 SNAPCOOK_LLM_API_KEY = os.environ.get("SNAPCOOK_LLM_API_KEY", "")
+SNAPCOOK_LLM_MODEL = os.environ.get("SNAPCOOK_LLM_MODEL", "claude-opus-5-5")
+SNAPCOOK_LLM_EFFORT = os.environ.get("SNAPCOOK_LLM_EFFORT", "medium")
 SNAPCOOK_LLM_BASE_URL = os.environ.get("SNAPCOOK_LLM_BASE_URL", "")
 
 # ---------------------------------------------------------------- seed data

@@ -15,6 +15,28 @@
     <button type="submit" class="flex-none h-[52px] px-5 rounded-[14px] bg-herb text-white text-[18px] font-bold hover:bg-herb-dark">{% translate "Search" %}</button>
   </form>
 
+  {% if drafts %}
+    <section class="px-5 pt-5" aria-labelledby="drafts">
+      <h2 id="drafts" class="text-[20px] font-extrabold">{% translate "Waiting for you" %}</h2>
+      <ul class="mt-2 flex flex-col gap-2">
+        {% for draft in drafts %}
+          <li>
+            <a href="{% if draft.status == 'ready' %}{% url 'imports:review' draft.pk %}{% else %}{% url 'imports:status' draft.pk %}{% endif %}"
+               class="flex items-center justify-between gap-3 min-h-14 px-4 py-2 rounded-2xl {% if draft.status == 'failed' %}bg-ember-tint{% else %}bg-herb-tint{% endif %}">
+              <span class="min-w-0 flex flex-col">
+                <span class="text-[18px] font-bold truncate">{{ draft.title|default:_("New recipe") }}</span>
+                <span class="text-[15px] text-ink-2">
+                  {% if draft.status == "ready" %}{% translate "Ready to check" %}{% elif draft.status == "failed" %}{% translate "Could not be read" %}{% else %}{% translate "Reading…" %}{% endif %}
+                </span>
+              </span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="flex-none"><path d="m9 6 6 6-6 6"/></svg>
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+
   <div class="flex items-baseline justify-between gap-3 px-5 pt-5">
     <h1 class="text-[26px] font-extrabold tracking-tight">{% translate "Recipes" %}</h1>
     <span class="text-[16px] text-ink-3">{% blocktranslate trimmed count counter=recipes|length %}
@@ -56,4 +78,11 @@
       <p class="mt-2 text-[17px] text-ink-2">{% translate "Recipes appear here as soon as they are added." %}</p>
     </div>
   {% endif %}
+
+  <div class="sticky bottom-0 px-5 py-3 border-t border-line bg-white">
+    <a href="{% url 'imports:add' %}" class="flex items-center justify-center gap-2.5 h-14 rounded-2xl bg-herb text-white text-[19px] font-bold hover:bg-herb-dark">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+      {% translate "Add a recipe" %}
+    </a>
+  </div>
 {% endblock %}

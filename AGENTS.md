@@ -105,6 +105,7 @@ packages/snapcook-core/src/snapcook_core/
 ├── canonical/hashing.py    # content_hash + version_id. The frozen contract.
 ├── schema/base.py          # SnapcookModel: frozen, extra=forbid, NonSemantic
 ├── ids.py                  # prefixed ULIDs; stable across edits, so diff can match
+├── importing/normalize.py  # a model's reading -> a draft; trusts none of it
 └── errors.py               # error tree + ValidationIssue (non-fatal diagnostics)
 
 apps/web/
@@ -117,7 +118,9 @@ apps/web/
 ├── catalog/management/commands/reindex.py   # proof that Postgres is a cache
 ├── api/auth.py             # PatAuth + require_ops_access
 ├── api/product.py          # /api/v1/  -- per-user scoped
-└── api/ops.py              # /ops/api/ -- ignores ownership. Read the danger note.
+├── api/ops.py              # /ops/api/ -- ignores ownership. Read the danger note.
+├── imports/fetch.py        # fetches only from the public internet; read before touching
+└── imports/tasks.py        # the worker's half of an import: fetch, read, normalise
 ```
 
 ## Commands

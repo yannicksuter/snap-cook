@@ -19,6 +19,15 @@ change** and says so explicitly here.
 
 ## [Unreleased]
 
+### Added — adding a recipe from a photo, a link or text
+
+- "Add a recipe" takes a photo of a cookbook page, photos or a PDF, a link or
+  pasted text. The worker reads it with Claude (`SNAPCOOK_LLM_API_KEY`) and
+  keeps only the recipe; the reader answers open questions, checks the draft
+  and saves it, private. Drafts wait on Home.
+- Links are fetched from the public internet only, never from the server's own
+  network.
+
 ### Added — reading pages for the phone, in English and German
 
 - The recipe list and the recipe page are rebuilt for reading on a phone: dark
