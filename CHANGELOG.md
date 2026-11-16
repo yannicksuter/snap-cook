@@ -19,6 +19,8 @@ change** and says so explicitly here.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-16
+
 ### Added — adding a recipe from a photo, a link or text
 
 - "Add a recipe" takes a photo of a cookbook page, photos or a PDF, a link or
@@ -41,13 +43,24 @@ change** and says so explicitly here.
   stores language and units once per person; without saved settings the
   browser's language applies, and recipes open in the same language.
 
+### Changed
+
+- GitHub releases are titled `v<version> – <pull request title>`, also
+  when published by hand.
+
+### Fixed
+
+- Product API tokens whose secret contains `_`, about half of all tokens
+  issued, were rejected: the token was split at every `_`.
+
+## [0.1.0] - 2026-11-16
+
 ### Added — the published image
 
 - CI publishes the image as `ghcr.io/yannicksuter/snap-cook` for Unraid and
   Docker Compose: release pull requests into `stable` publish test images, and
   merging tags `v<version>`, `stable` and `latest` and publishes the GitHub
-  release, titled `v<version> – <pull request title>`
-  (`docs/runbooks/release.md`). `docs/install.md` covers installing.
+  release (`docs/runbooks/release.md`). `docs/install.md` covers installing.
 - `scripts/test-container.py`, run by the new `image` check: Postgres, `web`
   and `worker` on a network with no route out, covering migrations, `/up`,
   static files, the worker cluster, the shared store and clean shutdown.
@@ -57,8 +70,6 @@ change** and says so explicitly here.
 
 ### Fixed
 
-- Product API tokens whose secret contains `_`, about half of all tokens
-  issued, were rejected: the token was split at every `_`.
 - The image no longer needs the internet to start. `uv run` re-synced the
   environment on every start and fetched hatchling from PyPI; the image now
   runs its virtualenv directly, and no longer ships the dev dependencies.
@@ -108,4 +119,6 @@ under the existing canonical form, not a new wire contract.
 - Documentation: README, AGENTS, CLAUDE, CONTRIBUTING, LICENSING,
   THIRD_PARTY_DATA, SECURITY, RECIPE_SPEC
 
-[Unreleased]: https://github.com/yannicksuter/snap-cook/commits/main
+[Unreleased]: https://github.com/yannicksuter/snap-cook/compare/v0.2.0...main
+[0.2.0]: https://github.com/yannicksuter/snap-cook/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/yannicksuter/snap-cook/releases/tag/v0.1.0
