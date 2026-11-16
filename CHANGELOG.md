@@ -24,7 +24,8 @@ change** and says so explicitly here.
 - CI publishes the image as `ghcr.io/yannicksuter/snap-cook` for Unraid and
   Docker Compose: release pull requests into `stable` publish test images, and
   merging tags `v<version>`, `stable` and `latest` and publishes the GitHub
-  release (`docs/runbooks/release.md`). `docs/install.md` covers installing.
+  release, titled `v<version> – <pull request title>`
+  (`docs/runbooks/release.md`). `docs/install.md` covers installing.
 - `scripts/test-container.py`, run by the new `image` check: Postgres, `web`
   and `worker` on a network with no route out, covering migrations, `/up`,
   static files, the worker cluster, the shared store and clean shutdown.

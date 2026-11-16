@@ -15,8 +15,10 @@ The image `ghcr.io/yannicksuter/snap-cook` is published by CI
    (`test-images.yml`).
 3. **Merging publishes the release.** CI pushes `sha-<full-commit>`, tags it
    `v<version>`, `stable` and `latest`, and publishes the GitHub release
-   `v<version>` with the title and description of the pull request, so write
-   them as the release notes. Unraid's auto-update then deploys it.
+   `v<version>`. Its title is always `v<version> – <pull request title>`, and
+   its notes are the pull request's description, so write both as release
+   notes: a short title without the version (CI adds it), and a short
+   description. Unraid's auto-update then deploys it.
 4. **Rollback:** use an earlier `v<version>` or `sha-<full-commit>` as the
    repository tag ([install.md](../install.md#updates)). A release published by
    hand, such as an older draft, tags its image the same way (`release.yml`).
@@ -49,8 +51,10 @@ python3 scripts/test-container.py snap-cook:test "$(git rev-parse HEAD)"
 
 ## One-time setup
 
-- Create the branch: `git push origin main:stable`. `main` stays the default
-  branch, so Dependabot's pull requests keep going there.
+- Create the branch: `git push origin main:stable`. CI treats that push like a
+  merged release: it publishes the version in `apps/web/pyproject.toml`, with
+  generated notes since no release pull request exists yet. `main` stays the
+  default branch, so Dependabot's pull requests keep going there.
 - Protect `stable` (**Settings → Branches**): require a pull request, and the
   checks `lint`, `core`, `contract`, `web`, `security` and `image`.
 - After the first image is published, open the [package
