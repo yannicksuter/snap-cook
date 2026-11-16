@@ -21,7 +21,6 @@ from snapcook_core.schema.quantity import (
     ApproxToken,
     Count,
     Range,
-    Scalar,
     ScalingPolicy,
     SizeGrade,
     UnitRef,
