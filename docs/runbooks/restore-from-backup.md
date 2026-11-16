@@ -8,10 +8,28 @@ reconstructible:
 | Lost | Cost |
 |---|---|
 | `/data/store` | **Everything.** All recipes and all history. |
-| `pgdata` | Accounts and social data — comments, likes, follows. Recipes are safe in the store. |
+| the database (`/data/postgres`, or `pgdata` with a separate database) | Accounts, settings, API tokens, drafts and social data. Recipes are safe in the store. |
 | the image | Nothing. Rebuild from source. |
 
-## Procedure
+## Procedure: one container (Unraid)
+
+The backup of `/data` holds the store and the database together.
+
+1. Stop `snap-cook`.
+2. Restore the backup into `/mnt/user/appdata/snap-cook`, replacing what is
+   there.
+3. Start `snap-cook`. It opens the restored database and applies any newer
+   migrations.
+4. Check: `curl -s http://<unraid-ip>:8931/up`, and
+   `docker exec snap-cook python manage.py reindex --full --yes`, which
+   rebuilds the projection from the restored store and reports how many recipes
+   it found.
+
+If only the store survived, delete `/mnt/user/appdata/snap-cook/postgres`
+before step 3: the container makes an empty database, and step 4 brings the
+recipes back. The accounts do not come back; see below.
+
+## Procedure: a separate database (Docker Compose)
 
 ```bash
 docker compose down
@@ -32,16 +50,10 @@ curl -s http://localhost:8931/up
 ```
 
 `reindex` reports how many recipes it projected; it should match what you
-expect the backup to hold. If `pgdata` was lost too, the accounts went with
-it, and `reindex` skips, with a warning, every recipe whose author matches no
-account by username or email. Restore `pgdata` from the same backup if you have
-it; otherwise recreate those accounts, then rerun step 3.
-
-On Unraid: stop `snap-cook-worker` and `snap-cook-web`, restore into
-`/mnt/user/appdata/snap-cook/data`, start `snap-cook-web` (it applies the
-schema itself), then run
-`docker exec snap-cook-web python manage.py reindex --full --yes` and start
-`snap-cook-worker`.
+expect the backup to hold. If the database was lost too, the accounts went
+with it, and `reindex` skips, with a warning, every recipe whose author matches
+no account by username or email. Restore the database from the same backup if
+you have it; otherwise recreate those accounts, then reindex again.
 
 ## Verifying a backup is good
 

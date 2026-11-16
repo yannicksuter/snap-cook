@@ -82,6 +82,12 @@ sort of that graph; a flowchart is a drawing of it. One model, many views.
 > Never build a queryset from `Recipe.objects` in a view or endpoint. One funnel
 > means visibility is enforced in one reviewable place.
 
+> **The embedded database never listens on TCP.** Without `POSTGRES_HOST` the
+> image runs its own Postgres (`entrypoint.sh`, role `all`) with trust
+> authentication on a Unix socket; a TCP listener would open it to anything
+> that can reach the container. `scripts/test-container.py` checks port 5432
+> is closed.
+
 > **The image never runs `uv run`.** It re-syncs the environment on every start
 > and fetches build dependencies from PyPI, so a container without internet
 > access never starts. The Dockerfile puts the virtualenv on `PATH` instead;

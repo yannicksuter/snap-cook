@@ -15,11 +15,12 @@ Django
                             reached by, or Django returns 400 DisallowedHost.
 
 Database (a DERIVED PROJECTION -- see below)
-    POSTGRES_HOST           default "localhost"
+    POSTGRES_HOST           default "localhost"; in the image, unset means the
+                            container's own Postgres (entrypoint.sh, role `all`)
     POSTGRES_PORT           default "5432"
     POSTGRES_DB             default "snapcook"
     POSTGRES_USER           default "snapcook"
-    POSTGRES_PASSWORD       default "" (required in production)
+    POSTGRES_PASSWORD       default ""; required for an external database
 
 Storage
     SNAPCOOK_DATA_DIR       Root of the authoritative recipe store.
@@ -179,10 +180,16 @@ for _directory in (SNAPCOOK_STORE_DIR, SNAPCOOK_SOURCES_DIR, SNAPCOOK_LOGS_DIR):
 
 # ---------------------------------------------------------------- database
 
+# In the image, a container without POSTGRES_HOST runs a Postgres of its own,
+# reachable only through a Unix socket (entrypoint.sh, role `all`). The image
+# names the socket's directory in SNAPCOOK_EMBEDDED_DB, so the app and every
+# `docker exec ... manage.py` find it. A local checkout has neither variable.
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "HOST": os.environ.get("POSTGRES_HOST", "localhost"),
+        "HOST": (
+            os.environ.get("POSTGRES_HOST") or os.environ.get("SNAPCOOK_EMBEDDED_DB") or "localhost"
+        ),
         "PORT": os.environ.get("POSTGRES_PORT", "5432"),
         "NAME": os.environ.get("POSTGRES_DB", "snapcook"),
         "USER": os.environ.get("POSTGRES_USER", "snapcook"),

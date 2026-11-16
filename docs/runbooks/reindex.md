@@ -21,7 +21,7 @@ in production.
 docker compose exec web python manage.py reindex --full --yes
 ```
 
-On Unraid: `docker exec snap-cook-web python manage.py reindex --full --yes`.
+On Unraid: `docker exec snap-cook python manage.py reindex --full --yes`.
 
 ## Single recipe
 

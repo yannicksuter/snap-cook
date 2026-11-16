@@ -45,6 +45,14 @@ change** and says so explicitly here.
 
 ### Changed
 
+- The image runs as one container by default: the site, the worker and,
+  without `POSTGRES_HOST`, its own PostgreSQL 17, with its data in
+  `/data/postgres` and reachable only through a socket. Unraid needs one
+  container and one folder (`docs/install.md`). The image without arguments
+  now starts as `all`, not `web`; Compose keeps the separate database and
+  names `web` and `worker` explicitly.
+- The image is based on Debian 13 (trixie) by name, which fixes the Postgres
+  major version.
 - GitHub releases are titled `v<version> – <pull request title>`, also
   when published by hand.
 

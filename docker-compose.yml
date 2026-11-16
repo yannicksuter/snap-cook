@@ -1,7 +1,9 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
-# Three services. Postgres is a derived projection -- losing pgdata costs social
-# data only, and `manage.py reindex --full` rebuilds the rest from ./data/store.
+# The setup with a separate database: three services. The image also runs on
+# its own, database included, which is how docs/install.md sets up Unraid.
+# Losing pgdata costs accounts, settings and social data; `manage.py reindex
+# --full` rebuilds the recipe projection from ./data/store.
 #
 # Run the published image (docs/install.md):
 #   docker compose pull && docker compose up -d --no-build --wait

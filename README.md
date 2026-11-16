@@ -22,15 +22,17 @@ than a list, and units and language are chosen by whoever reads them.
 ## Run it
 
 The image is `ghcr.io/yannicksuter/snap-cook`; `stable` is the newest release.
+It runs as one container, database included:
 
 ```bash
-cp .env.example .env                 # fill in the secrets
-docker compose pull && docker compose up -d --no-build --wait
+docker run -d --name snap-cook -p 8931:8931 -v "$PWD/snap-cook:/data" \
+  -e DJANGO_SECRET_KEY="$(openssl rand -hex 32)" -e DJANGO_ALLOWED_HOSTS=localhost \
+  ghcr.io/yannicksuter/snap-cook:stable
 ```
 
 [`docs/install.md`](docs/install.md) covers Unraid, Google sign-in, every
-setting, and updates. **Back up `/data`**: it holds the only copy of every
-recipe.
+setting, updates, and Docker Compose with a separate database. **Back up
+`/data`**: it holds the only copy of every recipe, and the database.
 
 ## Work on it
 
