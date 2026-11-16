@@ -1,13 +1,16 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
-# One image, two roles. `web` runs migrations then gunicorn; `worker` runs the
-# django-q cluster. Dispatch happens in entrypoint.sh on the first argument, so
-# there is exactly one image to build, tag and deploy.
+# One image. By default (role `all`) it is the whole app in one container: web,
+# worker and, without POSTGRES_HOST, a Postgres of its own with its data in
+# /data. The roles `web` and `worker` split it for a setup with a separate
+# database (docker-compose.yml). Dispatch is in entrypoint.sh.
 #
 # CI publishes it as ghcr.io/yannicksuter/snap-cook (docs/install.md), after
 # scripts/test-container.py has run it with no route to the internet.
 
-FROM python:3.13-slim AS base
+# The Debian release is pinned, not just Python: it decides the Postgres major
+# version, and a data folder cannot be opened by a different major.
+FROM python:3.13-slim-trixie AS base
 
 # PATH puts the image's own virtualenv first, so `python`, `gunicorn` and
 # `docker exec <container> python manage.py ...` all run in it. Never `uv run`
@@ -22,7 +25,23 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PATH="/app/.venv/bin:$PATH" \
     DJANGO_DEBUG=0 \
-    SNAPCOOK_DATA_DIR=/data
+    SNAPCOOK_DATA_DIR=/data \
+    SNAPCOOK_EMBEDDED_DB=/run/postgresql
+
+# PostgreSQL 17 for the one-container setup. Three trims:
+# - no default cluster: the entrypoint makes one in /data/postgres;
+# - no JIT: Debian's server package pulls in LLVM (about 130 MB) for query
+#   compilation that a recipe database never needs. Postgres runs without it,
+#   and the server starts with jit=off. Nothing installs packages after this
+#   layer, so forcing the libraries out leaves no apt run to trip over them;
+# - no package lists.
+RUN mkdir -p /etc/postgresql-common \
+ && echo "create_main_cluster = false" > /etc/postgresql-common/createcluster.conf \
+ && apt-get update \
+ && apt-get install -y --no-install-recommends postgresql-17 \
+ && rm -rf /usr/lib/postgresql/17/lib/llvmjit* /usr/lib/postgresql/17/lib/bitcode \
+ && dpkg --remove --force-depends libllvm19 libz3-4 \
+ && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -67,18 +86,19 @@ ARG GIT_COMMIT=unknown
 ENV GIT_COMMIT=${GIT_COMMIT}
 LABEL org.opencontainers.image.revision="${GIT_COMMIT}"
 
-# The authoritative recipe store. THIS is the volume that must be backed up --
-# Postgres is rebuildable from it via `manage.py reindex --full`.
-# On Unraid: /mnt/user/appdata/snap-cook/data -> /data
+# Everything worth keeping: the recipe store (the authoritative copy of every
+# recipe) and, in the one-container setup, the database in /data/postgres.
+# THIS is the volume that must be backed up.
+# On Unraid: /mnt/user/appdata/snap-cook -> /data
 RUN mkdir -p /data
 VOLUME ["/data"]
 
 EXPOSE 8931
 
-# Unraid shows this next to the container. `web` answers when /up does; the
-# worker serves nothing to probe, so it is healthy while it runs (entrypoint.sh).
+# Unraid shows this next to the container. `all` and `web` answer when /up
+# does; the worker serves nothing to probe, so it is healthy while it runs.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
     CMD ["/app/entrypoint.sh", "healthcheck"]
 
 ENTRYPOINT ["/app/entrypoint.sh"]
-CMD ["web"]
+CMD ["all"]

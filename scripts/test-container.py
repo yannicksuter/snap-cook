@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: AGPL-3.0-or-later
-"""Run the built image the way Unraid runs it, and check it.
+"""Run the built image the two ways it is deployed, and check it.
 
-Postgres, then `web` and `worker` from the image under test sharing one /data
-volume, all on a temporary Docker network with no route out. An image that
-needs the internet to start fails here instead of at boot on the server.
+1. On its own, as on Unraid: one container, its own Postgres, one /data volume.
+2. Split, as in docker-compose.yml: Postgres, then `web` and `worker` from the
+   image sharing one /data volume.
+
+Both on a temporary Docker network with no route out. An image that needs the
+internet to start fails here instead of at boot on the server.
 
     python3 scripts/test-container.py IMAGE COMMIT
 
@@ -109,8 +112,72 @@ def sql(db: str, query: str) -> str:
     )  # fmt: skip
 
 
+def _count_recipes(container: str) -> str:
+    output = docker(
+        "exec", container, "python", "manage.py", "shell", "-c",
+        "from catalog.models import Recipe; print(Recipe.objects.count())",
+    )  # fmt: skip
+    return output.splitlines()[-1]
+
+
+def all_in_one(image: str, commit: str) -> None:
+    """The default: one container, no POSTGRES_HOST, everything in /data."""
+    name = "snapcook-aio-" + uuid.uuid4().hex[:12]
+    data, network = name + "-data", name
+    docker("network", "create", "--internal", network)
+    docker("volume", "create", data)
+    container = ""
+    try:
+        container = docker(
+            "run", "-d", "--network", network,
+            "--health-interval=1s", "--health-start-period=0s",
+            "--mount", f"type=volume,source={data},target=/data",
+            "-e", "DJANGO_SECRET_KEY=container-test-only-secret-key",
+            "-e", "DJANGO_ALLOWED_HOSTS=cook.example.com,127.0.0.1",
+            image,
+        )  # fmt: skip
+        wait_healthy(container)
+        status, _, body = fetch(container, "/up")
+        assert status == 200 and json.loads(body) == {"status": "ok", "commit": commit}, body
+        wait_for(
+            lambda: re.search(r"Q Cluster \S+ \[snapcook\] running\.", docker("logs", container)),
+            "The worker's cluster did not start",
+        )
+        print("One container runs its own database, web and worker, with no internet.", flush=True)
+
+        port = docker(
+            "exec", container, "python", "-c",
+            "import socket; print(socket.socket().connect_ex(('127.0.0.1', 5432)))",
+        )  # fmt: skip
+        assert port != "0", "the embedded database must not listen on TCP"
+        print("Its database listens on a socket only, not on a port.", flush=True)
+
+        docker("exec", container, "python", "manage.py", "seed_corpus")
+        assert _count_recipes(container) == str(CORPUS_SIZE)
+        assert stop(container) == 0
+        assert "database system is shut down" in docker("logs", container)
+        docker("start", container)
+        wait_healthy(container)
+        assert _count_recipes(container) == str(CORPUS_SIZE)
+        print("Recipes and database survive a restart, and it stops cleanly.", flush=True)
+        assert stop(container) == 0
+    except Exception:
+        if container:
+            print(f"--- logs of {container[:12]}", flush=True)
+            subprocess.run(["docker", "logs", "--tail", "80", container], check=False)
+        raise
+    finally:
+        if container:
+            subprocess.run(
+                ["docker", "rm", "-fv", container], check=False, stdout=subprocess.DEVNULL
+            )
+        docker("volume", "rm", data)
+        docker("network", "rm", network)
+
+
 def main() -> None:
     image, commit = sys.argv[1:]
+    all_in_one(image, commit)
     name = "snapcook-test-" + uuid.uuid4().hex[:12]
     data, pgdata, network = name + "-data", name + "-pgdata", name
     containers: list[str] = []
@@ -147,11 +214,11 @@ def main() -> None:
             containers.append(container)
             return container
 
-        container = start("-e", "POSTGRES_PASSWORD=incorrect-password", image)
+        container = start("-e", "POSTGRES_PASSWORD=incorrect-password", image, "web")
         assert wait_exit(container) != 0
         print("web refuses to start with the wrong database password.", flush=True)
 
-        web = start(image)
+        web = start(image, "web")
         wait_healthy(web)
         status, _, body = fetch(web, "/up")
         assert status == 200 and json.loads(body) == {"status": "ok", "commit": commit}, body
@@ -193,7 +260,7 @@ def main() -> None:
         assert "Shutting down: Master" in docker("logs", web)
         docker("rm", "-v", web)
         containers.remove(web)
-        web = start(image)
+        web = start(image, "web")
         wait_healthy(web)
         docker("exec", worker, "python", "manage.py", "reindex", "--full", "--yes")
         assert sql(db, "SELECT count(*) FROM catalog_recipe") == str(CORPUS_SIZE)

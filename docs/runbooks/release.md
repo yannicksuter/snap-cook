@@ -15,10 +15,10 @@ The image `ghcr.io/yannicksuter/snap-cook` is published by CI
    (`test-images.yml`).
 3. **Merging publishes the release.** CI pushes `sha-<full-commit>`, tags it
    `v<version>`, `stable` and `latest`, and publishes the GitHub release
-   `v<version>`. Its title is always `v<version> – <pull request title>`, and
-   its notes are the pull request's description, so write both as release
-   notes: a short title without the version (CI adds it), and a short
-   description. Unraid's auto-update then deploys it.
+   `v<version>` with the pull request's title and description. Both titles are
+   `v<version> – <title>`; CI adds the version if the pull request lacks it.
+   Keep the description short: it becomes the release notes word for word.
+   Unraid's auto-update then deploys it.
 4. **Rollback:** use an earlier `v<version>` or `sha-<full-commit>` as the
    repository tag ([install.md](../install.md#updates)). A release published by
    hand, such as an older draft, tags its image the same way (`release.yml`).
@@ -34,7 +34,7 @@ or drafted is not released again: the merge still publishes `sha-<commit>`, but
 # 1. Raise the version in apps/web/pyproject.toml, then refresh the lock file.
 uv lock
 # 2. Move CHANGELOG.md's [Unreleased] entries under the new version.
-# 3. Open the pull request from main into stable.
+# 3. Open the pull request from main into stable, titled "v<version> – <title>".
 ```
 
 A release containing a `FORMAT_VERSION` bump is a breaking change; say so in

@@ -16,7 +16,7 @@ No user-visible impact — nothing else authenticates with it.
 
 Then check the `ops-access` lines in the web container's log for requests you
 did not make: `docker compose logs web | grep ops-access` (on Unraid,
-`docker logs snap-cook-web 2>&1 | grep ops-access`). Docker drops that log when
+`docker logs snap-cook 2>&1 | grep ops-access`). Docker drops that log when
 the container is recreated, so look before updating it.
 
 ## API token pepper
