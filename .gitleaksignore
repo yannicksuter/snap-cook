@@ -1,0 +1,7 @@
+# Findings gitleaks reports that are not secrets, by fingerprint
+# (<commit>:<file>:<rule>:<line>). Each needs a reason.
+
+# docs/install.md wrote "`SNAPCOOK_OPS_API_ENABLED=1`", a setting name and a
+# flag, which the generic-api-key rule reads as a key. Reworded in the next
+# commit; the old wording stays in this one's history.
+9e81f148a58e14a675616a223ccfd936c5a34ba5:docs/install.md:generic-api-key:124

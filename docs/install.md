@@ -120,10 +120,10 @@ Behind the tunnel, or any other reverse proxy, the site takes the scheme from
 and Google's exact match would refuse it.
 
 > **The ops API answers only your LAN or a VPN.** It ignores ownership and can
-> read every user's private recipe, so the app refuses any request that came
-> through the tunnel or another proxy, token or not. With
-> `SNAPCOOK_OPS_API_ENABLED=1` it answers at `http://<unraid-ip>:8931/ops/api/`
-> and nowhere else ([ops API](reference/api-ops.md)).
+> read every user's private recipe, so the app refuses every request that came
+> through the tunnel or another proxy, even one with the right token. Switched
+> on, it answers at `http://<unraid-ip>:8931/ops/api/` and nowhere else
+> ([ops API](reference/api-ops.md)).
 
 ## Logs
 
