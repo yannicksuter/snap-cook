@@ -74,6 +74,10 @@ new version **in the owner's name**, because `reindex` takes the owner from the
 latest version's author. A failed run is not retried by reloading the page; the
 reader retries. Translating uses the import's model and key, at low effort.
 
+Editing a recipe keeps every translation whose source string did not change
+(`snapcook_core.editing.carry_translations`), so an edit costs one translation
+of the edited strings, not of the recipe.
+
 ## Interface language
 
 Everything a reader sees around the recipe (headings, buttons, hints) goes

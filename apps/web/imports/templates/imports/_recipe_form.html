@@ -1,0 +1,70 @@
+{% comment %}
+SPDX-License-Identifier: AGPL-3.0-or-later
+
+A recipe's details, a preview, and its text: the fields of the form that checks
+an import (imports/review.html) and of the one that edits a saved recipe
+(recipes/edit.html). Expects ``form`` (a DetailsForm), ``model`` (the preview,
+or None) and ``problem``; ``text_open`` shows the text without a click.
+{% endcomment %}{% load i18n %}
+<div class="flex flex-col gap-2">
+  <label for="id_title" class="text-[17px] font-extrabold">{{ form.title.label }}</label>
+  <input id="id_title" name="title" type="text" maxlength="200" required value="{{ form.title.value|default_if_none:'' }}"
+         class="h-14 px-4 rounded-[14px] border-2 border-line-strong text-[19px] outline-none focus:border-herb">
+  {% for error in form.title.errors %}<p class="text-[16px] text-ember" role="alert">{{ error }}</p>{% endfor %}
+</div>
+<div class="flex flex-col gap-2">
+  <label for="id_description" class="text-[17px] font-extrabold">{{ form.description.label }}</label>
+  <textarea id="id_description" name="description" rows="3" maxlength="500"
+            class="px-4 py-3 rounded-[14px] border-2 border-line-strong text-[18px] leading-relaxed outline-none focus:border-herb">{{ form.description.value|default_if_none:'' }}</textarea>
+</div>
+<div class="flex flex-col gap-2">
+  <label for="id_servings" class="text-[17px] font-extrabold">{{ form.servings.label }}</label>
+  <input id="id_servings" name="servings" type="number" min="1" max="100" value="{{ form.servings.value|default_if_none:'' }}"
+         class="w-32 h-14 px-4 rounded-[14px] border-2 border-line-strong text-[19px] outline-none focus:border-herb">
+  {% for error in form.servings.errors %}<p class="text-[16px] text-ember" role="alert">{{ error }}</p>{% endfor %}
+</div>
+
+{% if model %}
+  <section class="pt-4" aria-labelledby="preview-ingredients">
+    <h2 id="preview-ingredients" class="text-[24px] font-extrabold">{% translate "Ingredients" %}</h2>
+    <ul class="mt-2">
+      {% for ingredient in model.ingredients %}
+        <li class="grid grid-cols-[6.5rem_minmax(0,1fr)] gap-3.5 items-baseline py-3 border-b border-line-soft">
+          {% if ingredient.quantity and not ingredient.quantity.after_name %}
+            <span class="text-right text-[18px] font-extrabold text-herb">{{ ingredient.quantity.display }}</span>
+          {% else %}
+            <span></span>
+          {% endif %}
+          <span class="text-[18px]">{{ ingredient.name }}{% if ingredient.quantity.after_name %} <span class="text-ink-3">{{ ingredient.quantity.display }}</span>{% endif %}{% if ingredient.optional %} <span class="text-ink-3">({% translate "optional" %})</span>{% endif %}</span>
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+  <section class="pt-4" aria-labelledby="preview-steps">
+    <h2 id="preview-steps" class="text-[24px] font-extrabold">{% translate "Steps" %}</h2>
+    <ol class="mt-1">
+      {% for step in model.steps %}
+        <li class="flex gap-3.5 py-3.5{% if not forloop.last %} border-b border-line-soft{% endif %}">
+          <span aria-hidden="true" class="flex-none w-9 h-9 rounded-full bg-ink text-white flex items-center justify-center text-[18px] font-extrabold">{{ step.index }}</span>
+          <p class="pt-1 text-[18px] leading-normal min-w-0">{{ step.text }}</p>
+        </li>
+      {% endfor %}
+    </ol>
+  </section>
+{% endif %}
+
+<details class="group rounded-2xl border border-line"{% if text_open or problem or form.cooklang.errors %} open{% endif %}>
+  <summary class="flex items-center justify-between gap-3 min-h-14 px-4 text-[18px] font-bold cursor-pointer list-none hover:text-herb [&::-webkit-details-marker]:hidden">
+    {% translate "Edit the recipe text" %}
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="transition-transform group-open:rotate-90"><path d="m9 6 6 6-6 6"/></svg>
+  </summary>
+  <div class="px-4 pb-4 flex flex-col gap-2">
+    <p class="text-[15px] leading-relaxed text-ink-2">
+      {% translate "One step per paragraph. Ingredients, times and temperatures are marked like this:" %}
+      <code class="font-mono">@flour{200%g}</code> <code class="font-mono">~{30%min}</code> <code class="font-mono">^{180%C}</code> <code class="font-mono">^fan{160%C}</code>
+    </p>
+    <label for="id_cooklang" class="sr-only">{{ form.cooklang.label }}</label>
+    <textarea id="id_cooklang" name="cooklang" rows="14" required
+              class="px-3 py-2.5 rounded-xl border-2 border-line-strong font-mono text-[15px] leading-relaxed outline-none focus:border-herb">{{ form.cooklang.value|default_if_none:'' }}</textarea>
+  </div>
+</details>

@@ -25,16 +25,29 @@ from decimal import Decimal, InvalidOperation
 from urllib.parse import urlencode
 
 from django.conf import settings
+from django.contrib import messages
+from django.db import transaction
 from django.db.models import Q
 from django.http import Http404, HttpRequest, HttpResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.urls import reverse
-from translations.jobs import progress_for
+from django.utils import timezone
+from django.utils.translation import gettext as _
+from django.views.decorators.http import require_http_methods
+from ruamel.yaml import YAMLError
 
 from catalog.access import get_recipe_or_404, visible_recipes
+from catalog.models import Recipe as CatalogRecipe
+from catalog.projection import project_recipe
+from imports.forms import DetailsForm
 from imports.models import ImportJob
+from snapcook_core.cooklang.frontmatter import parse_document
+from snapcook_core.editing import revise, text_for_editing
+from snapcook_core.errors import CODE_NO_DENSITY, CODE_SCALING_MANUAL, CODE_UNIT_UNRESOLVED
+from snapcook_core.importing import with_details
 from snapcook_core.render import RenderOptions, build_render_model, render_mermaid
 from snapcook_core.store import FilesystemStore
+from translations.jobs import progress_for
 
 _SYSTEMS = ("metric", "us")
 _MAX_SERVINGS = 100
@@ -61,7 +74,7 @@ class _View:
 
 
 def index(request: HttpRequest) -> HttpResponse:
-    """Recipe list, optionally filtered by a search for words in the title or description.
+    """Recipe list, optionally filtered by a search in the title, description or ingredients.
 
     Starts from ``visible_recipes`` rather than ``Recipe.objects`` -- see the
     warning in catalog/access.py.
@@ -69,7 +82,11 @@ def index(request: HttpRequest) -> HttpResponse:
     query = request.GET.get("q", "").strip()
     recipes = visible_recipes(request.user).select_related("owner")
     if query:
-        recipes = recipes.filter(Q(title__icontains=query) | Q(description__icontains=query))
+        recipes = recipes.filter(
+            Q(title__icontains=query)
+            | Q(description__icontains=query)
+            | Q(search_terms__icontains=query)
+        )
     # The reader's own unsaved imports: where a draft waits after they left the
     # page that was reading it.
     drafts = ImportJob.objects.filter(owner=request.user).exclude(status=ImportJob.Status.SAVED)
@@ -86,7 +103,7 @@ def detail(request: HttpRequest, slug: str) -> HttpResponse:
         "model": model,
         "view": view,
         "mermaid": render_mermaid(model),
-        "warnings": [w for w in model.warnings if w.severity in ("warn", "error")],
+        "notes": _notes(model, view),
         # Shown in another language, a recipe is translated once, in the worker.
         "translation": progress_for(
             request.user, catalog_recipe.recipe_id, recipe, head.version_id, view.lang
@@ -95,6 +112,30 @@ def detail(request: HttpRequest, slug: str) -> HttpResponse:
     is_htmx = request.headers.get("HX-Request")
     template = "recipes/_render.html" if is_htmx else "recipes/detail.html"
     return render(request, template, context)
+
+
+def _notes(model, view: _View) -> list[str]:
+    """What the core's diagnostics mean for a cook: a sentence each, at most once.
+
+    The core records every value it would not scale or could not convert, in
+    English, for whoever maintains the recipe. A cook needs to hear only about
+    what they just did -- changed the amount, or chose cups and ounces -- once,
+    in their own language. Everything else stays out of the page.
+    """
+    codes = {issue.code for issue in model.warnings}
+    notes = []
+    if CODE_SCALING_MANUAL in codes:
+        notes.append(
+            _(
+                "Times and oven temperatures stay as in the recipe. "
+                "Check them when you cook more or less."
+            )
+        )
+    if view.system == "us" and codes & {CODE_UNIT_UNRESOLVED, CODE_NO_DENSITY}:
+        notes.append(
+            _("Some amounts cannot be shown in cups and ounces, so they stay as in the recipe.")
+        )
+    return notes
 
 
 def chart(request: HttpRequest, slug: str) -> HttpResponse:
@@ -108,6 +149,87 @@ def chart(request: HttpRequest, slug: str) -> HttpResponse:
         "print_now": request.GET.get("print") == "1",
     }
     return render(request, "recipes/chart.html", context)
+
+
+@require_http_methods(["GET", "POST"])
+def edit(request: HttpRequest, slug: str) -> HttpResponse:
+    """The owner changes the recipe as text; saving makes a new version of it.
+
+    The text is the recipe in its own language. ``revise`` keeps what text
+    cannot hold -- the id, who may see it, its source, and the translations of
+    every string that did not change -- and the commit is in the owner's name,
+    as every version must be: ``reindex`` takes the owner from the latest one.
+    """
+    row = get_recipe_or_404(request.user, slug)
+    if row.owner_id != request.user.pk:
+        raise Http404  # someone else's recipe, shared with this reader: not theirs to change
+    store = FilesystemStore(settings.SNAPCOOK_STORE_DIR)
+    head = store.head(row.recipe_id)
+    if head is None:
+        raise Http404
+
+    if request.method == "POST":
+        form = DetailsForm(request.POST)
+        text = ""
+        if form.is_valid():
+            data = form.cleaned_data
+            text = with_details(
+                data["cooklang"],
+                title=data["title"],
+                description=data["description"],
+                servings=data["servings"],
+            )
+    else:
+        text = text_for_editing(head.recipe)
+        form = DetailsForm(initial=_edit_fields(text))
+
+    revision = revise(head.recipe, text) if text else None
+    if request.method == "POST" and request.POST.get("action") == "save" and revision:
+        if revision.recipe is not None:
+            with transaction.atomic():
+                # One commit at a time per recipe, against what HEAD is now: a
+                # translation may have landed while this page was open.
+                owner = CatalogRecipe.objects.select_for_update().get(pk=row.pk).owner
+                head = store.head(row.recipe_id)
+                revision = revise(head.recipe, text)
+                if revision.recipe is not None:
+                    store.commit(
+                        revision.recipe,
+                        author=head.author,
+                        created_at=timezone.now().strftime("%Y-%m-%dT%H:%M:%S"),
+                        message="edit",
+                        origin="authored",
+                    )
+                    row = project_recipe(store, row.recipe_id, owner)
+            if revision.recipe is not None:
+                messages.success(request, _("Saved."))
+                return redirect("recipes:detail", row.slug)
+
+    model = None
+    if revision is not None and revision.recipe is not None:
+        saved = getattr(getattr(request.user, "preferences", None), "unit_system", "metric")
+        options = RenderOptions(
+            lang=revision.recipe.source_lang, system=saved if saved in _SYSTEMS else "metric"
+        )
+        model = build_render_model(revision.recipe, options)
+    problem = ""
+    if revision is not None and revision.recipe is None:
+        problem = _("This text cannot be read: %(detail)s") % {"detail": revision.detail}
+    context = {"recipe": row, "form": form, "model": model, "problem": problem}
+    return render(request, "recipes/edit.html", context)
+
+
+def _edit_fields(text: str) -> dict:
+    try:
+        front, _body = parse_document(text)
+    except YAMLError:
+        front = {}
+    return {
+        "title": front.get("title", ""),
+        "description": front.get("description", ""),
+        "servings": front.get("servings"),
+        "cooklang": text,
+    }
 
 
 def _rendered(request: HttpRequest, slug: str):

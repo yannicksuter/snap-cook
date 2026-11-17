@@ -19,6 +19,23 @@ change** and says so explicitly here.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-11-18
+
+### Added
+
+- The owner can edit a recipe: its name, description, servings and text, with
+  a preview. Saving makes a new version, so nothing earlier is lost, and keeps
+  the translations of everything that did not change.
+- Search finds a recipe by its ingredients too, in every language the app
+  knows them in: "sugar" finds a recipe with "Zucker". Existing recipes are
+  indexed when the update starts.
+
+### Changed
+
+- Changing the servings no longer fills the page with technical warnings. One
+  plain note says that times and oven temperatures stay as in the recipe.
+  Notes about units that cannot be converted appear only in cups and ounces.
+
 ## [0.5.0] - 2026-11-17
 
 ### Added
@@ -193,7 +210,8 @@ under the existing canonical form, not a new wire contract.
 - Documentation: README, AGENTS, CLAUDE, CONTRIBUTING, LICENSING,
   THIRD_PARTY_DATA, SECURITY, RECIPE_SPEC
 
-[Unreleased]: https://github.com/yannicksuter/snap-cook/compare/v0.5.0...main
+[Unreleased]: https://github.com/yannicksuter/snap-cook/compare/v0.6.0...main
+[0.6.0]: https://github.com/yannicksuter/snap-cook/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/yannicksuter/snap-cook/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/yannicksuter/snap-cook/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/yannicksuter/snap-cook/compare/v0.2.0...v0.3.0

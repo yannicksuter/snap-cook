@@ -54,6 +54,12 @@ class Recipe(models.Model):
     license_spdx = models.CharField(max_length=64, blank=True, default="")
     source_url = models.URLField(blank=True, default="")
     tags = models.JSONField(default=list)
+    search_terms = models.TextField(
+        blank=True,
+        default="",
+        help_text="What a search finds the recipe by beyond its title: every ingredient's "
+        "name and the title in every language known, one per line (snapcook_core.search).",
+    )
 
     head_version_id = models.CharField(max_length=72, db_index=True)
     head_content_hash = models.CharField(max_length=72)

@@ -1,0 +1,34 @@
+{% extends "recipes/base.html" %}
+{% comment %}
+SPDX-License-Identifier: AGPL-3.0-or-later
+
+The owner changes a saved recipe: its details and its text, with a preview.
+The fields are the same as when an import is checked (imports/_recipe_form.html);
+saving makes a new version, so nothing earlier is lost.
+{% endcomment %}
+{% load i18n %}
+
+{% block title %}{% translate "Edit recipe" %} · snap-cook{% endblock %}
+
+{% block content %}
+  <div class="px-2 border-b border-line">
+    <a href="{% url 'recipes:detail' recipe.slug %}" class="inline-flex items-center gap-1 h-12 px-3 text-[18px] font-bold text-ink hover:text-herb">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+      {% translate "Back to the recipe" %}
+    </a>
+  </div>
+
+  <h1 class="px-5 pt-5 text-[28px] font-extrabold tracking-tight">{% translate "Edit recipe" %}</h1>
+  <p class="px-5 mt-2 text-[17px] leading-relaxed text-ink-2">{% translate "Saving keeps the earlier version, and translations of what you did not change." %}</p>
+
+  {% if problem %}
+    <p class="mx-5 mt-4 rounded-2xl border-2 border-ember-edge bg-ember-tint px-4 py-3 text-[17px] leading-relaxed" role="alert">{{ problem }}</p>
+  {% endif %}
+
+  <form method="post" class="px-5 pt-6 pb-10 flex flex-col gap-4">
+    {% csrf_token %}
+    {% include "imports/_recipe_form.html" with text_open=True %}
+    <button type="submit" name="action" value="save" class="h-14 rounded-2xl bg-herb text-white text-[19px] font-extrabold hover:bg-herb-dark">{% translate "Save" %}</button>
+    <button type="submit" name="action" value="update" class="h-12 rounded-[14px] border-2 border-line-strong text-[17px] font-bold hover:border-ink-3">{% translate "Update the preview" %}</button>
+  </form>
+{% endblock %}

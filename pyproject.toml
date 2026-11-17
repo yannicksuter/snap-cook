@@ -46,6 +46,7 @@ known-first-party = [
     "catalog",
     "recipes",
     "imports",
+    "translations",
     "social",
     "api",
 ]

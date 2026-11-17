@@ -5,14 +5,6 @@ readable form of it is a view.** snap-cook stores the model and generates the
 prose — along with a flowchart, a printable page, and the same recipe in your
 language and your units.
 
-```
-                      ┌─→  ordered step list
-   recipe (a DAG)  ───┼─→  flowchart
-                      └─→  printed cookbook page
-
-                    × your language  × your unit system  × your scale
-```
-
 Recipes are files rather than database rows, their steps form a graph rather
 than a list, and units and language are chosen by whoever reads them.
 [How it works](docs/architecture/overview.md).
