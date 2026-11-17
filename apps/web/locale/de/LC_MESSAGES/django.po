@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: snap-cook\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-16 21:16+0000\n"
+"POT-Creation-Date: 2026-11-17 19:49+0000\n"
 "PO-Revision-Date: 2026-11-16 21:30+0100\n"
 "Last-Translator: snap-cook\n"
 "Language-Team: German\n"
@@ -57,15 +57,22 @@ msgstr "Abmelden"
 msgid "Saved."
 msgstr "Gespeichert."
 
-#: imports/forms.py
 #
+#: imports/forms.py
 msgid "Link to a recipe"
 msgstr "Link zu einem Rezept"
 
-#: imports/forms.py imports/templates/imports/add.html
 #
+#: imports/forms.py imports/templates/imports/add.html
 msgid "Recipe text"
 msgstr "Rezepttext"
+
+#: imports/forms.py
+msgid ""
+"That is more text than one recipe needs. Copy only the part with the recipe."
+msgstr ""
+"Das ist mehr Text, als ein Rezept braucht. Kopiere nur den Teil mit dem "
+"Rezept."
 
 #: imports/forms.py
 msgid "Photos"
@@ -81,18 +88,31 @@ msgid "At most %(count)s photos at once."
 msgstr "Höchstens %(count)s Fotos auf einmal."
 
 #: imports/forms.py
-msgid "Each photo can be at most 7 MB."
-msgstr "Jedes Foto darf höchstens 7 MB haben."
-
-#: imports/forms.py
 msgid ""
 "This is an iPhone HEIC photo. Choose it from the photo picker, which sends a "
 "JPEG, or set the camera to “Most Compatible”."
-msgstr "Das ist ein HEIC-Foto vom iPhone. Wähle es über die Fotoauswahl, die ein JPEG sendet, oder stelle die Kamera auf „Maximale Kompatibilität“."
+msgstr ""
+"Das ist ein HEIC-Foto vom iPhone. Wähle es über die Fotoauswahl, die ein "
+"JPEG sendet, oder stelle die Kamera auf „Maximale Kompatibilität“."
 
 #: imports/forms.py
 msgid "Use a photo (JPEG, PNG, WebP, GIF) or a PDF."
 msgstr "Verwende ein Foto (JPEG, PNG, WebP, GIF) oder ein PDF."
+
+#: imports/forms.py
+#, python-format
+msgid "A PDF can be at most %(size)s MB."
+msgstr "Ein PDF darf höchstens %(size)s MB haben."
+
+#: imports/forms.py
+#, python-format
+msgid "Each photo can be at most %(size)s MB."
+msgstr "Jedes Foto darf höchstens %(size)s MB haben."
+
+#: imports/forms.py
+#, python-format
+msgid "Together the files can be at most %(size)s MB."
+msgstr "Zusammen dürfen die Dateien höchstens %(size)s MB haben."
 
 #: imports/forms.py
 msgid "Name"
@@ -102,8 +122,8 @@ msgstr "Name"
 msgid "Short description"
 msgstr "Kurze Beschreibung"
 
-#: imports/forms.py
 #
+#: imports/forms.py
 msgid "Serves"
 msgstr "Portionen"
 
@@ -136,7 +156,9 @@ msgstr "Bereit zum Prüfen"
 msgid ""
 "This usually takes under a minute. You can leave this page: the draft waits "
 "for you on Home."
-msgstr "Das dauert meist weniger als eine Minute. Du kannst die Seite verlassen: Der Entwurf wartet auf der Startseite auf dich."
+msgstr ""
+"Das dauert meist weniger als eine Minute. Du kannst die Seite verlassen: Der "
+"Entwurf wartet auf der Startseite auf dich."
 
 #: imports/templates/imports/_progress.html
 msgid "That did not work"
@@ -154,8 +176,8 @@ msgstr "Nochmals versuchen"
 msgid "Delete"
 msgstr "Löschen"
 
-#: imports/templates/imports/add.html recipes/templates/recipes/index.html
 #
+#: imports/templates/imports/add.html recipes/templates/recipes/index.html
 msgid "Add a recipe"
 msgstr "Rezept hinzufügen"
 
@@ -165,18 +187,37 @@ msgstr "Schliessen"
 
 #: imports/templates/imports/add.html imports/views.py
 msgid "Reading recipes is not set up on this server yet."
-msgstr "Das Einlesen von Rezepten ist auf diesem Server noch nicht eingerichtet."
+msgstr ""
+"Das Einlesen von Rezepten ist auf diesem Server noch nicht eingerichtet."
 
 #: imports/templates/imports/add.html
 msgid ""
 "Set SNAPCOOK_LLM_API_KEY on the worker container; docs/install.md says how."
-msgstr "Setze SNAPCOOK_LLM_API_KEY im Worker-Container; wie das geht, steht in docs/install.md."
+msgstr ""
+"Setze SNAPCOOK_LLM_API_KEY im Worker-Container; wie das geht, steht in docs/"
+"install.md."
 
 #: imports/templates/imports/add.html
 msgid ""
 "snap-cook picks out the ingredients and the steps, and leaves everything "
 "else out."
-msgstr "snap-cook sucht die Zutaten und die Schritte heraus und lässt alles andere weg."
+msgstr ""
+"snap-cook sucht die Zutaten und die Schritte heraus und lässt alles andere "
+"weg."
+
+#. Translators: the Ctrl key as keyboards print it. German keyboards say “Strg”, Swiss ones “Ctrl”.
+#: imports/templates/imports/add.html
+msgctxt "keyboard key"
+msgid "Ctrl"
+msgstr "Ctrl"
+
+#: imports/templates/imports/add.html
+msgid "Paste a page copied from a website or a PDF"
+msgstr "Eine kopierte Webseite oder PDF-Seite einfügen"
+
+#: imports/templates/imports/add.html
+msgid "Or drop a PDF or a photo onto this page"
+msgstr "Oder ein PDF oder Foto auf diese Seite ziehen"
 
 #: imports/templates/imports/add.html
 msgid "Take a photo"
@@ -194,8 +235,8 @@ msgstr "Foto einlesen"
 msgid "Or paste a link"
 msgstr "Oder einen Link einfügen"
 
-#: imports/templates/imports/add.html
 #
+#: imports/templates/imports/add.html
 msgid "Get the recipe"
 msgstr "Rezept holen"
 
@@ -204,12 +245,13 @@ msgid "Other ways"
 msgstr "Andere Wege"
 
 #: imports/templates/imports/add.html
-msgid "Choose from your photos"
-msgstr "Aus deinen Fotos wählen"
+msgid "Choose photos or a PDF"
+msgstr "Fotos oder ein PDF wählen"
 
 #: imports/templates/imports/add.html
-msgid "Screenshots or a PDF too, several pages at once"
-msgstr "Auch Screenshots oder ein PDF, mehrere Seiten auf einmal"
+msgid "Screenshots and web pages saved as PDF too, several at once"
+msgstr ""
+"Auch Screenshots und als PDF gespeicherte Webseiten, mehrere auf einmal"
 
 #: imports/templates/imports/add.html
 msgid "Read the photos"
@@ -220,8 +262,9 @@ msgid "Paste text"
 msgstr "Text einfügen"
 
 #: imports/templates/imports/add.html
-msgid "From an email, a message or a whole web page"
-msgstr "Aus einer E-Mail, einer Nachricht oder einer ganzen Webseite"
+msgid "A whole web page or PDF you copied, an email or a message"
+msgstr ""
+"Eine ganze kopierte Webseite oder ein PDF, eine E-Mail oder eine Nachricht"
 
 #: imports/templates/imports/add.html
 msgid "Read the text"
@@ -231,8 +274,16 @@ msgstr "Text einlesen"
 msgid "New recipes stay private until you share them."
 msgstr "Neue Rezepte bleiben privat, bis du sie teilst."
 
-#: imports/templates/imports/review.html
+#: imports/templates/imports/add.html
+msgid "Drop it here to read it"
+msgstr "Hier loslassen zum Einlesen"
+
+#: imports/templates/imports/add.html
+msgid "Sending…"
+msgstr "Wird gesendet…"
+
 #
+#: imports/templates/imports/review.html
 msgid "Check the recipe"
 msgstr "Rezept prüfen"
 
@@ -256,7 +307,9 @@ msgstr "Quelle:"
 #, python-format
 msgid ""
 "A step uses “%(name)s”, but no step makes it. Check the recipe text below."
-msgstr "Ein Schritt verwendet „%(name)s“, aber kein Schritt stellt es her. Prüfe den Rezepttext unten."
+msgstr ""
+"Ein Schritt verwendet „%(name)s“, aber kein Schritt stellt es her. Prüfe den "
+"Rezepttext unten."
 
 #: imports/templates/imports/review.html
 msgid "Keep it as it is"
@@ -282,10 +335,11 @@ msgstr "Rezepttext bearbeiten"
 msgid ""
 "One step per paragraph. Ingredients, times and temperatures are marked like "
 "this:"
-msgstr "Ein Schritt pro Absatz. Zutaten, Zeiten und Temperaturen werden so markiert:"
+msgstr ""
+"Ein Schritt pro Absatz. Zutaten, Zeiten und Temperaturen werden so markiert:"
 
-#: imports/templates/imports/review.html
 #
+#: imports/templates/imports/review.html
 msgid "Save recipe"
 msgstr "Rezept speichern"
 
@@ -304,20 +358,24 @@ msgstr "Rezepte"
 
 #: imports/views.py
 msgid "That link leads into a private network, so it cannot be read."
-msgstr "Dieser Link führt in ein privates Netzwerk und kann deshalb nicht gelesen werden."
+msgstr ""
+"Dieser Link führt in ein privates Netzwerk und kann deshalb nicht gelesen "
+"werden."
 
 #: imports/views.py
 msgid ""
 "The page could not be loaded. Check the link, or paste the recipe’s text "
 "instead."
-msgstr "Die Seite konnte nicht geladen werden. Prüfe den Link oder füge stattdessen den Text des Rezepts ein."
+msgstr ""
+"Die Seite konnte nicht geladen werden. Prüfe den Link oder füge stattdessen "
+"den Text des Rezepts ein."
 
 #: imports/views.py
 msgid "The page is too large to read."
 msgstr "Die Seite ist zu umfangreich zum Lesen."
 
-#: imports/views.py
 #
+#: imports/views.py
 msgid "No recipe was found in it."
 msgstr "Darin wurde kein Rezept gefunden."
 
@@ -347,10 +405,11 @@ msgstr "Der Entwurf wurde gelöscht."
 
 #: imports/views.py
 msgid "That answer no longer fits the text. Edit the text instead."
-msgstr "Diese Antwort passt nicht mehr zum Text. Bearbeite stattdessen den Text."
+msgstr ""
+"Diese Antwort passt nicht mehr zum Text. Bearbeite stattdessen den Text."
 
-#: imports/views.py
 #
+#: imports/views.py
 msgid "Saved. Only you can see this recipe."
 msgstr "Gespeichert. Nur du siehst dieses Rezept."
 
@@ -434,8 +493,8 @@ msgstr "Suchen"
 msgid "Waiting for you"
 msgstr "Wartet auf dich"
 
-#: recipes/templates/recipes/index.html
 #
+#: recipes/templates/recipes/index.html
 msgid "New recipe"
 msgstr "Neues Rezept"
 

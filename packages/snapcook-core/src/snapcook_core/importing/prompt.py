@@ -22,7 +22,7 @@ EXAMPLE_SLUGS = ("004-tomato-sauce", "005-pancakes", "006-roesti")
 
 _INSTRUCTIONS = """\
 You read recipes for snap-cook, a family's recipe collection. The reader gives you \
-a web page, photos of a cookbook page or a handwritten card, or pasted text. You \
+a web page, photos of a cookbook page or a handwritten card, a PDF, or pasted text. You \
 return the one recipe in it, written in snap-cook's Cooklang format, with a few \
 notes for the person who checks your draft before it is saved.
 
@@ -122,7 +122,8 @@ def describe_source(source: ImportSource) -> str:
         what = "one photo or file" if count == 1 else f"{count} photos or files, in order"
         return (
             f"The reader took or chose {what}. They show one recipe, perhaps across "
-            "several pages, or a page with a picture of the finished dish. Return the recipe."
+            "several pages, or a page with a picture of the finished dish. A PDF may be "
+            "a whole web page saved as one, noise included. Return the recipe."
         )
     if source.kind == "page":
         parts = [f"URL: {source.url}"] if source.url else []

@@ -107,6 +107,13 @@ from.
 - **Fetching is guarded.** Any signed-in reader picks the URL, so the worker
   connects only to public addresses, checks every redirect, and connects to
   the address it checked (`imports/fetch.py`).
+- **On a computer, paste or drop.** Ctrl+V outside a field on `/add/` reads what
+  was copied: a whole page as text, a link, or a file. A file dropped anywhere on
+  the page is read like a chosen one. The page's script only fills in one of the
+  three forms, so the server checks everything as before. The limits are in
+  `imports/forms.py`: 200,000 characters of text (a page with its comments, not
+  a cookbook), 7 MB a photo, 32 MB a PDF (a page printed to PDF, photos and all),
+  and 50 MB together.
 - **Failures are words.** Every way an import can end has a code and a sentence
   on the waiting page; nothing raises out of the task, so django-q never reads
   a job twice.

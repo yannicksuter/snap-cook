@@ -19,6 +19,22 @@ change** and says so explicitly here.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-11-17
+
+### Added
+
+- On a computer, "Add a recipe" reads whatever you paste with Ctrl+V (⌘V on a
+  Mac): a whole web page or PDF copied with Ctrl+A and Ctrl+C, a link, or a
+  copied image. A PDF or a photo can also be dropped onto the page.
+
+### Changed
+
+- A PDF can be up to 32 MB, so a web page printed to PDF fits. Photos stay at
+  7 MB each, and all files together can be at most 50 MB.
+- Pasted text can be up to 200,000 characters, enough for a page with its
+  comments. A longer paste gets a message saying to copy only the recipe,
+  instead of a technical error.
+
 ## [0.3.0] - 2026-11-16
 
 ### Changed
@@ -132,7 +148,8 @@ under the existing canonical form, not a new wire contract.
 - Documentation: README, AGENTS, CLAUDE, CONTRIBUTING, LICENSING,
   THIRD_PARTY_DATA, SECURITY, RECIPE_SPEC
 
-[Unreleased]: https://github.com/yannicksuter/snap-cook/compare/v0.3.0...main
+[Unreleased]: https://github.com/yannicksuter/snap-cook/compare/v0.4.0...main
+[0.4.0]: https://github.com/yannicksuter/snap-cook/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/yannicksuter/snap-cook/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/yannicksuter/snap-cook/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/yannicksuter/snap-cook/releases/tag/v0.1.0
