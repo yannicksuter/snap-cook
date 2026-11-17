@@ -19,6 +19,8 @@ change** and says so explicitly here.
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-11-17
+
 ### Added
 
 - A recipe shown in another language is translated as a whole: its name,
@@ -191,7 +193,8 @@ under the existing canonical form, not a new wire contract.
 - Documentation: README, AGENTS, CLAUDE, CONTRIBUTING, LICENSING,
   THIRD_PARTY_DATA, SECURITY, RECIPE_SPEC
 
-[Unreleased]: https://github.com/yannicksuter/snap-cook/compare/v0.4.0...main
+[Unreleased]: https://github.com/yannicksuter/snap-cook/compare/v0.5.0...main
+[0.5.0]: https://github.com/yannicksuter/snap-cook/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/yannicksuter/snap-cook/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/yannicksuter/snap-cook/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/yannicksuter/snap-cook/compare/v0.1.0...v0.2.0
