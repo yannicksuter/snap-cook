@@ -30,6 +30,7 @@ _TRANSLATED = [code for code, _ in settings.LANGUAGES if code != "en"]
 @dataclass
 class _Entry:
     msgid: str = ""
+    context: str | None = None
     plural: str | None = None
     msgstr: dict[int, str] = field(default_factory=dict)
     fuzzy: bool = False
@@ -65,12 +66,16 @@ def _entries(po: Path) -> list[_Entry]:
                 target = (
                     ("msgstr", int(index.group(1)))
                     if index
-                    else {"msgid": ("msgid", 0), "msgid_plural": ("plural", 0)}.get(
-                        keyword, ("msgstr", 0)
-                    )
+                    else {
+                        "msgctxt": ("context", 0),
+                        "msgid": ("msgid", 0),
+                        "msgid_plural": ("plural", 0),
+                    }.get(keyword, ("msgstr", 0))
                 )
             kind, n = target
-            if kind == "msgid":
+            if kind == "context":
+                entry.context = (entry.context or "") + text
+            elif kind == "msgid":
                 entry.msgid += text
             elif kind == "plural":
                 entry.plural = (entry.plural or "") + text
@@ -100,7 +105,18 @@ def test_the_compiled_catalogue_matches_its_source(language: str) -> None:
     with translation.override(language):
         for entry in _entries(_LOCALE / language / "LC_MESSAGES" / "django.po"):
             if entry.plural is None:
-                assert translation.gettext(entry.msgid) == entry.msgstr[0], entry.msgid
+                assert _served(entry) == entry.msgstr[0], entry.msgid
             else:
-                assert translation.ngettext(entry.msgid, entry.plural, 1) == entry.msgstr[0]
-                assert translation.ngettext(entry.msgid, entry.plural, 2) == entry.msgstr[1]
+                assert _served(entry, 1) == entry.msgstr[0], entry.msgid
+                assert _served(entry, 2) == entry.msgstr[1], entry.msgid
+
+
+def _served(entry: _Entry, count: int | None = None) -> str:
+    """What Django serves for the entry, in the active language."""
+    if entry.context is None:
+        if count is None:
+            return translation.gettext(entry.msgid)
+        return translation.ngettext(entry.msgid, entry.plural, count)
+    if count is None:
+        return translation.pgettext(entry.context, entry.msgid)
+    return translation.npgettext(entry.context, entry.msgid, entry.plural, count)

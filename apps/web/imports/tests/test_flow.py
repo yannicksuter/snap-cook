@@ -8,17 +8,20 @@ real path: forms, files on disk, the draft text, the store and the catalog.
 
 from __future__ import annotations
 
+import re
+
 import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 
 from catalog.models import Recipe
-from imports import views
+from imports import forms, views
 from imports.models import ImportJob
 from imports.tasks import read_recipe
 
 pytestmark = pytest.mark.django_db
 
 _JPEG = b"\xff\xd8\xff\xe0" + b"\x00" * 64
+_PDF = b"%PDF-1.7\n" + b"0" * 128
 
 
 @pytest.fixture
@@ -133,6 +136,62 @@ def test_an_iphone_photo_gets_its_own_explanation(cook, client, reader) -> None:
     upload = SimpleUploadedFile("IMG_0002.HEIC", heic, content_type="image/heic")
     page = client.post("/add/", {"kind": "files", "files": [upload]}).content.decode()
     assert "HEIC" in page
+
+
+def test_a_whole_copied_page_can_be_pasted(cook, client, reader) -> None:
+    # Lines up to the limit with each line break counted once; past it if the
+    # CRLF a browser sends for each one counted twice.
+    lines = (forms.MAX_TEXT_CHARS + 1) // 100
+    text = "\r\n".join(["x" * 99] * lines)
+    response = client.post("/add/", {"kind": "text", "text": text})
+    job = _job()
+    assert response["Location"] == f"/drafts/{job.pk}/"
+    assert job.source_text == text.replace("\r\n", "\n")
+
+
+def test_more_text_than_a_recipe_needs_is_refused(cook, client, reader) -> None:
+    text = "x" * (forms.MAX_TEXT_CHARS + 1)
+    page = client.post("/add/", {"kind": "text", "text": text}).content.decode()
+    assert re.search(r'id="text-errors"[^>]*><p>That is more text than one recipe needs', page)
+    assert not ImportJob.objects.exists()
+
+
+def test_the_page_checks_the_same_text_limit_as_the_server(cook, client, reader) -> None:
+    page = client.get("/add/", HTTP_ACCEPT_LANGUAGE="de").content.decode()
+    assert f'data-max="{forms.MAX_TEXT_CHARS}"' in page
+    assert 'id="computer-hint" hidden' in page
+
+
+def test_a_pdf_may_be_larger_than_a_photo(cook, client, reader, monkeypatch) -> None:
+    monkeypatch.setattr(forms, "MAX_PHOTO_BYTES", len(_PDF) - 1)
+    pdf = SimpleUploadedFile("saved page.pdf", _PDF, content_type="application/pdf")
+    client.post("/add/", {"kind": "files", "files": [pdf]})
+    assert [path.name for path in _job().source_files()] == ["1.pdf"]
+
+    photo = SimpleUploadedFile("IMG_0003.jpg", _JPEG.ljust(len(_PDF), b"\x00"))
+    page = client.post("/add/", {"kind": "files", "files": [photo]}).content.decode()
+    assert "Each photo can be at most" in page
+    assert ImportJob.objects.count() == 1
+
+
+def test_pdfs_have_limits_of_their_own_and_together(cook, client, reader, monkeypatch) -> None:
+    monkeypatch.setattr(forms, "MAX_PDF_BYTES", len(_PDF) - 1)
+    pdf = SimpleUploadedFile("cookbook.pdf", _PDF, content_type="application/pdf")
+    assert (
+        "A PDF can be at most"
+        in client.post("/add/", {"kind": "files", "files": [pdf]}).content.decode()
+    )
+
+    monkeypatch.setattr(forms, "MAX_PDF_BYTES", len(_PDF))
+    monkeypatch.setattr(forms, "MAX_TOTAL_BYTES", 2 * len(_PDF) - 1)
+    pdfs = [
+        SimpleUploadedFile(f"page {n}.pdf", _PDF, content_type="application/pdf") for n in (1, 2)
+    ]
+    assert (
+        "Together the files can be at most"
+        in client.post("/add/", {"kind": "files", "files": pdfs}).content.decode()
+    )
+    assert not ImportJob.objects.exists()
 
 
 def test_a_link_into_the_private_network_is_refused(cook, client, reader) -> None:
