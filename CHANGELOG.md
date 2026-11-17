@@ -19,6 +19,21 @@ change** and says so explicitly here.
 
 ## [Unreleased]
 
+### Added
+
+- The owner can edit a recipe: its name, description, servings and text, with
+  a preview. Saving makes a new version, so nothing earlier is lost, and keeps
+  the translations of everything that did not change.
+- Search finds a recipe by its ingredients too, in every language the app
+  knows them in: "sugar" finds a recipe with "Zucker". Existing recipes are
+  indexed when the update starts.
+
+### Changed
+
+- Changing the servings no longer fills the page with technical warnings. One
+  plain note says that times and oven temperatures stay as in the recipe.
+  Notes about units that cannot be converted appear only in cups and ounces.
+
 ## [0.5.0] - 2026-11-17
 
 ### Added

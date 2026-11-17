@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: snap-cook\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-17 21:04+0000\n"
+"POT-Creation-Date: 2026-11-17 23:09+0000\n"
 "PO-Revision-Date: 2026-11-16 21:30+0100\n"
 "Last-Translator: snap-cook\n"
 "Language-Team: German\n"
@@ -41,6 +41,7 @@ msgstr ""
 "Für Menüs und Schaltflächen. Rezepte öffnen sich ebenfalls in dieser Sprache."
 
 #: accounts/templates/accounts/settings.html
+#: recipes/templates/recipes/edit.html
 msgid "Save"
 msgstr "Speichern"
 
@@ -53,7 +54,7 @@ msgstr "Angemeldet als %(email)s"
 msgid "Sign out"
 msgstr "Abmelden"
 
-#: accounts/views.py
+#: accounts/views.py recipes/views.py
 msgid "Saved."
 msgstr "Gespeichert."
 
@@ -176,6 +177,32 @@ msgstr "Nochmals versuchen"
 #: imports/templates/imports/_progress.html
 msgid "Delete"
 msgstr "Löschen"
+
+#: imports/templates/imports/_recipe_form.html
+#: recipes/templates/recipes/_render.html
+msgid "Ingredients"
+msgstr "Zutaten"
+
+#: imports/templates/imports/_recipe_form.html
+#: recipes/templates/recipes/_render.html
+msgid "optional"
+msgstr "optional"
+
+#: imports/templates/imports/_recipe_form.html
+#: recipes/templates/recipes/_render.html
+msgid "Steps"
+msgstr "Schritte"
+
+#: imports/templates/imports/_recipe_form.html
+msgid "Edit the recipe text"
+msgstr "Rezepttext bearbeiten"
+
+#: imports/templates/imports/_recipe_form.html
+msgid ""
+"One step per paragraph. Ingredients, times and temperatures are marked like "
+"this:"
+msgstr ""
+"Ein Schritt pro Absatz. Zutaten, Zeiten und Temperaturen werden so markiert:"
 
 #
 #: imports/templates/imports/add.html recipes/templates/recipes/index.html
@@ -317,35 +344,12 @@ msgstr ""
 msgid "Keep it as it is"
 msgstr "So lassen"
 
-#: imports/templates/imports/review.html recipes/templates/recipes/_render.html
-msgid "Ingredients"
-msgstr "Zutaten"
-
-#: imports/templates/imports/review.html recipes/templates/recipes/_render.html
-msgid "optional"
-msgstr "optional"
-
-#: imports/templates/imports/review.html recipes/templates/recipes/_render.html
-msgid "Steps"
-msgstr "Schritte"
-
-#: imports/templates/imports/review.html
-msgid "Edit the recipe text"
-msgstr "Rezepttext bearbeiten"
-
-#: imports/templates/imports/review.html
-msgid ""
-"One step per paragraph. Ingredients, times and temperatures are marked like "
-"this:"
-msgstr ""
-"Ein Schritt pro Absatz. Zutaten, Zeiten und Temperaturen werden so markiert:"
-
 #
 #: imports/templates/imports/review.html
 msgid "Save recipe"
 msgstr "Rezept speichern"
 
-#: imports/templates/imports/review.html
+#: imports/templates/imports/review.html recipes/templates/recipes/edit.html
 msgid "Update the preview"
 msgstr "Vorschau aktualisieren"
 
@@ -428,8 +432,8 @@ msgid "Fit"
 msgstr "Einpassen"
 
 #: recipes/templates/recipes/_render.html
-msgid "Something in this recipe needs checking:"
-msgstr "Bei diesem Rezept muss etwas geprüft werden:"
+msgid "Edit"
+msgstr "Bearbeiten"
 
 #: recipes/templates/recipes/_render.html
 msgid "Servings"
@@ -500,13 +504,27 @@ msgid "Your settings: language and units"
 msgstr "Deine Einstellungen: Sprache und Einheiten"
 
 #
-#: recipes/templates/recipes/chart.html
+#: recipes/templates/recipes/chart.html recipes/templates/recipes/edit.html
 msgid "Back to the recipe"
 msgstr "Zurück zum Rezept"
+
+#: recipes/templates/recipes/edit.html
+msgid "Edit recipe"
+msgstr "Rezept bearbeiten"
+
+#: recipes/templates/recipes/edit.html
+msgid ""
+"Saving keeps the earlier version, and translations of what you did not "
+"change."
+msgstr "Beim Speichern bleibt die frühere Fassung erhalten, ebenso die Übersetzungen von allem, was du nicht änderst."
 
 #: recipes/templates/recipes/index.html
 msgid "Search recipes"
 msgstr "Rezepte suchen"
+
+#: recipes/templates/recipes/index.html
+msgid "Search by name or ingredient"
+msgstr "Nach Name oder Zutat suchen"
 
 #: recipes/templates/recipes/index.html
 msgid "Search"
@@ -597,6 +615,23 @@ msgstr "%(list)s und %(last)s"
 #, python-format
 msgid "Uses what you made in steps %(numbers)s."
 msgstr "Verwendet, was du in den Schritten %(numbers)s zubereitet hast."
+
+#: recipes/views.py
+msgid ""
+"Times and oven temperatures stay as in the recipe. Check them when you cook "
+"more or less."
+msgstr "Zeiten und Ofentemperaturen bleiben wie im Rezept. Prüfe sie, wenn du mehr oder weniger kochst."
+
+#: recipes/views.py
+msgid ""
+"Some amounts cannot be shown in cups and ounces, so they stay as in the "
+"recipe."
+msgstr "Manche Mengen lassen sich nicht in Cups und Unzen zeigen und bleiben wie im Rezept."
+
+#: recipes/views.py
+#, python-format
+msgid "This text cannot be read: %(detail)s"
+msgstr "Dieser Text lässt sich nicht lesen: %(detail)s"
 
 #: translations/templates/translations/_progress.html
 msgid ""

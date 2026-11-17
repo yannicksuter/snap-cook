@@ -102,10 +102,16 @@ def scale_spec(
             issues.add(
                 CODE_SCALING_MANUAL,
                 f"not scaled automatically ({spec.scaling.value}); check this value "
-                f"for a {factor}x batch",
+                f"for a {_factor_text(factor)}x batch",
                 severity="warn",
                 element_id=element_id,
             )
         return spec
 
     return spec.model_copy(update={"quantity": scale_quantity(spec.quantity, factor)})
+
+
+def _factor_text(factor: Decimal) -> str:
+    """``2``, ``1.5``, ``0.92``: 11 of 12 servings is not worth 28 digits."""
+    rounded = factor.quantize(Decimal("0.01")).normalize()
+    return format(rounded, "f")

@@ -9,7 +9,7 @@
     <label for="q" class="sr-only">{% translate "Search recipes" %}</label>
     <div class="flex-1 min-w-0 flex items-center gap-2.5 h-[52px] px-4 rounded-[14px] border-2 border-line-strong text-ink-2 focus-within:border-herb">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="flex-none"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      <input id="q" name="q" type="search" value="{{ query }}" placeholder="{% translate 'Search recipes' %}"
+      <input id="q" name="q" type="search" value="{{ query }}" placeholder="{% translate 'Search by name or ingredient' %}"
              class="flex-1 min-w-0 bg-transparent text-[18px] text-ink outline-none placeholder:text-ink-3">
     </div>
     <button type="submit" class="flex-none h-[52px] px-5 rounded-[14px] bg-herb text-white text-[18px] font-bold hover:bg-herb-dark">{% translate "Search" %}</button>

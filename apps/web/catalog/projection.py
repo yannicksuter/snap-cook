@@ -25,6 +25,7 @@ from django.utils.text import slugify
 from catalog.models import Recipe as CatalogRecipe
 from catalog.models import RecipeVersion
 from snapcook_core.schema.recipe import Recipe as CoreRecipe
+from snapcook_core.search import search_terms
 from snapcook_core.store.base import RecipeStore, VersionRecord
 
 __all__ = ["OwnerResolver", "project_recipe", "project_store"]
@@ -85,6 +86,7 @@ def project_recipe(store: RecipeStore, recipe_id: str, owner: object) -> Catalog
             "license_spdx": provenance.license_spdx or "",
             "source_url": provenance.source_url or "",
             "tags": list(recipe.tags),
+            "search_terms": "\n".join(search_terms(recipe)),
             "head_version_id": head.version_id,
             "head_content_hash": head.content_hash,
             "created_at": _parse_dt(history[-1].created_at),

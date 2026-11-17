@@ -61,6 +61,15 @@ def test_search_narrows_the_list(seeded, cook, client) -> None:
     assert "1 recipe" in page
 
 
+def test_a_search_finds_a_recipe_by_its_ingredients_in_any_language(seeded, cook, client) -> None:
+    # Rösti is written in English with German translations; the potato is in the
+    # registry with its name in both.
+    for word in ("potato", "Kartoffel", "butter"):
+        page = _page(client, f"/?q={word}")
+        assert "/r/rosti/" in page, word
+    assert "/r/rosti/" not in _page(client, "/?q=tomato")
+
+
 def test_a_search_without_matches_says_so(seeded, cook, client) -> None:
     page = _page(client, "/?q=lasagne")
     assert "No recipe matches “lasagne”." in page
@@ -176,3 +185,13 @@ def test_the_chart_prints_on_a_page_of_its_own(seeded, cook, client) -> None:
     assert "chart:drawn" in page and "window.print()" in page
     assert 'href="/r/rosti/?lang=de&amp;system=metric&amp;servings=4"' in page
     assert "chart:drawn', () => window.print()" not in _page(client, "/r/rosti/chart/")
+
+
+# -- notes ------------------------------------------------------------------------------
+
+
+def test_changing_the_amount_says_once_that_times_stay(seeded, cook, client) -> None:
+    assert "Times and oven temperatures stay" not in _page(client, "/r/rosti/")
+    page = _page(client, "/r/rosti/?servings=3")
+    assert page.count("Times and oven temperatures stay as in the recipe.") == 1
+    assert "not scaled automatically" not in page

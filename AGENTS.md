@@ -113,6 +113,7 @@ packages/snapcook-core/src/snapcook_core/
 ├── ids.py                  # prefixed ULIDs; stable across edits, so diff can match
 ├── importing/normalize.py  # a model's reading -> a draft; trusts none of it
 ├── translating/pieces.py   # what a translation may change: words, never structure
+├── editing.py              # a saved recipe edited as text: same id, translations kept
 └── errors.py               # error tree + ValidationIssue (non-fatal diagnostics)
 
 apps/web/
