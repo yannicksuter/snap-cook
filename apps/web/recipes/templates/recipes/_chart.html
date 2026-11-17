@@ -1,0 +1,27 @@
+{% comment %}
+SPDX-License-Identifier: AGPL-3.0-or-later
+
+The chart's frame, on the recipe page and on its print page. The toolbar shows
+only in full screen; the page's script (_chart_assets.html) opens it, and moves
+and zooms the drawing there.
+{% endcomment %}{% load i18n %}
+<div id="chart" class="group/chart chart-paper mx-5 mt-4 rounded-3xl overflow-hidden print:mx-0 [&.is-full]:fixed [&.is-full]:inset-0 [&.is-full]:z-50 [&.is-full]:m-0 [&.is-full]:flex [&.is-full]:flex-col [&.is-full]:rounded-none">
+  <div class="hidden group-[.is-full]/chart:flex items-center justify-end gap-2 p-2.5 bg-white border-b border-line">
+    <button type="button" data-chart="out" aria-label="{% translate 'Zoom out' %}" class="inline-flex w-11 h-11 items-center justify-center rounded-xl border-2 border-line-strong hover:border-ink-3">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg>
+    </button>
+    <button type="button" data-chart="in" aria-label="{% translate 'Zoom in' %}" class="inline-flex w-11 h-11 items-center justify-center rounded-xl border-2 border-line-strong hover:border-ink-3">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+    <button type="button" data-chart="fit" class="inline-flex h-11 px-3.5 items-center rounded-xl border-2 border-line-strong text-[16px] font-bold hover:border-ink-3">{% translate "Fit" %}</button>
+    <button type="button" data-chart="close" class="inline-flex h-11 px-3.5 items-center gap-2 rounded-xl bg-ink text-white text-[16px] font-bold hover:bg-ink-2">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      {% translate "Close" %}
+    </button>
+  </div>
+  <div data-chart-view class="overflow-x-auto px-4 py-6 group-[.is-full]/chart:flex-1 group-[.is-full]/chart:overflow-hidden group-[.is-full]/chart:touch-none group-[.is-full]/chart:p-0">
+    <div data-chart-canvas class="group-[.is-full]/chart:w-full group-[.is-full]/chart:h-full">
+      <pre class="mermaid">{{ mermaid }}</pre>
+    </div>
+  </div>
+</div>

@@ -7,15 +7,15 @@ build a context dict. If domain logic appears here, it is a bug -- move it into
 the core package where a Flutter client and the API can reach it too.
 
 The detail view is the thesis made interactive: one stored recipe, re-rendered
-on the fly into whatever language, unit system and number of servings the
-reader chooses. The controls are plain links that HTMX turns into fragment
-swaps, so a reader can flip Rösti from German-metric to English-US-for-six
-without the recipe changing on disk, and the page still works without
-JavaScript.
+on the fly for the reader's language, unit system and number of servings, with
+the method drawn as a chart beside it. The servings stepper is plain links that
+HTMX turns into fragment swaps, so the page still works without JavaScript.
 
-Language and units start from the reader's settings (``request.LANGUAGE_CODE``
-already holds the saved language; see ``accounts.middleware``). The query
-string overrides them for one view without changing anything stored.
+Language and units come from the reader's settings (``request.LANGUAGE_CODE``
+already holds the saved language; see ``accounts.middleware``); a recipe in
+another language is translated for them (``translations``). The query string
+still overrides both for one view -- a shared link, the chart's print page --
+without changing anything stored.
 """
 
 from __future__ import annotations
@@ -26,36 +26,21 @@ from urllib.parse import urlencode
 
 from django.conf import settings
 from django.db.models import Q
-from django.http import HttpRequest, HttpResponse
+from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
-from django.utils.translation import gettext as _
+from translations.jobs import progress_for
 
 from catalog.access import get_recipe_or_404, visible_recipes
 from imports.models import ImportJob
-from snapcook_core.render import (
-    RenderOptions,
-    build_render_model,
-    render_mermaid,
-    render_text,
-)
+from snapcook_core.render import RenderOptions, build_render_model, render_mermaid
 from snapcook_core.store import FilesystemStore
 
 _SYSTEMS = ("metric", "us")
-# "Show this recipe in X", written in X: a reader looks for their own language,
-# not for its name in the language they are trying to leave.
-_SHOW_IN = {"en": "Show in English", "de": "Auf Deutsch anzeigen"}
 _MAX_SERVINGS = 100
 _MAX_SCALE = Decimal(100)
 # For a recipe that does not say how many it serves, the stepper walks these.
 _SCALE_STEPS = (Decimal("0.5"), Decimal(1), Decimal("1.5"), Decimal(2), Decimal(3), Decimal(4))
-
-
-@dataclass(frozen=True)
-class _Link:
-    label: str
-    url: str
-    lang: str = ""
 
 
 @dataclass(frozen=True)
@@ -69,8 +54,10 @@ class _View:
     amount: str
     fewer: str
     more: str
-    languages: tuple[_Link, ...]
-    units: _Link
+    here: str
+    """This recipe page, for this same view."""
+    print_chart: str
+    """The chart alone, for this same view, printing itself once drawn."""
 
 
 def index(request: HttpRequest) -> HttpResponse:
@@ -92,26 +79,48 @@ def index(request: HttpRequest) -> HttpResponse:
 
 def detail(request: HttpRequest, slug: str) -> HttpResponse:
     """One recipe, rendered for the reader's language, units and servings."""
-    catalog_recipe = get_recipe_or_404(request.user, slug)
-    store = FilesystemStore(settings.SNAPCOOK_STORE_DIR)
-    recipe = store.head_recipe(catalog_recipe.recipe_id)
-
-    view = _view_from_request(request, slug, recipe.servings)
-    model = build_render_model(
-        recipe, RenderOptions(lang=view.lang, system=view.system, scale=view.scale)
-    )
-
+    catalog_recipe, head, view, model = _rendered(request, slug)
+    recipe = head.recipe
     context = {
         "recipe": catalog_recipe,
         "model": model,
         "view": view,
         "mermaid": render_mermaid(model),
-        "plaintext": render_text(model),
         "warnings": [w for w in model.warnings if w.severity in ("warn", "error")],
+        # Shown in another language, a recipe is translated once, in the worker.
+        "translation": progress_for(
+            request.user, catalog_recipe.recipe_id, recipe, head.version_id, view.lang
+        ),
     }
     is_htmx = request.headers.get("HX-Request")
     template = "recipes/_render.html" if is_htmx else "recipes/detail.html"
     return render(request, template, context)
+
+
+def chart(request: HttpRequest, slug: str) -> HttpResponse:
+    """The chart alone, to print: the same language, units and servings as the page."""
+    catalog_recipe, _head, view, model = _rendered(request, slug)
+    context = {
+        "recipe": catalog_recipe,
+        "model": model,
+        "view": view,
+        "mermaid": render_mermaid(model),
+        "print_now": request.GET.get("print") == "1",
+    }
+    return render(request, "recipes/chart.html", context)
+
+
+def _rendered(request: HttpRequest, slug: str):
+    """The visible recipe, its HEAD, the reader's view of it, and that view rendered."""
+    catalog_recipe = get_recipe_or_404(request.user, slug)
+    head = FilesystemStore(settings.SNAPCOOK_STORE_DIR).head(catalog_recipe.recipe_id)
+    if head is None:
+        raise Http404
+    view = _view_from_request(request, slug, head.recipe.servings)
+    model = build_render_model(
+        head.recipe, RenderOptions(lang=view.lang, system=view.system, scale=view.scale)
+    )
+    return catalog_recipe, head, view, model
 
 
 def _view_from_request(request: HttpRequest, slug: str, base_servings: int | None) -> _View:
@@ -125,14 +134,14 @@ def _view_from_request(request: HttpRequest, slug: str, base_servings: int | Non
         saved = getattr(getattr(request.user, "preferences", None), "unit_system", "metric")
         system = saved if saved in _SYSTEMS else "metric"
 
-    def url(**changes: object) -> str:
+    def url(route: str = "recipes:detail", **changes: object) -> str:
         params: dict[str, object] = {"lang": lang, "system": system}
         if base_servings:
             params["servings"] = servings
         else:
             params["scale"] = _scale_str(scale)
         params.update(changes)
-        return f"{reverse('recipes:detail', args=[slug])}?{urlencode(params)}"
+        return f"{reverse(route, args=[slug])}?{urlencode(params)}"
 
     if base_servings:
         servings = _parse_servings(request.GET.get("servings"), base_servings)
@@ -149,11 +158,6 @@ def _view_from_request(request: HttpRequest, slug: str, base_servings: int | Non
         fewer = url(scale=_scale_str(smaller[-1])) if smaller else ""
         more = url(scale=_scale_str(larger[0])) if larger else ""
 
-    other = "us" if system == "metric" else "metric"
-    if other == "us":
-        units_label = _("Show in US cups and ounces")
-    else:
-        units_label = _("Show in grams and millilitres")
     return _View(
         lang=lang,
         system=system,
@@ -162,12 +166,8 @@ def _view_from_request(request: HttpRequest, slug: str, base_servings: int | Non
         amount=amount,
         fewer=fewer,
         more=more,
-        languages=tuple(
-            _Link(_SHOW_IN.get(code, name), url(lang=code), lang=code)
-            for code, name in settings.LANGUAGES
-            if code != lang
-        ),
-        units=_Link(units_label, url(system=other)),
+        here=url(),
+        print_chart=url("recipes:chart", print=1),
     )
 
 

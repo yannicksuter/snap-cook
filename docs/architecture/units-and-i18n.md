@@ -50,12 +50,29 @@ commit.
 ## Translation
 
 - Ingredient names resolve through the registry at render time, per language.
-  They are not stored in translation files.
-- Only prose is translated per recipe, in sibling files.
+  They are not stored in translations.
+- Prose is translated per recipe, inside the recipe: every `LocalizedText`
+  (title, description, the words of a step, notes, what a step makes, pans)
+  gains a value per language. Words no registry knows, an ingredient it cannot
+  bind or a unit it cannot resolve, go to the recipe's `glossary`, keyed by the
+  word as written.
 - Each translated string records the hash of its **source** string, so staleness
-  is per string — fixing one typo does not invalidate a whole translation.
-- A translation must lower to a graph with the same action ids. Translators
-  translate text; they cannot alter structure.
+  is per string: fixing one typo invalidates one translation, and the next run
+  redoes only that.
+- A translation must lower to a graph with the same action ids and slot
+  sequence. Translators translate text; they cannot alter structure. The model
+  never sees amounts as text: a step goes out as its prose with numbered slots,
+  `Den ⟦1⟧ verrühren`, and a step whose slots come back missing, repeated or
+  out of order keeps its source words (`snapcook_core.translating`).
+- Oven settings and the words standing in for an amount are closed
+  vocabularies, labelled by the renderer in the reader's language. They need no
+  translation.
+
+How it runs: opening a recipe in another language starts one run in the worker
+(`translations`), and the page says so until the run commits. The run commits a
+new version **in the owner's name**, because `reindex` takes the owner from the
+latest version's author. A failed run is not retried by reloading the page; the
+reader retries. Translating uses the import's model and key, at low effort.
 
 ## Interface language
 
@@ -78,8 +95,9 @@ interface is not English by construction.
   untranslated or the `.mo` is older than its `.po`.
 - **Adding a language**: add it to `LANGUAGES` in `settings.py`, run
   `makemessages -l <code>` and `compilemessages` (commands in `AGENTS.md`),
-  translate every entry, and give `_SHOW_IN` in `recipes/views.py` its "show in"
-  label.
+  translate every entry, and give the renderer's label tables in
+  `snapcook_core/render/build.py` (sizes, approximations, oven settings) and the
+  translation prompt's `_LANGUAGE_NAMES` an entry for it.
 
 Not localised yet, all in core rather than the web app:
 

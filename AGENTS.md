@@ -112,6 +112,7 @@ packages/snapcook-core/src/snapcook_core/
 ├── schema/base.py          # SnapcookModel: frozen, extra=forbid, NonSemantic
 ├── ids.py                  # prefixed ULIDs; stable across edits, so diff can match
 ├── importing/normalize.py  # a model's reading -> a draft; trusts none of it
+├── translating/pieces.py   # what a translation may change: words, never structure
 └── errors.py               # error tree + ValidationIssue (non-fatal diagnostics)
 
 apps/web/
@@ -126,7 +127,8 @@ apps/web/
 ├── api/product.py          # /api/v1/  -- per-user scoped
 ├── api/ops.py              # /ops/api/ -- ignores ownership. Read the danger note.
 ├── imports/fetch.py        # fetches only from the public internet; read before touching
-└── imports/tasks.py        # the worker's half of an import: fetch, read, normalise
+├── imports/tasks.py        # the worker's half of an import: fetch, read, normalise
+└── translations/tasks.py   # commits a translation in the OWNER's name; read why first
 ```
 
 ## Commands
@@ -176,7 +178,10 @@ production: `DJANGO_SECRET_KEY`, `DJANGO_ALLOWED_HOSTS`, `POSTGRES_PASSWORD`,
 
 `SNAPCOOK_OPS_API_TOKEN` is the highest-value secret in the system — it bypasses
 per-user scoping. The app refuses to boot if the ops API is enabled with a weak,
-placeholder or low-entropy token.
+placeholder or low-entropy token, and the API refuses every request that came
+through a proxy or tunnel or from a public address (`api.auth.direct_from_the_lan`).
+Never loosen that check: it is what makes switching the API on safe on a server
+whose site is tunnelled.
 
 ## Conventions
 

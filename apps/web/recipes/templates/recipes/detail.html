@@ -2,11 +2,9 @@
 {% comment %}
 SPDX-License-Identifier: AGPL-3.0-or-later
 
-The detail shell. The recipe itself, its controls, and the flowchart all live in
+The detail shell. The recipe itself, its controls, and its chart all live in
 the swappable #render fragment; this page only supplies the frame and the
-Mermaid runtime. Mermaid is initialised with startOnLoad off and re-run after
-every HTMX swap, because a swapped-in <pre class="mermaid"> is new DOM the
-library has not seen yet.
+chart's look and behaviour (_chart_assets.html, shared with the print page).
 {% endcomment %}
 {% load i18n %}
 
@@ -24,14 +22,5 @@ library has not seen yet.
     {% include "recipes/_render.html" %}
   </div>
 
-  <script type="module">
-    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-    mermaid.initialize({ startOnLoad: false, theme: 'neutral', securityLevel: 'strict' });
-    async function draw() {
-      const nodes = document.querySelectorAll('pre.mermaid:not([data-processed])');
-      if (nodes.length) { await mermaid.run({ nodes }); }
-    }
-    draw();
-    document.body.addEventListener('htmx:afterSwap', draw);
-  </script>
+  {% include "recipes/_chart_assets.html" %}
 {% endblock %}

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: snap-cook\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-17 19:49+0000\n"
+"POT-Creation-Date: 2026-11-17 21:04+0000\n"
 "PO-Revision-Date: 2026-11-16 21:30+0100\n"
 "Last-Translator: snap-cook\n"
 "Language-Team: German\n"
@@ -169,6 +169,7 @@ msgid "Look at what was read"
 msgstr "Ansehen, was gelesen wurde"
 
 #: imports/templates/imports/_progress.html
+#: translations/templates/translations/_progress.html
 msgid "Try again"
 msgstr "Nochmals versuchen"
 
@@ -182,6 +183,7 @@ msgid "Add a recipe"
 msgstr "Rezept hinzufügen"
 
 #: imports/templates/imports/add.html imports/templates/imports/review.html
+#: recipes/templates/recipes/_chart.html
 msgid "Close"
 msgstr "Schliessen"
 
@@ -413,6 +415,18 @@ msgstr ""
 msgid "Saved. Only you can see this recipe."
 msgstr "Gespeichert. Nur du siehst dieses Rezept."
 
+#: recipes/templates/recipes/_chart.html
+msgid "Zoom out"
+msgstr "Verkleinern"
+
+#: recipes/templates/recipes/_chart.html
+msgid "Zoom in"
+msgstr "Vergrössern"
+
+#: recipes/templates/recipes/_chart.html
+msgid "Fit"
+msgstr "Einpassen"
+
 #: recipes/templates/recipes/_render.html
 msgid "Something in this recipe needs checking:"
 msgstr "Bei diesem Rezept muss etwas geprüft werden:"
@@ -441,7 +455,7 @@ msgstr "Mehr Portionen"
 msgid "More"
 msgstr "Mehr"
 
-#: recipes/templates/recipes/_render.html
+#: recipes/templates/recipes/_render.html recipes/templates/recipes/chart.html
 #, python-format
 msgid "for %(counter)s serving"
 msgid_plural "for %(counter)s servings"
@@ -462,24 +476,33 @@ msgid "Step %(number)s:"
 msgstr "Schritt %(number)s:"
 
 #: recipes/templates/recipes/_render.html
-msgid "Show as a flowchart"
-msgstr "Als Ablaufdiagramm anzeigen"
+msgid "At a glance"
+msgstr "Auf einen Blick"
+
+#: recipes/templates/recipes/_render.html
+msgid "Full screen"
+msgstr "Vollbild"
+
+#: recipes/templates/recipes/_render.html recipes/templates/recipes/chart.html
+msgid "Print"
+msgstr "Drucken"
 
 #: recipes/templates/recipes/_render.html
 msgid ""
-"The same recipe as a diagram: rounded shapes are ingredients, boxes are what "
-"you have made so far, and the arrows are the steps."
+"The recipe as a chart: the ingredients in green go into the numbered steps, "
+"and the dark green shape at the end is the finished dish."
 msgstr ""
-"Dasselbe Rezept als Diagramm: Abgerundete Formen sind Zutaten, Kästen sind, "
-"was du bisher zubereitet hast, und die Pfeile sind die Schritte."
-
-#: recipes/templates/recipes/_render.html
-msgid "Show as plain text"
-msgstr "Als reinen Text anzeigen"
+"Das Rezept als Diagramm: Die Zutaten in Grün gehen in die nummerierten "
+"Schritte, und die dunkelgrüne Form am Ende ist das fertige Gericht."
 
 #: recipes/templates/recipes/base.html
 msgid "Your settings: language and units"
 msgstr "Deine Einstellungen: Sprache und Einheiten"
+
+#
+#: recipes/templates/recipes/chart.html
+msgid "Back to the recipe"
+msgstr "Zurück zum Rezept"
 
 #: recipes/templates/recipes/index.html
 msgid "Search recipes"
@@ -575,10 +598,24 @@ msgstr "%(list)s und %(last)s"
 msgid "Uses what you made in steps %(numbers)s."
 msgstr "Verwendet, was du in den Schritten %(numbers)s zubereitet hast."
 
-#: recipes/views.py
-msgid "Show in US cups and ounces"
-msgstr "In US-Cups und Unzen anzeigen"
+#: translations/templates/translations/_progress.html
+msgid ""
+"Translating this recipe. It changes by itself when it is done, usually "
+"within a minute."
+msgstr ""
+"Das Rezept wird übersetzt. Es wechselt von selbst, sobald es fertig ist, "
+"meist innerhalb einer Minute."
 
-#: recipes/views.py
-msgid "Show in grams and millilitres"
-msgstr "In Gramm und Millilitern anzeigen"
+#: translations/templates/translations/_progress.html
+msgid "This recipe could not be translated, so it is shown as written."
+msgstr ""
+"Das Rezept konnte nicht übersetzt werden und wird deshalb so gezeigt, wie es "
+"geschrieben ist."
+
+#: translations/templates/translations/_progress.html
+msgid ""
+"Translating is not set up on this server, so most of this recipe is shown as "
+"written."
+msgstr ""
+"Übersetzen ist auf diesem Server nicht eingerichtet, deshalb steht das "
+"meiste so da, wie es geschrieben ist."

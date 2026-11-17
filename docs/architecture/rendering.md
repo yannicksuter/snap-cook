@@ -32,10 +32,16 @@ Diffing and translation-isomorphism checks depend on the second.
 
 **text** walks the prose chunks, substituting display values into slots.
 
-**mermaid** ignores prose and walks the graph. Ingredients become stadium nodes,
-states become boxes. An action with one input is a labelled edge; an action with
-several inputs needs a join node, because a labelled edge cannot express a
-hyperedge.
+**mermaid** walks the graph. Every step is a numbered box with its times and
+temperatures; its ingredients, stadium nodes with their amounts, flow into it; a
+result a later step names gets a box of its own, and an unnamed one is skipped;
+the dish the recipe ends with closes the chart, under its own name or the
+recipe's. A step is named by its verb or, for an imported recipe without verbs,
+by its first sentence, shortened in the middle so a German verb at the end
+survives. Nodes and label parts carry classes (`step`, `n`, `qty`, `time`, …)
+and no colours: the web app styles them (`recipes/_chart_assets.html`), shows
+the chart on every recipe page with a full-screen view, and prints it alone on
+an A4 page (`/r/<slug>/chart/`).
 
 **print** is the hardest and lands last, but it is the **design constraint** on
 the model. Pagination, typography and image placement are unforgiving, and if

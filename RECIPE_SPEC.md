@@ -222,6 +222,7 @@ representation, not two.
 | `#stand mixer{}` | cookware |
 | `~{30%min}` / `~proof{2%h}` | timer, optionally named |
 | `^{220%C}` | **snap-cook**: temperature |
+| `^fan{200%C}` | **snap-cook**: temperature for one oven setting: `conventional`, `fan`, `top`, `bottom` or `grill` |
 | `=> dough` | **snap-cook**: names this action's output state |
 | `@&{dough}` | **snap-cook**: consumes a named state |
 
@@ -257,12 +258,15 @@ a poor storage model.
 
 ---
 
-## 7. Internationalisation *(planned)*
+## 7. Internationalisation
 
 - Ingredient names resolve through `binding.ingredient_id → Ingredient.names[lang]`
-  at render time. They are **not** stored in translation files.
-- Only prose — title, description, step literals, notes — is translated
-  per recipe, in sibling files (`recipe.de.cook`).
+  at render time. They are **not** stored in translations.
+- Prose — title, description, step literals, notes, state names, cookware — is
+  translated per recipe, as further values of each `LocalizedText`. Writing
+  the translated projections as sibling files (`recipe.de.cook`) is planned.
+- Words no registry knows — an unbound ingredient's name, an unresolved unit —
+  are translated in `Recipe.glossary[lang][word]`, keyed by the word as written.
 - Each translated string records the `sha256` of its **source** string.
   Staleness is therefore detected per string, so fixing one typo does not
   invalidate an entire translation.

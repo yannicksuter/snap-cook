@@ -78,6 +78,14 @@ class Recipe(SnapcookModel):
     actions: list[Action]
     provenance: Provenance = Provenance()
 
+    glossary: dict[str, dict[str, str]] = {}
+    """Translations of the words no registry knows, per language:
+    ``glossary["en"]["Magerquark"] == "low-fat quark"``. They are an ingredient
+    the registry cannot bind, a unit it cannot resolve, and words standing in
+    for an amount ("zum Bestreuen"). Keyed by the word as authored, so a word
+    that is changed loses its translation instead of keeping a wrong one. Prose
+    is translated where it lives, in each :class:`LocalizedText`."""
+
     # -- graph invariants, enforced at construction ---------------------------
 
     @model_validator(mode="after")

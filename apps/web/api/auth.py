@@ -16,6 +16,7 @@ reason its token is the highest-value secret in the system.
 from __future__ import annotations
 
 import hmac
+import ipaddress
 import logging
 
 from django.conf import settings
@@ -73,14 +74,54 @@ def _check_ops_token(request: HttpRequest) -> bool:
     return hmac.compare_digest(expected, presented)
 
 
+# Headers a reverse proxy or tunnel adds on the way in. Cloudflare's tunnel adds
+# CF-Connecting-IP and CF-Ray to every request it carries, and no client can
+# take them off, so their presence is proof the request came from outside.
+_PROXY_HEADERS = (
+    "HTTP_CF_CONNECTING_IP",
+    "HTTP_CF_RAY",
+    "HTTP_X_FORWARDED_FOR",
+    "HTTP_FORWARDED",
+    "HTTP_X_REAL_IP",
+)
+
+
+def direct_from_the_lan(request: HttpRequest) -> bool:
+    """True for a request that reached the app straight from an address the
+    internet cannot route: the LAN, Docker's bridge, a VPN such as Tailscale.
+
+    The ops API's one real safeguard used to be a sentence in the docs: do not
+    route it through a public tunnel. On a server whose site *is* behind a
+    tunnel, that left switching it on one forgotten proxy rule away from
+    publishing every private recipe. Now the app refuses what came through a
+    proxy, so the API answers on the LAN or a VPN and nowhere else.
+    """
+    if any(header in request.META for header in _PROXY_HEADERS):
+        return False
+    try:
+        address = ipaddress.ip_address(request.META.get("REMOTE_ADDR", ""))
+    except ValueError:
+        return False
+    if getattr(address, "ipv4_mapped", None) is not None:
+        address = address.ipv4_mapped
+    return not address.is_global
+
+
 def require_ops_access(request: HttpRequest) -> bool:
     """Allow a **staff** web session, else require the ops bearer token.
+
+    Either way, only for a request straight from the LAN or a VPN (see
+    :func:`direct_from_the_lan`).
 
     The ``is_staff`` check is the essential difference from a single-operator
     deployment. Anyone with a Google account can sign in to snap-cook, so a
     bare authenticated session must not confer ops access -- that would hand
     every user the ability to read every other user's private recipes.
     """
+    if not direct_from_the_lan(request):
+        _log_ops_access(request, actor="proxied", allowed=False)
+        return False
+
     user = getattr(request, "user", None)
     if user is not None and user.is_authenticated and user.is_staff:
         _log_ops_access(request, actor=f"session:{user.pk}")

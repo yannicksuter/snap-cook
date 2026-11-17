@@ -75,6 +75,8 @@ class RenderedTimer:
 @dataclass(frozen=True, slots=True)
 class RenderedTemperature:
     display: str
+    """The value with its oven setting, if any: "155 °C fan", "155 °C Umluft"."""
+    mode: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -84,6 +86,9 @@ class RenderedStep:
     action_id: str
     index: int
     text: str
+    summary: str = ""
+    """The step's first sentence with ingredient names but no amounts, short
+    enough for a box in the flowchart, where the amounts have boxes of their own."""
     verb: str | None = None
     ingredients: tuple[RenderedIngredient, ...] = ()
     cookware: tuple[str, ...] = ()
@@ -102,9 +107,21 @@ class RenderedStep:
 
 @dataclass(frozen=True, slots=True)
 class RenderNode:
+    """One shape in the flowchart, with its parts kept apart for a renderer to set."""
+
     id: str
     label: str
-    kind: str  # "ingredient" | "state" | "join"
+    """The name: an ingredient's, a step's summary, a result's, the dish's."""
+    kind: str  # "ingredient" | "step" | "state" | "dish"
+    number: int | None = None
+    """A step's number, as in the method."""
+    amount: str = ""
+    """An ingredient's amount; after the name when ``amount_after`` ("to taste")."""
+    amount_after: bool = False
+    times: tuple[str, ...] = ()
+    """A step's timers, as displayed."""
+    temperatures: tuple[str, ...] = ()
+    """A step's temperatures, each with its oven setting."""
 
 
 @dataclass(frozen=True, slots=True)

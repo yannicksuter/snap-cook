@@ -35,6 +35,7 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),
     path("settings/", include("accounts.urls")),
     path("", include("imports.urls")),
+    path("", include("translations.urls")),
     path("", include("recipes.urls")),
 ]
 

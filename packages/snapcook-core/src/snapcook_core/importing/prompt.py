@@ -32,10 +32,11 @@ where it says otherwise.
 # What to keep and what to leave out
 
 Keep everything a cook needs: each ingredient with its amount and unit, and each \
-step with its times, temperatures, pans and tins, sizes, and the signs that tell \
-when something is done. Leave out everything else: the story around the recipe, \
-ads, comments, navigation, nutrition tables, links to other recipes. Say what you \
-left out in `left_out`, a few words each.
+step with its times, temperatures and the oven setting each one is for, pans and \
+tins, sizes, and the signs that tell when something is done. Leave out \
+everything else: the story around the recipe, ads, comments, navigation, \
+nutrition tables, links to other recipes. Say what you left out in `left_out`, a \
+few words each.
 
 If the source holds several recipes, take the main one. A part it needs that has \
 its own recipe on the page (a sauce, a dough) becomes steps of the same recipe.
@@ -77,6 +78,13 @@ pan. Words in place of a number (to taste, a pinch, for frying) always take `=`.
 - `#name{}`: a pan, pot, tin or tool, such as `#frying pan{}`.
 - `~{amount%unit}`: a time, such as `~{30%min}` or `~{1.5%h}`.
 - `^{amount%C}`: a temperature, such as `^{180%C}`, or `%F` if the source uses it.
+- `^setting{amount%C}`: a temperature for one oven setting. The settings are \
+`conventional` (top and bottom heat, Ober- und Unterhitze), `fan` (fan or \
+convection, Umluft, Heissluft), `top` (top heat only), `bottom` (bottom heat \
+only) and `grill` (grill or broil). Whenever the source names the setting, write \
+it, and when it gives a temperature for each setting, keep every one: \
+`at ^conventional{175%C} (^fan{155%C})`. The setting is shown to the reader in \
+their language, so do not repeat it in words beside the temperature.
 - `=> name` at the very end of a step names what the step makes, when a later \
 step uses it. That later step refers to it as `@&{name}`, spelled exactly the \
 same. This is how a recipe records which parts are prepared separately and \
