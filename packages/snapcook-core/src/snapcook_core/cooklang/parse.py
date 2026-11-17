@@ -29,6 +29,7 @@ from snapcook_core.schema.graph import (
     FoodState,
     IngredientChunk,
     LiteralChunk,
+    OvenMode,
     StateChunk,
     Temperature,
     TemperatureChunk,
@@ -56,6 +57,24 @@ from snapcook_core.units.registry import resolve_unit
 __all__ = ["parse_cook"]
 
 _SIZE_VALUES = {grade.value for grade in SizeGrade}
+# The oven setting named in ``^fan{160%C}``. The keywords are what the printer
+# writes; the rest are the words a model or a person may write instead, in
+# English and German, compared with case, spaces and punctuation removed.
+_OVEN_MODES: dict[str, OvenMode] = {
+    **dict.fromkeys(
+        ("conventional", "topandbottomheat", "topbottomheat", "static",
+         "oberunterhitze", "oberundunterhitze", "ounterhitze", "ouhitze"),
+        "conventional",
+    ),
+    **dict.fromkeys(
+        ("fan", "fanoven", "fanforced", "fanassisted", "convection", "convectionoven",
+         "umluft", "heissluft", "heißluft"),
+        "fan",
+    ),
+    **dict.fromkeys(("top", "topheat", "oberhitze"), "top"),
+    **dict.fromkeys(("bottom", "bottomheat", "unterhitze"), "bottom"),
+    **dict.fromkeys(("grill", "broil", "broiler", "grillen"), "grill"),
+}  # fmt: skip
 _PRODUCE = re.compile(r"\s*=>\s*(?P<name>[^{}@#~^]+?)\s*$")
 
 # Surface -> approx token, best effort. Text round-trips on the surface alone, so
@@ -295,12 +314,23 @@ class _StepScanner:
         return TimerChunk(index=index), end
 
     def _temperature(self, i: int):
-        braced = self._braced(i)
+        open_brace = self.text.find("{", i + 1)
+        if open_brace == -1:
+            return None
+        name = self.text[i + 1 : open_brace]
+        mode = None
+        if name:
+            mode = _OVEN_MODES.get(re.sub(r"[\W_]+", "", name.casefold()))
+            if mode is None:
+                # Not a setting this dialect knows. Leave the token as written
+                # rather than drop the word: a reviewer sees it and can fix it.
+                return None
+        braced = self._braced(open_brace)
         if braced is None:
             return None
         body, end = braced
         value_str, _, unit = body.partition("%")
-        temp = Temperature(value=Decimal(value_str), unit=(unit or "C"))
+        temp = Temperature(value=Decimal(value_str), unit=(unit or "C"), mode=mode)
         index = len(self.temperatures)
         self.temperatures.append(temp)
         return TemperatureChunk(index=index), end

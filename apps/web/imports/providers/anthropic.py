@@ -1,11 +1,15 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-"""Read recipes with Claude through the Anthropic API.
+"""Read and translate recipes with Claude through the Anthropic API.
 
 One request per import: the instructions (identical every time, so they are
 cached), the source -- photos and PDFs as attachments, a page or pasted text as
 text -- and ``RawExtraction`` as the required output shape. The model's answer is
 validated against that schema by the SDK and then handed to core's
 ``normalize``, which trusts none of it.
+
+One request per translation too: the recipe's pending pieces as JSON, and
+``RawTranslation`` back, which core's ``apply_translation`` checks piece by
+piece. Translating needs less thought than reading, so it runs at low effort.
 
 The request runs on the worker (``imports.tasks``), never in a web request. Its
 time limits are set so the SDK's own retries finish well inside the worker's
@@ -22,6 +26,12 @@ import anthropic
 
 from imports.providers import NotSetUp, ProviderError
 from snapcook_core.importing import ImportSource, RawExtraction, describe_source, system_prompt
+from snapcook_core.translating import (
+    RawTranslation,
+    TranslationRequest,
+    describe_request,
+    translation_prompt,
+)
 
 __all__ = ["AnthropicImporter"]
 
@@ -61,6 +71,25 @@ class AnthropicImporter:
         )
 
     def extract(self, source: ImportSource) -> RawExtraction:
+        return self._parse(
+            system=system_prompt(),
+            content=_content(source),
+            output_format=RawExtraction,
+            effort=self._effort,
+            task="read",
+        )
+
+    def translate(self, request: TranslationRequest) -> RawTranslation:
+        return self._parse(
+            system=translation_prompt(request.source_lang, request.target_lang),
+            content=[{"type": "text", "text": describe_request(request)}],
+            output_format=RawTranslation,
+            effort="low",
+            task="translate",
+        )
+
+    def _parse(self, *, system: str, content: list[dict], output_format, effort: str, task: str):
+        """One request with a required output shape; every failure as a ProviderError."""
         fallback = {}
         if self._model in _FALLBACK_MODELS:
             fallback = {"betas": ["server-side-fallback-2026-07-01"], "fallbacks": "default"}
@@ -68,16 +97,10 @@ class AnthropicImporter:
             response = self._client.beta.messages.parse(
                 model=self._model,
                 max_tokens=_MAX_TOKENS,
-                system=[
-                    {
-                        "type": "text",
-                        "text": system_prompt(),
-                        "cache_control": {"type": "ephemeral"},
-                    }
-                ],
-                messages=[{"role": "user", "content": _content(source)}],
-                output_format=RawExtraction,
-                output_config={"effort": self._effort},
+                system=[{"type": "text", "text": system, "cache_control": {"type": "ephemeral"}}],
+                messages=[{"role": "user", "content": content}],
+                output_format=output_format,
+                output_config={"effort": effort},
                 **fallback,
             )
         except anthropic.AuthenticationError as error:
@@ -95,7 +118,8 @@ class AnthropicImporter:
 
         usage = response.usage
         logger.info(
-            "import read by %s: %s input, %s cached, %s output tokens, stop %s, request %s",
+            "%s by %s: %s input, %s cached, %s output tokens, stop %s, request %s",
+            task,
             response.model,
             usage.input_tokens,
             usage.cache_read_input_tokens,
@@ -104,7 +128,7 @@ class AnthropicImporter:
             response._request_id,
         )
         if response.stop_reason == "refusal":
-            raise ProviderError("refused", "the model declined to read this source")
+            raise ProviderError("refused", f"the model declined to {task} this")
         if response.stop_reason == "max_tokens":
             raise ProviderError("model_failed", "the reading was cut off before it finished")
         if response.parsed_output is None:

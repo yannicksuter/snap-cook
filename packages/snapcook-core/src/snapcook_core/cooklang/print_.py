@@ -206,7 +206,8 @@ def _timer_token(timer: Timer, recipe: Recipe, lang: str) -> str:
 
 
 def _temperature_token(temperature: Temperature) -> str:
-    return f"^{{{encode_decimal(temperature.value)}%{temperature.unit}}}"
+    mode = temperature.mode or ""
+    return f"^{mode}{{{encode_decimal(temperature.value)}%{temperature.unit}}}"
 
 
 def _quantity_body(spec: QuantitySpec | None) -> str:

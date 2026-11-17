@@ -142,15 +142,37 @@ def test_recipes_open_in_the_reader_language(seeded, cook, client) -> None:
 
 
 def test_one_recipe_can_be_read_in_another_language(seeded, cook, client) -> None:
-    """The link changes the recipe's language for this view, not the interface's."""
+    """A shared link changes the recipe's language for this view, not the interface's."""
     page = _page(client, "/r/rosti/?lang=de")
     assert "Reiben Sie" in page
     assert "Ingredients" in page
-    assert "Show in English" in page
 
 
 def test_units_follow_the_saved_settings(seeded, cook, client) -> None:
     UserPreferences.objects.create(user=cook, unit_system="us")
     page = _page(client, "/r/tomato-sauce/")
-    assert "Show in grams and millilitres" in page
+    assert "2 tbsp" in page
     assert "30 ml" not in page
+
+
+# -- the chart --------------------------------------------------------------------
+
+
+def test_the_recipe_ends_with_its_chart_not_a_list_of_options(seeded, cook, client) -> None:
+    page = _page(client, "/r/rosti/")
+    assert "At a glance" in page
+    assert '<pre class="mermaid">' in page
+    assert 'id="more"' not in page
+    assert "Show as plain text" not in page
+    assert "/r/rosti/chart/?lang=en&amp;system=metric&amp;servings=2&amp;print=1" in page
+
+
+def test_the_chart_prints_on_a_page_of_its_own(seeded, cook, client) -> None:
+    page = _page(client, "/r/rosti/chart/?lang=de&servings=4&print=1")
+    assert "<h1" in page and "Rösti" in page
+    assert "for 4 servings" in page
+    # Escaped in the page; Mermaid reads the <pre>'s text, markup and all.
+    assert "&lt;span class=qty&gt;1.5 kg&lt;/span&gt; Kartoffel" in page
+    assert "chart:drawn" in page and "window.print()" in page
+    assert 'href="/r/rosti/?lang=de&amp;system=metric&amp;servings=4"' in page
+    assert "chart:drawn', () => window.print()" not in _page(client, "/r/rosti/chart/")

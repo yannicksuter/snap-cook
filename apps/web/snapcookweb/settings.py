@@ -127,6 +127,7 @@ INSTALLED_APPS = [
     "catalog",  # DERIVED: the Postgres projection of the file store
     "recipes",  # presentation only: the HTMX UI
     "imports",  # DB-authoritative: import jobs and drafts
+    "translations",  # DB-authoritative: translation runs (the words go to the store)
     "social",  # DB-authoritative: follows, likes, comments
     "api",  # presentation only: django-ninja routers
 ]

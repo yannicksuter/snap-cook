@@ -49,6 +49,7 @@ __all__ = [
     "FoodState",
     "IngredientChunk",
     "LiteralChunk",
+    "OvenMode",
     "StateChunk",
     "Temperature",
     "TemperatureChunk",
@@ -62,11 +63,24 @@ _F_PER_C = Decimal("1.8")
 _F_OFFSET = Decimal("32")
 
 
+OvenMode = Literal["conventional", "fan", "top", "bottom", "grill"]
+"""The oven setting a temperature is meant for: top and bottom heat, fan
+(convection), top heat only, bottom heat only, or the grill (broiler)."""
+
+
 class Temperature(SnapcookModel):
-    """An oven or liquid temperature. Affine, and never auto-scaled."""
+    """An oven or liquid temperature. Affine, and never auto-scaled.
+
+    ``mode`` is the oven setting the value is for. Sources often give one value
+    per setting -- 175 °C top and bottom heat, 155 °C fan -- and the two are not
+    interchangeable, so the setting is data that a renderer labels in the
+    reader's language, not words beside the number that a translation or an
+    importer can lose. Absent for a liquid, or when the source names no setting.
+    """
 
     value: Decimal
     unit: Literal["C", "F"] = "C"
+    mode: OvenMode | None = None
 
     def value_in(self, unit: Literal["C", "F"]) -> Decimal:
         """Convert, exactly, using the affine relation -- not a ratio."""

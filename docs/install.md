@@ -119,11 +119,11 @@ Behind the tunnel, or any other reverse proxy, the site takes the scheme from
 `DJANGO_ALLOWED_HOSTS`. Without that, Django would build an `http://` callback,
 and Google's exact match would refuse it.
 
-> **The tunnel must not carry `/ops/api/`.** It ignores ownership and can read
-> every user's private recipe. Leave `SNAPCOOK_OPS_API_ENABLED` at `0` on a
-> tunnelled server, or block `/ops/api/` for the tunnel's host name (e.g. with
-> a Cloudflare WAF rule) and use it from the LAN only. It is not nested under
-> `/api/` precisely so a proxy can treat the two differently.
+> **The ops API answers only your LAN or a VPN.** It ignores ownership and can
+> read every user's private recipe, so the app refuses every request that came
+> through the tunnel or another proxy, even one with the right token. Switched
+> on, it answers at `http://<unraid-ip>:8931/ops/api/` and nowhere else
+> ([ops API](reference/api-ops.md)).
 
 ## Logs
 

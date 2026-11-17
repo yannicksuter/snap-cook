@@ -19,6 +19,51 @@ change** and says so explicitly here.
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-11-17
+
+### Added
+
+- A recipe shown in another language is translated as a whole: its name,
+  description, steps and notes, and the ingredient names and units the
+  ingredient registry does not know. The first time, the worker translates it
+  (usually under a minute) and the page updates by itself; after that it opens
+  translated. Editing a step makes only that step's translation stale.
+- A temperature keeps the oven setting it is for. A recipe that gives 175 °C top
+  and bottom heat and 155 °C fan shows both, labelled in the reader's language
+  ("Ober-/Unterhitze", "Umluft"), in the step and on its chips. The importer
+  writes it as `^fan{155%C}`.
+- Every recipe ends with its chart, "At a glance": numbered steps with their
+  times and oven settings, the ingredients with their amounts flowing in, and
+  the finished dish last. It opens full screen, where it pans and zooms, and
+  prints on a page of its own.
+- The ops API can show every import, to check the importer against its sources:
+  the uploaded file itself, the model's reading as it came back, the draft as
+  checked, what it left out, and the recipe as stored now
+  (`/ops/api/imports`, `/ops/api/recipes/{slug}`).
+
+### Changed
+
+- The ops API answers only the LAN or a VPN. It refuses any request that came
+  through a tunnel or reverse proxy, or from a public address, even with the
+  token, so it can be switched on where the site runs through Cloudflare.
+
+- The "More" section is gone. Language and units come from your settings;
+  a recipe in another language is translated for you. The plain-text view is
+  gone too.
+- The chart no longer shows English placeholders ("combine", "step 2") in a
+  recipe without verbs, which is every imported one.
+
+### Fixed
+
+- A word written in front of a temperature, such as `^Umluft{155%C}`, was
+  silently dropped. A word that names no oven setting now stays in the text.
+
+### Notes
+
+- A recipe that has an oven setting, or has been translated, cannot be opened by
+  0.4.0 or older. Rolling back past this release needs the `/data` backup from
+  before it.
+
 ## [0.4.0] - 2026-11-17
 
 ### Added
@@ -148,7 +193,8 @@ under the existing canonical form, not a new wire contract.
 - Documentation: README, AGENTS, CLAUDE, CONTRIBUTING, LICENSING,
   THIRD_PARTY_DATA, SECURITY, RECIPE_SPEC
 
-[Unreleased]: https://github.com/yannicksuter/snap-cook/compare/v0.4.0...main
+[Unreleased]: https://github.com/yannicksuter/snap-cook/compare/v0.5.0...main
+[0.5.0]: https://github.com/yannicksuter/snap-cook/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/yannicksuter/snap-cook/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/yannicksuter/snap-cook/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/yannicksuter/snap-cook/compare/v0.1.0...v0.2.0

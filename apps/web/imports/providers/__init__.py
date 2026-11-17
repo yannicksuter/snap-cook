@@ -1,9 +1,10 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-"""Which model reads recipes on this server, chosen by ``SNAPCOOK_LLM_PROVIDER``.
+"""Which model reads and translates recipes here, chosen by ``SNAPCOOK_LLM_PROVIDER``.
 
-Every provider satisfies ``snapcook_core.importing.RecipeImporter``. The rest of
-the pipeline sees only that protocol, so a local model can replace the hosted
-one later without anything else changing.
+Every provider satisfies ``snapcook_core.importing.RecipeImporter`` and
+``snapcook_core.translating.RecipeTranslator``. The rest of the app sees only
+those protocols, so a local model can replace the hosted one later without
+anything else changing.
 """
 
 from __future__ import annotations
@@ -11,8 +12,9 @@ from __future__ import annotations
 from django.conf import settings
 
 from snapcook_core.importing import RecipeImporter
+from snapcook_core.translating import RecipeTranslator
 
-__all__ = ["NotSetUp", "ProviderError", "importer", "is_set_up"]
+__all__ = ["NotSetUp", "ProviderError", "importer", "is_set_up", "translator"]
 
 
 class NotSetUp(Exception):
@@ -38,6 +40,15 @@ def is_set_up() -> bool:
 
 def importer() -> RecipeImporter:
     """The configured provider. Cheap: constructing one makes no request."""
+    return _provider()
+
+
+def translator() -> RecipeTranslator:
+    """The same provider, for translating. Raises ``NotSetUp`` the same way."""
+    return _provider()
+
+
+def _provider():
     provider = settings.SNAPCOOK_LLM_PROVIDER
     if provider == "anthropic":
         if not settings.SNAPCOOK_LLM_API_KEY:

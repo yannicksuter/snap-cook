@@ -44,7 +44,7 @@ docs/architecture/units-and-i18n.md.
 </head>
 <body class="min-h-full bg-white text-ink font-sans antialiased flex flex-col">
 
-  <header class="border-b border-line">
+  <header class="border-b border-line print:hidden">
     <div class="max-w-3xl mx-auto px-5 py-3 flex items-center justify-between gap-3">
       <a href="{% url 'recipes:index' %}" class="text-[23px] font-extrabold tracking-tight text-ink hover:text-herb">snap-cook</a>
       {% if user.is_authenticated %}
@@ -68,7 +68,7 @@ docs/architecture/units-and-i18n.md.
     {% block content %}{% endblock %}
   </main>
 
-  <footer class="border-t border-line">
+  <footer class="border-t border-line print:hidden">
     <div class="max-w-3xl mx-auto px-5 py-4 text-[15px] text-ink-3">
       {% comment %}
         The build commit, so "which version am I looking at?" is answerable

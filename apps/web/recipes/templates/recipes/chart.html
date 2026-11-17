@@ -1,0 +1,47 @@
+{% extends "recipes/base.html" %}
+{% comment %}
+SPDX-License-Identifier: AGPL-3.0-or-later
+
+The chart alone, to print: the recipe's name over it, nothing else. Opened from
+the recipe page with ?print=1, it prints itself once the chart is drawn; the
+print dialog's own settings decide paper and margins beyond the A4 default.
+{% endcomment %}
+{% load i18n %}
+
+{% block title %}{{ model.title }} · snap-cook{% endblock %}
+
+{% block content %}
+  <div class="pb-10 print:pb-0">
+    <div class="px-2 border-b border-line flex items-center justify-between gap-2 print:hidden">
+      <a href="{{ view.here }}" class="inline-flex items-center gap-1 h-12 px-3 text-[18px] font-bold text-ink hover:text-herb">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+        {% translate "Back to the recipe" %}
+      </a>
+      <button type="button" onclick="window.print()" class="inline-flex h-11 px-3.5 mr-1 items-center gap-2 rounded-xl bg-ink text-white text-[16px] font-bold hover:bg-ink-2">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg>
+        {% translate "Print" %}
+      </button>
+    </div>
+
+    <header class="px-5 pt-7 print:px-0 print:pt-0">
+      <p class="text-[13px] font-extrabold uppercase tracking-[0.2em] text-herb">snap-cook</p>
+      <h1 class="mt-1.5 text-[34px] leading-tight font-extrabold tracking-tight">{{ model.title }}</h1>
+      {% if model.description %}<p class="mt-2 text-[17px] leading-relaxed text-ink-2">{{ model.description }}</p>{% endif %}
+      {% if view.servings %}
+        <p class="mt-2 text-[16px] font-bold text-ink-3">{% blocktranslate trimmed count counter=view.servings %}
+          for {{ counter }} serving
+        {% plural %}
+          for {{ counter }} servings
+        {% endblocktranslate %}</p>
+      {% endif %}
+    </header>
+
+    {% include "recipes/_chart.html" %}
+  </div>
+
+  {% include "recipes/_chart_assets.html" %}
+  {% if print_now %}
+    {# Registered before the chart's module script runs, so its signal is never missed. #}
+    <script>document.addEventListener('chart:drawn', () => window.print(), { once: true });</script>
+  {% endif %}
+{% endblock %}

@@ -1,21 +1,23 @@
 flowchart TD
-    nod_ts_softened["softened aromatics"]
-    nod_ts_crushed["crushed tomatoes"]
-    nod_ts_sauce["tomato sauce"]
-    iuse_ts_oil(["30 ml olive oil"])
-    iuse_ts_onion(["1 medium onion"])
-    iuse_ts_garlic(["2 garlic"])
-    join_act_ts_1{"sweat"}
-    iuse_ts_tomato(["6 tomato"])
-    iuse_ts_salt(["salt to taste"])
-    join_act_ts_3{"simmer"}
+    step_act_ts_1("<span class=n>1</span> sweat"):::step
+    iuse_ts_oil(["<span class=qty>30 ml</span> olive oil"]):::ingredient
+    iuse_ts_onion(["<span class=qty>1 medium</span> onion"]):::ingredient
+    iuse_ts_garlic(["<span class=qty>2</span> garlic"]):::ingredient
+    nod_ts_softened["softened aromatics"]:::state
+    step_act_ts_2("<span class=n>2</span> crush"):::step
+    iuse_ts_tomato(["<span class=qty>6</span> tomato"]):::ingredient
+    nod_ts_crushed["crushed tomatoes"]:::state
+    step_act_ts_3("<span class=n>3</span> simmer<br><span class=time>30 min</span>"):::step
+    iuse_ts_salt(["salt <span class=qty>to taste</span>"]):::ingredient
+    nod_ts_sauce(["tomato sauce"]):::dish
 
-    iuse_ts_oil --> join_act_ts_1
-    iuse_ts_onion --> join_act_ts_1
-    iuse_ts_garlic --> join_act_ts_1
-    join_act_ts_1 -->|sweat| nod_ts_softened
-    iuse_ts_tomato -->|crush| nod_ts_crushed
-    nod_ts_softened --> join_act_ts_3
-    nod_ts_crushed --> join_act_ts_3
-    iuse_ts_salt --> join_act_ts_3
-    join_act_ts_3 -->|simmer, 30 min| nod_ts_sauce
+    iuse_ts_oil --> step_act_ts_1
+    iuse_ts_onion --> step_act_ts_1
+    iuse_ts_garlic --> step_act_ts_1
+    step_act_ts_1 --> nod_ts_softened
+    iuse_ts_tomato --> step_act_ts_2
+    step_act_ts_2 --> nod_ts_crushed
+    iuse_ts_salt --> step_act_ts_3
+    nod_ts_softened --> step_act_ts_3
+    nod_ts_crushed --> step_act_ts_3
+    step_act_ts_3 --> nod_ts_sauce

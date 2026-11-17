@@ -20,6 +20,13 @@ from imports.providers import NotSetUp, ProviderError, importer
 from imports.providers.anthropic import AnthropicImporter
 from imports.providers.fake import FakeImporter
 from snapcook_core.importing import ImportFile, ImportSource, RawExtraction, system_prompt
+from snapcook_core.translating import (
+    Piece,
+    RawTranslation,
+    TranslatedPiece,
+    TranslationRequest,
+    translation_prompt,
+)
 
 _READING = RawExtraction(is_recipe=True, cooklang="---\ntitle: Soup\n---\n\nStir @water{1%l}.")
 
@@ -164,3 +171,23 @@ def test_other_providers(settings, provider: str, available: bool) -> None:
     else:
         with pytest.raises(NotSetUp):
             importer()
+
+
+def test_a_translation_asks_for_every_piece_at_low_effort() -> None:
+    answer = RawTranslation(pieces=[TranslatedPiece(key="title", text="Cheesecake")])
+    reader, messages = _importer(_response(parsed=answer))
+    request = TranslationRequest("de", "en", (Piece("title", "Käsekuchen", "the recipe's name"),))
+    assert reader.translate(request) == answer
+
+    call = messages.calls[0]
+    assert call["output_format"] is RawTranslation
+    assert call["output_config"] == {"effort": "low"}
+    assert call["system"][0]["text"] == translation_prompt("de", "en")
+    (content,) = call["messages"]
+    assert '"text": "Käsekuchen"' in content["content"][0]["text"]
+
+
+def test_the_fake_translation_keeps_every_slot() -> None:
+    request = TranslationRequest("de", "en", (Piece("step:a", "Die ⟦1⟧ rühren."),))
+    (piece,) = FakeImporter().translate(request).pieces
+    assert piece.text == "[en] Die ⟦1⟧ rühren."

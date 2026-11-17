@@ -13,4 +13,5 @@ app_name = "recipes"
 urlpatterns = [
     path("", views.index, name="index"),
     path("r/<slug:slug>/", views.detail, name="detail"),
+    path("r/<slug:slug>/chart/", views.chart, name="chart"),
 ]

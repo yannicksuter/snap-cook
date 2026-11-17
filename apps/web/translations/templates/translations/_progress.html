@@ -1,0 +1,26 @@
+{% comment %}
+SPDX-License-Identifier: AGPL-3.0-or-later
+
+The note above a recipe that is being translated. While the run works, it asks
+every two seconds; the answer is "nothing yet" (no swap), a reload once the
+words are in, or this note again saying it failed, which stops the asking.
+{% endcomment %}{% load i18n %}
+{% if translation.state == "working" %}
+  <div id="translation" role="status" hx-get="{% url 'translations:status' translation.job.pk %}" hx-trigger="every 2s" hx-swap="outerHTML"
+       class="mx-5 mt-5 flex items-center gap-3 rounded-2xl bg-herb-tint px-4 py-3 text-[17px] leading-snug">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true" class="flex-none text-herb animate-spin"><path d="M12 3a9 9 0 1 0 9 9"/></svg>
+    <span>{% translate "Translating this recipe. It changes by itself when it is done, usually within a minute." %}</span>
+  </div>
+{% elif translation.state == "failed" %}
+  <div id="translation" role="alert" class="mx-5 mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-ember-edge bg-ember-tint px-4 py-3 text-[17px] leading-snug">
+    <span>{% translate "This recipe could not be translated, so it is shown as written." %}</span>
+    <form method="post" action="{% url 'translations:retry' translation.job.pk %}">
+      {% csrf_token %}
+      <button type="submit" class="h-11 px-4 rounded-xl border-2 border-ember text-ember text-[16px] font-bold hover:bg-white">{% translate "Try again" %}</button>
+    </form>
+  </div>
+{% elif translation.state == "unavailable" %}
+  <p id="translation" class="mx-5 mt-5 rounded-2xl bg-surface px-4 py-3 text-[17px] leading-snug text-ink-2">
+    {% translate "Translating is not set up on this server, so most of this recipe is shown as written." %}
+  </p>
+{% endif %}

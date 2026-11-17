@@ -1,0 +1,201 @@
+{% comment %}
+SPDX-License-Identifier: AGPL-3.0-or-later
+
+The chart's look and behaviour, shared by the recipe page and its print page.
+
+The core renderer gives every node a class (ingredient, step, state, dish) and
+every part of a label one too (n: a step's number, qty: an amount, time and
+temp: a step's chips), and no colours; they are set here. Label styles are not
+scoped to #chart: Mermaid measures each label to size its shape, and they must
+apply while it does.
+
+Mermaid draws a chart only once it can be seen, after the font has loaded: a
+chart drawn in a closed <details> or in a fallback font comes out squashed. It
+draws again after every HTMX swap, because a swapped-in <pre class="mermaid"> is
+new DOM it has not seen, and says "chart:drawn" when it is done, which the print
+page waits for.
+{% endcomment %}
+<style>
+  /* The chart as a printed piece: warm paper with a faint dot grid. */
+  .chart-paper {
+    background-color: #FBF9F4;
+    background-image: radial-gradient(#E2DCCF 1.1px, transparent 1.4px);
+    background-size: 20px 20px;
+    border: 1px solid #ECE6DA;
+  }
+  #chart pre.mermaid { margin: 0; background: transparent; }
+  #chart.is-full pre.mermaid { height: 100%; }
+
+  .nodeLabel { line-height: 1.35; }
+  /* A step: its number in a badge, then its words. */
+  .nodeLabel .n {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 1.75em; height: 1.75em; padding: 0 0.4em; margin-right: 0.4em;
+    border-radius: 999px; background: #1C1F1D; color: #FFFFFF;
+    font-size: 0.85em; font-weight: 800; vertical-align: 0.06em;
+  }
+  /* A step's times and temperatures: chips under its words. */
+  .nodeLabel :is(.time, .temp) {
+    display: inline-flex; align-items: center; gap: 0.3em;
+    margin: 0.55em 0.15em 0; padding: 0.22em 0.65em 0.22em 0.5em;
+    border-radius: 999px; font-size: 0.8em; font-weight: 700; white-space: nowrap;
+  }
+  .nodeLabel :is(.time, .temp)::before {
+    content: ""; width: 1.05em; height: 1.05em; background: currentColor;
+    -webkit-mask: var(--icon) center / contain no-repeat; mask: var(--icon) center / contain no-repeat;
+  }
+  .nodeLabel .time {
+    background: #FBEEE3; color: #9A4A12;
+    --icon: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7v5l3 2'/%3E%3C/svg%3E");
+  }
+  .nodeLabel .temp {
+    background: #FDE6DE; color: #A3361B;
+    --icon: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 14.8V4a2 2 0 0 0-4 0v10.8a4 4 0 1 0 4 0z'/%3E%3C/svg%3E");
+  }
+  .nodeLabel .qty { font-weight: 800; color: #2F6B3A; }
+  .node.step .nodeLabel { font-weight: 600; }
+  .node.state .nodeLabel { font-style: italic; font-weight: 700; }
+  .node.dish .nodeLabel { font-size: 1.15em; font-weight: 800; letter-spacing: 0.01em; }
+  .node.dish .nodeLabel p::before {
+    content: ""; display: inline-block; width: 1.15em; height: 1.15em; margin-right: 0.45em;
+    vertical-align: -0.18em; background: currentColor;
+    --icon: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 17h18M5 17a7 7 0 0 1 14 0M12 8V6M10 6h4'/%3E%3C/svg%3E");
+    -webkit-mask: var(--icon) center / contain no-repeat; mask: var(--icon) center / contain no-repeat;
+  }
+
+  /* Colours, which do not change a shape's size. Mermaid's own sheet colours
+     every span in a chart, so these need the !important to win. */
+  #chart .nodeLabel { color: #1C1F1D !important; }
+  #chart .nodeLabel .n { color: #FFFFFF !important; }
+  #chart .nodeLabel .qty { color: #2F6B3A !important; }
+  #chart .nodeLabel .time { color: #9A4A12 !important; }
+  #chart .nodeLabel .temp { color: #A3361B !important; }
+  #chart .node.ingredient :is(rect, path) { fill: #E7F0E9 !important; stroke: #2F6B3A !important; stroke-width: 1.2px !important; }
+  #chart .node.step :is(rect, path) {
+    fill: #FFFFFF !important; stroke: #1C1F1D !important; stroke-width: 1.5px !important;
+    rx: 18px; ry: 18px; filter: drop-shadow(0 5px 9px rgba(28, 31, 29, 0.10));
+  }
+  #chart .node.state :is(rect, path) {
+    fill: #FFFFFF !important; stroke: #2F6B3A !important; stroke-width: 1.5px !important;
+    stroke-dasharray: 6 4; rx: 10px; ry: 10px;
+  }
+  #chart .node.state .nodeLabel { color: #24552D !important; }
+  #chart .node.dish :is(rect, path) {
+    fill: #2F6B3A !important; stroke: #24552D !important; stroke-width: 2px !important;
+    filter: drop-shadow(0 8px 14px rgba(47, 107, 58, 0.30));
+  }
+  #chart .node.dish .nodeLabel { color: #FFFFFF !important; }
+  #chart .flowchart-link { stroke: #A3ABA5 !important; stroke-width: 2px !important; }
+  #chart marker path { fill: #A3ABA5 !important; stroke: #A3ABA5 !important; }
+
+  @media print {
+    @page { size: A4; margin: 14mm; }
+    #chart { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .chart-paper { background: none; border: none; }
+    #chart [data-chart-view] { padding: 6mm 0 0; overflow: visible; }
+    /* The whole page width, but never taller than what is left of the page. */
+    #chart svg { max-width: none !important; min-width: 0 !important; width: 100% !important; height: auto; max-height: 215mm; }
+  }
+</style>
+
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  import Panzoom from 'https://cdn.jsdelivr.net/npm/@panzoom/panzoom@4.6.2/dist/panzoom.es.js';
+
+  mermaid.initialize({
+    startOnLoad: false,
+    securityLevel: 'strict',
+    theme: 'base',
+    themeVariables: {
+      fontFamily: '"Atkinson Hyperlegible Next", system-ui, sans-serif',
+      fontSize: '17px',
+      primaryColor: '#FFFFFF',
+      primaryBorderColor: '#1C1F1D',
+      primaryTextColor: '#1C1F1D',
+      lineColor: '#A3ABA5',
+    },
+    flowchart: { curve: 'basis', nodeSpacing: 30, rankSpacing: 52, padding: 16, wrappingWidth: 250 },
+  });
+
+  async function draw() {
+    await document.fonts.ready;
+    const nodes = [...document.querySelectorAll('pre.mermaid:not([data-processed])')]
+      .filter((node) => node.checkVisibility());
+    if (nodes.length) {
+      await mermaid.run({ nodes });
+      // Shrunk to fit a phone, a wide chart's words would be too small to
+      // read: below its natural width, at most 600 px, it scrolls instead.
+      for (const node of nodes) {
+        const svg = node.querySelector('svg');
+        if (svg) { svg.style.minWidth = `${Math.min(svg.viewBox.baseVal.width, 600)}px`; }
+      }
+      document.dispatchEvent(new CustomEvent('chart:drawn'));
+    }
+  }
+  draw();
+  document.body.addEventListener('htmx:afterSwap', draw);
+  // A <details> opening does not bubble its toggle event, so listen while it travels down.
+  document.addEventListener('toggle', draw, true);
+
+  // Full screen: the chart fills the screen, and dragging, pinching or the
+  // wheel moves and zooms it. Where the browser cannot go full screen (an
+  // iPhone), the chart still covers the page.
+  let zoom = null;
+  let wheel = null;
+
+  function open(chart) {
+    if (chart.classList.contains('is-full')) return;
+    chart.classList.add('is-full');
+    document.documentElement.style.overflow = 'hidden';
+    chart.requestFullscreen?.().catch(() => {});
+    const canvas = chart.querySelector('[data-chart-canvas]');
+    const svg = canvas.querySelector('svg');
+    if (svg) {
+      svg.dataset.style = svg.getAttribute('style') || '';
+      svg.style.maxWidth = 'none';
+      svg.style.minWidth = '0';
+      svg.style.width = '100%';
+      svg.style.height = '100%';
+    }
+    zoom = Panzoom(canvas, { canvas: true, maxScale: 8, minScale: 0.5, step: 0.3, cursor: 'grab' });
+    wheel = (event) => zoom.zoomWithWheel(event);
+    chart.querySelector('[data-chart-view]').addEventListener('wheel', wheel, { passive: false });
+  }
+
+  function close(chart) {
+    if (!chart.classList.contains('is-full')) return;
+    chart.classList.remove('is-full');
+    document.documentElement.style.overflow = '';
+    chart.querySelector('[data-chart-view]').removeEventListener('wheel', wheel);
+    zoom?.destroy();
+    zoom = null;
+    const canvas = chart.querySelector('[data-chart-canvas]');
+    canvas.style.transform = '';
+    const svg = canvas.querySelector('svg');
+    if (svg) { svg.setAttribute('style', svg.dataset.style || ''); }
+    if (document.fullscreenElement) { document.exitFullscreen().catch(() => {}); }
+  }
+
+  document.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-chart]');
+    const chart = document.getElementById('chart');
+    if (!button || !chart) return;
+    const actions = {
+      open: () => open(chart),
+      close: () => close(chart),
+      in: () => zoom?.zoomIn(),
+      out: () => zoom?.zoomOut(),
+      fit: () => zoom?.reset(),
+    };
+    actions[button.dataset.chart]?.();
+  });
+  document.addEventListener('keydown', (event) => {
+    const chart = document.querySelector('#chart.is-full');
+    if (chart && event.key === 'Escape') close(chart);
+  });
+  // Leaving the browser's full screen (Esc, or a swipe) leaves ours too.
+  document.addEventListener('fullscreenchange', () => {
+    const chart = document.querySelector('#chart.is-full');
+    if (chart && !document.fullscreenElement) close(chart);
+  });
+</script>

@@ -1,19 +1,19 @@
 flowchart TD
-    nod_ro_grated["grated potatoes"]
-    nod_ro_done["rösti"]
-    iuse_ro_potato(["800 g potato"])
-    iuse_ro_onion(["1 medium onion"])
-    iuse_ro_salt(["salt to taste"])
-    iuse_ro_pepper(["pepper to taste"])
-    join_act_ro_1{"grate"}
-    iuse_ro_butter(["40 g butter"])
-    join_act_ro_2{"fry"}
+    step_act_ro_1("<span class=n>1</span> grate"):::step
+    iuse_ro_potato(["<span class=qty>800 g</span> potato"]):::ingredient
+    iuse_ro_onion(["<span class=qty>1 medium</span> onion"]):::ingredient
+    iuse_ro_salt(["salt <span class=qty>to taste</span>"]):::ingredient
+    iuse_ro_pepper(["pepper <span class=qty>to taste</span>"]):::ingredient
+    nod_ro_grated["grated potatoes"]:::state
+    step_act_ro_2("<span class=n>2</span> fry<br><span class=time>15 min</span><span class=temp>180 °C</span>"):::step
+    iuse_ro_butter(["<span class=qty>40 g</span> butter"]):::ingredient
+    nod_ro_done(["rösti"]):::dish
 
-    iuse_ro_potato --> join_act_ro_1
-    iuse_ro_onion --> join_act_ro_1
-    iuse_ro_salt --> join_act_ro_1
-    iuse_ro_pepper --> join_act_ro_1
-    join_act_ro_1 -->|grate| nod_ro_grated
-    nod_ro_grated --> join_act_ro_2
-    iuse_ro_butter --> join_act_ro_2
-    join_act_ro_2 -->|fry, 15 min @ 180 °C| nod_ro_done
+    iuse_ro_potato --> step_act_ro_1
+    iuse_ro_onion --> step_act_ro_1
+    iuse_ro_salt --> step_act_ro_1
+    iuse_ro_pepper --> step_act_ro_1
+    step_act_ro_1 --> nod_ro_grated
+    iuse_ro_butter --> step_act_ro_2
+    nod_ro_grated --> step_act_ro_2
+    step_act_ro_2 --> nod_ro_done

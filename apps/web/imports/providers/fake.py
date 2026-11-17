@@ -3,7 +3,9 @@
 
 It ignores the source and always "reads" the corpus tomato sauce, with one open
 question, so the whole flow -- add, wait, check, save -- can be tried without an
-API key or any cost. Never set it on a server people use.
+API key or any cost. It "translates" by putting the language in front of every
+piece, which keeps the slots of a step in place. Never set it on a server people
+use.
 """
 
 from __future__ import annotations
@@ -11,6 +13,7 @@ from __future__ import annotations
 from snapcook_core.cooklang import print_cook
 from snapcook_core.importing import Answer, ImportSource, Question, RawExtraction
 from snapcook_core.testing import get_recipe
+from snapcook_core.translating import RawTranslation, TranslatedPiece, TranslationRequest
 
 __all__ = ["FakeImporter"]
 
@@ -45,4 +48,12 @@ class FakeImporter:
             ],
             left_out=["the introduction", "the page number"],
             source_title="Fake Cookbook" if source.kind == "files" else None,
+        )
+
+    def translate(self, request: TranslationRequest) -> RawTranslation:
+        return RawTranslation(
+            pieces=[
+                TranslatedPiece(key=piece.key, text=f"[{request.target_lang}] {piece.text}")
+                for piece in request.pieces
+            ]
         )

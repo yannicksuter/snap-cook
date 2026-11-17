@@ -16,7 +16,7 @@ is dead last and display-only.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from decimal import Decimal
 
 from snapcook_core.errors import (
@@ -127,7 +127,7 @@ def build_render_model(recipe: Recipe, options: RenderOptions | None = None) -> 
         ingredients=tuple(all_ingredient_lines),
         steps=tuple(steps),
         side_by_side=_side_by_side(steps),
-        graph=_build_graph(recipe, ordered, steps_by_action, state_names),
+        graph=_build_graph(recipe, ordered, steps_by_action, state_names, title),
         warnings=tuple(issues.issues),
     )
 
@@ -166,11 +166,23 @@ def _render_step(
         state_names,
     )
     verb = _resolve_localized(action.verb, recipe, opts) if action.verb else None
+    names_only = {ref: replace(ri, quantity=None) for ref, ri in rendered_ings.items()}
+    plain = _render_text(
+        action,
+        recipe,
+        opts,
+        names_only,
+        rendered_cook,
+        rendered_timers,
+        rendered_temps,
+        state_names,
+    )
 
     return RenderedStep(
         action_id=action.id,
         index=index,
         text=text,
+        summary=_summary(plain),
         verb=verb,
         ingredients=tuple(rendered_ings[use.id] for use in action.ingredients),
         cookware=tuple(rendered_cook.values()),
@@ -295,8 +307,8 @@ def _size_label(size, lang: str) -> str | None:
 
 
 # An approximation is a closed vocabulary too, so "to taste" reads as "nach
-# Geschmack" for a German reader rather than staying stubbornly English. The
-# authored surface is the fallback for a language not covered here.
+# Geschmack" for a German reader rather than staying stubbornly English. Words
+# outside it come from the recipe's glossary, or stay as authored.
 _APPROX_LABELS: dict[str, dict[str, str]] = {
     "en": {
         "pinch": "a pinch",
@@ -327,11 +339,16 @@ _APPROX_LABELS: dict[str, dict[str, str]] = {
 }
 
 
-def _approx_label(token: str, lang: str, surface: str) -> str:
-    table = _APPROX_LABELS.get(lang.split("-", 1)[0])
-    if table is None:
-        return surface
-    return table.get(token, surface)
+def _approx_label(token: str, lang: str) -> str | None:
+    return _APPROX_LABELS.get(lang.split("-", 1)[0], {}).get(token)
+
+
+def _gloss(recipe: Recipe, lang: str, word: str) -> str:
+    """``word`` in ``lang`` from the recipe's glossary, or as authored."""
+    if lang == recipe.source_lang:
+        return word
+    table = recipe.glossary.get(lang) or recipe.glossary.get(lang.split("-", 1)[0]) or {}
+    return table.get(word, word)
 
 
 # -- ingredients --------------------------------------------------------------
@@ -350,7 +367,7 @@ def _render_ingredient(
             CODE_INGREDIENT_UNBOUND, f"unknown ingredient id {use.ingredient_id}", element_id=use.id
         )
     if ingredient is None:
-        name = use.name
+        name = _gloss(recipe, opts.lang, use.name)
         if use.ingredient_id is None:
             issues.add(
                 CODE_INGREDIENT_UNBOUND,
@@ -364,7 +381,9 @@ def _render_ingredient(
     quantity = None
     unresolved = False
     if use.quantity is not None:
-        quantity, unresolved = _render_quantity(use.quantity, ingredient, opts, issues, use.id)
+        quantity, unresolved = _render_quantity(
+            use.quantity, ingredient, recipe, opts, issues, use.id
+        )
 
     prep = _resolve_localized(use.prep, recipe, opts) if use.prep else None
     notes = _resolve_localized(use.notes, recipe, opts) if use.notes else None
@@ -383,6 +402,7 @@ def _render_ingredient(
 def _render_quantity(
     spec: QuantitySpec,
     ingredient: Ingredient | None,
+    recipe: Recipe,
     opts: RenderOptions,
     issues: IssueCollector,
     element_id: str,
@@ -393,7 +413,9 @@ def _render_quantity(
     divisible = ingredient.divisible if ingredient is not None else True
 
     if isinstance(quantity, Approx):
-        label = _approx_label(quantity.token.value, opts.lang, quantity.surface)
+        label = _approx_label(quantity.token.value, opts.lang)
+        if label is None:
+            label = _gloss(recipe, opts.lang, quantity.surface)
         return RenderedQuantity(display=label, after_name=True), False
 
     if isinstance(quantity, Count):
@@ -411,6 +433,10 @@ def _render_quantity(
                 f"unit {quantity.unit.surface!r} not resolved; cannot convert",
                 element_id=element_id,
             )
+            shown_unit = quantity.unit.model_copy(
+                update={"surface": _gloss(recipe, opts.lang, quantity.unit.surface)}
+            )
+            quantity = quantity.model_copy(update={"unit": shown_unit})
         return RenderedQuantity(
             display=format_quantity(quantity, profile)
         ), unit_id is None and quantity.unit is not None
@@ -506,13 +532,37 @@ def _render_timer(
     return RenderedTimer(label=label, display=display)
 
 
+# The oven setting after a temperature, in the reader's language. English as
+# British recipes write it, "180 °C (160 °C fan)"; German as the dial says it.
+_OVEN_MODE_LABELS: dict[str, dict[str, str]] = {
+    "en": {
+        "conventional": "conventional",
+        "fan": "fan",
+        "top": "top heat",
+        "bottom": "bottom heat",
+        "grill": "grill",
+    },
+    "de": {
+        "conventional": "Ober-/Unterhitze",
+        "fan": "Umluft",
+        "top": "Oberhitze",
+        "bottom": "Unterhitze",
+        "grill": "Grill",
+    },
+}
+
+
 def _render_temperature(temperature: Temperature, opts: RenderOptions) -> RenderedTemperature:
     unit = "F" if opts.system in ("us", "imperial") else "C"
     value = temperature.value_in(unit)
     # Ovens are set in steps, not to the exact conversion; snapping to 5°
     # turns 356 °F into a dial a reader actually has.
     rounded = (value / 5).quantize(Decimal(1)) * 5
-    return RenderedTemperature(display=f"{rounded} °{unit}")
+    display = f"{rounded} °{unit}"
+    if temperature.mode:
+        labels = _OVEN_MODE_LABELS.get(opts.lang.split("-", 1)[0], _OVEN_MODE_LABELS["en"])
+        display = f"{display} {labels[temperature.mode]}"
+    return RenderedTemperature(display=display, mode=temperature.mode)
 
 
 # -- graph --------------------------------------------------------------------
@@ -547,64 +597,85 @@ def _build_graph(
     ordered: list[Action],
     steps_by_action: dict[str, RenderedStep],
     state_names: dict[str, str],
+    title: str,
 ) -> RenderGraph:
+    """The recipe as a flowchart a cook can follow.
+
+    Every step is a numbered box, so the chart and the method point at each
+    other; its ingredients flow into it. A result a later step names (a dough,
+    a sauce) gets a box of its own, and an unnamed one is skipped, the next step
+    following straight on. What the recipe ends with is the dish, under its own
+    name or, unnamed, the recipe's title. Nothing here is English unless the
+    reader's language is: an imported recipe has no verbs, and placeholder words
+    like "combine" read as noise in a German recipe.
+    """
     nodes: list[RenderNode] = []
     edges: list[RenderEdge] = []
-    seen: set[str] = set()
-
-    def add_node(node: RenderNode) -> None:
-        if node.id not in seen:
-            seen.add(node.id)
-            nodes.append(node)
-
-    for action in ordered:
-        add_node(
-            RenderNode(id=action.produces.id, label=state_names[action.produces.id], kind="state")
-        )
+    terminal = set(recipe.terminal_state_ids)
+    # Where a later step that uses a state connects from: the state's own box,
+    # or, for an unnamed state, the step that made it.
+    source_of: dict[str, str] = {}
 
     for action in ordered:
         step = steps_by_action[action.id]
-        inputs: list[str] = list(action.uses)
+        step_node = f"step_{action.id}"
+        nodes.append(
+            RenderNode(
+                id=step_node,
+                label=step.verb or step.summary,
+                kind="step",
+                number=step.index,
+                times=tuple(
+                    f"{timer.label + ' ' if timer.label else ''}{timer.display}"
+                    for timer in step.timers
+                ),
+                temperatures=tuple(temperature.display for temperature in step.temperatures),
+            )
+        )
         for use, rendered in zip(action.ingredients, step.ingredients):
-            add_node(RenderNode(id=use.id, label=_ingredient_inline(rendered), kind="ingredient"))
-            inputs.append(use.id)
+            quantity = rendered.quantity
+            nodes.append(
+                RenderNode(
+                    id=use.id,
+                    label=rendered.name,
+                    kind="ingredient",
+                    amount=quantity.display if quantity is not None else "",
+                    amount_after=quantity is not None and quantity.after_name,
+                )
+            )
+            edges.append(RenderEdge(src=use.id, dst=step_node))
+        for used in action.uses:
+            edges.append(RenderEdge(src=source_of.get(used, used), dst=step_node))
 
-        label = _edge_label(step)
-        target = action.produces.id
-        if len(inputs) <= 1:
-            for src in inputs:
-                edges.append(RenderEdge(src=src, dst=target, label=label))
-            if not inputs:  # a source step with no inputs at all
-                add_node(RenderNode(id=f"start_{action.id}", label="start", kind="state"))
-                edges.append(RenderEdge(src=f"start_{action.id}", dst=target, label=label))
+        state = action.produces
+        if state.id in terminal:
+            label = state_names[state.id] if state.name is not None else title
+            nodes.append(RenderNode(id=state.id, label=label, kind="dish"))
+            edges.append(RenderEdge(src=step_node, dst=state.id))
+            source_of[state.id] = state.id
+        elif state.name is not None:
+            nodes.append(RenderNode(id=state.id, label=state_names[state.id], kind="state"))
+            edges.append(RenderEdge(src=step_node, dst=state.id))
+            source_of[state.id] = state.id
         else:
-            # A hyperedge (many inputs, one output) cannot be one labelled edge,
-            # so a join node carries the verb.
-            join = f"join_{action.id}"
-            add_node(RenderNode(id=join, label=step.verb or "combine", kind="join"))
-            for src in inputs:
-                edges.append(RenderEdge(src=src, dst=join))
-            edges.append(RenderEdge(src=join, dst=target, label=label))
+            source_of[state.id] = step_node
 
     return RenderGraph(nodes=tuple(nodes), edges=tuple(edges))
 
 
-def _edge_label(step: RenderedStep) -> str:
-    """The action label for a flowchart edge: verb, duration and temperature.
+def _summary(text: str, limit: int = 90) -> str:
+    """A step's first sentence; a long one keeps its start and its end.
 
-    The Mermaid renderer ignores prose and walks the graph, so the edge is where
-    a reader learns "mix, 3 min @ 220 °C". Assembled from the already-rendered
-    step so scaling and unit choice are not redone.
+    The middle goes, not the end, because German puts the verb last: "Die
+    Quarkmasse auf den Boden geben … (155 °C Umluft) backen" still says what to
+    do, where a cut at the end would drop "backen".
     """
-    parts: list[str] = []
-    if step.verb:
-        parts.append(step.verb)
-    for timer in step.timers:
-        parts.append(f"{timer.label + ' ' if timer.label else ''}{timer.display}")
-    label = ", ".join(parts)
-    if step.temperatures:
-        label = f"{label} @ {' / '.join(t.display for t in step.temperatures)}".strip(" @")
-    return label
+    sentence = text.strip().split(". ", 1)[0].rstrip(".")
+    if len(sentence) <= limit:
+        return sentence
+    head = sentence[: limit * 3 // 5].rsplit(" ", 1)[0].rstrip(",;:")
+    tail = sentence[-(limit * 2 // 5) :].split(" ", 1)[-1]
+    return f"{head} … {tail}"
 
 
 # -- helpers ------------------------------------------------------------------
