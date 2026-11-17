@@ -9,7 +9,7 @@
 
 [project]
 name = "snapcook-web"
-version = "0.5.0"
+version = "0.6.0"
 description = "snap-cook Django web application"
 requires-python = ">=3.12"
 license = "AGPL-3.0-or-later"

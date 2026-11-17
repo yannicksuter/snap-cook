@@ -1089,7 +1089,7 @@ wheels = [
 
 [[package]]
 name = "snapcook-core"
-version = "0.3.0"
+version = "0.4.0"
 source = { editable = "packages/snapcook-core" }
 dependencies = [
     { name = "pint" },
@@ -1110,7 +1110,7 @@ requires-dist = [
 
 [[package]]
 name = "snapcook-web"
-version = "0.5.0"
+version = "0.6.0"
 source = { virtual = "apps/web" }
 dependencies = [
     { name = "anthropic" },
