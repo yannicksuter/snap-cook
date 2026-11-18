@@ -10,7 +10,7 @@
 
 # The Debian release is pinned, not just Python: it decides the Postgres major
 # version, and a data folder cannot be opened by a different major.
-FROM python:3.13-slim-trixie AS base
+FROM python:3.15-slim-trixie AS base
 
 # PATH puts the image's own virtualenv first, so `python`, `gunicorn` and
 # `docker exec <container> python manage.py ...` all run in it. Never `uv run`
