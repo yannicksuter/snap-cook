@@ -19,6 +19,8 @@ change** and says so explicitly here.
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-11-19
+
 ### Added
 
 - The top of a recipe says how long it takes: ready in, hands-on, cooking and
@@ -233,7 +235,8 @@ under the existing canonical form, not a new wire contract.
 - Documentation: README, AGENTS, CLAUDE, CONTRIBUTING, LICENSING,
   THIRD_PARTY_DATA, SECURITY, RECIPE_SPEC
 
-[Unreleased]: https://github.com/yannicksuter/snap-cook/compare/v0.6.0...main
+[Unreleased]: https://github.com/yannicksuter/snap-cook/compare/v0.7.0...main
+[0.7.0]: https://github.com/yannicksuter/snap-cook/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/yannicksuter/snap-cook/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/yannicksuter/snap-cook/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/yannicksuter/snap-cook/compare/v0.3.0...v0.4.0
