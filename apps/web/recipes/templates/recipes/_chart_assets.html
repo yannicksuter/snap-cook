@@ -14,8 +14,10 @@ chart drawn in a closed <details> or in a fallback font comes out squashed. It
 draws again after every HTMX swap, because a swapped-in <pre class="mermaid"> is
 new DOM it has not seen, and says "chart:drawn" when it is done, which the print
 page waits for.
-{% endcomment %}
+{% endcomment %}{% load recipe_extras %}
 <style>
+  /* Each oven setting's symbol on the chart's temperature chips (recipes/oven.py). */
+  {% oven_icon_styles %}
   /* The chart as a printed piece: warm paper with a faint dot grid. */
   .chart-paper {
     background-color: #FBF9F4;
@@ -102,9 +104,30 @@ page waits for.
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
   import Panzoom from 'https://cdn.jsdelivr.net/npm/@panzoom/panzoom@4.6.2/dist/panzoom.es.js';
 
+  // Before anything is awaited: Mermaid draws every chart by itself on the
+  // page's load event unless told not to, and that event can come while ELK is
+  // still loading -- the chart would then be drawn without draw() below, which
+  // softens its lines, sets its width and tells the print page it is ready.
+  mermaid.initialize({ startOnLoad: false });
+
+  // ELK keeps the order the chart is written in -- the steps' own order -- so
+  // step 1's branch sits left of step 3's. Mermaid's own layout places branches
+  // wherever crosses fewest lines. Without ELK the chart is the same, only in
+  // that order.
+  let layout = 'dagre';
+  try {
+    const elk = await import('https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@1/dist/mermaid-layout-elk.esm.min.mjs');
+    mermaid.registerLayoutLoaders(elk.default);
+    layout = 'elk';
+  } catch (error) {
+    console.warn('chart: keeping the default layout', error);
+  }
+
   mermaid.initialize({
     startOnLoad: false,
     securityLevel: 'strict',
+    layout,
+    elk: { considerModelOrder: 'NODES_AND_EDGES', forceNodeModelOrder: true, nodePlacementStrategy: 'NETWORK_SIMPLEX', nodePlacementAlignment: 'BALANCED' },
     theme: 'base',
     themeVariables: {
       fontFamily: '"Atkinson Hyperlegible Next", system-ui, sans-serif',
@@ -117,12 +140,44 @@ page waits for.
     flowchart: { curve: 'basis', nodeSpacing: 30, rankSpacing: 52, padding: 16, wrappingWidth: 250 },
   });
 
+  // ELK draws its lines at right angles with a 7 px bend. Wider bends read as a
+  // drawing rather than a circuit; the straight runs, and so the order, stay.
+  function soften(edge, radius = 18) {
+    // The line's real shape: where it starts, each bend's corner (the control
+    // point of ELK's small curve there), and where it ends.
+    const points = [];
+    let last = null;
+    for (const [, command, args] of edge.getAttribute('d').matchAll(/([MLQ])([^MLQ]*)/g)) {
+      const values = args.split(/[\s,]+/).filter(Boolean).map(Number);
+      if (command === 'M' && !points.length) points.push([values[0], values[1]]);
+      if (command === 'Q') points.push([values[0], values[1]]);
+      last = [values.at(-2), values.at(-1)];
+    }
+    if (!last || points.length < 2) return;
+    points.push(last);
+    const toward = (from, to, distance) => {
+      const length = Math.hypot(to[0] - from[0], to[1] - from[1]) || 1;
+      return [from[0] + ((to[0] - from[0]) * distance) / length, from[1] + ((to[1] - from[1]) * distance) / length];
+    };
+    let d = `M${points[0][0]},${points[0][1]}`;
+    for (let i = 1; i < points.length - 1; i++) {
+      const [before, corner, after] = [points[i - 1], points[i], points[i + 1]];
+      const r = Math.min(radius, Math.hypot(corner[0] - before[0], corner[1] - before[1]) / 2, Math.hypot(after[0] - corner[0], after[1] - corner[1]) / 2);
+      const [a, b] = [toward(corner, before, r), toward(corner, after, r)];
+      d += `L${a[0]},${a[1]}Q${corner[0]},${corner[1]} ${b[0]},${b[1]}`;
+    }
+    edge.setAttribute('d', d + `L${points.at(-1)[0]},${points.at(-1)[1]}`);
+  }
+
   async function draw() {
     await document.fonts.ready;
     const nodes = [...document.querySelectorAll('pre.mermaid:not([data-processed])')]
       .filter((node) => node.checkVisibility());
     if (nodes.length) {
       await mermaid.run({ nodes });
+      if (layout === 'elk') {
+        for (const edge of document.querySelectorAll('#chart path.flowchart-link')) soften(edge);
+      }
       // Shrunk to fit a phone, a wide chart's words would be too small to
       // read: below its natural width, at most 600 px, it scrolls instead.
       for (const node of nodes) {

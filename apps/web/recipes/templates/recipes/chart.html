@@ -27,6 +27,7 @@ print dialog's own settings decide paper and margins beyond the A4 default.
       <p class="text-[13px] font-extrabold uppercase tracking-[0.2em] text-herb">snap-cook</p>
       <h1 class="mt-1.5 text-[34px] leading-tight font-extrabold tracking-tight">{{ model.title }}</h1>
       {% if model.description %}<p class="mt-2 text-[17px] leading-relaxed text-ink-2">{{ model.description }}</p>{% endif %}
+      {% include "recipes/_facts.html" %}
       {% if view.servings %}
         <p class="mt-2 text-[16px] font-bold text-ink-3">{% blocktranslate trimmed count counter=view.servings %}
           for {{ counter }} serving

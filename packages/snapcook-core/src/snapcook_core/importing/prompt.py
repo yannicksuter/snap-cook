@@ -57,10 +57,18 @@ order a cook works:
 title: The recipe's name
 description: One sentence in your own words saying what the dish is.
 servings: 4
+prep time: 25 min
+total time: 2 h 10 min
 lang: en
 ---
 
 `servings` is a whole number; leave the line out when the source does not say. \
+Write `prep time` (the hands-on work: Arbeitszeit, Zubereitungszeit), `cook time` \
+(in the oven or on the stove: Backzeit, Kochzeit), `rest time` (resting, chilling, \
+rising: Ruhezeit) and `total time` (from the start to the finished dish: \
+Gesamtzeit, Fertig in) only as the source states them for this recipe, in hours \
+and minutes; leave out any line it does not state. Times shown beside other \
+recipes on the page are not this recipe's. \
 Inside a step, mark:
 
 - `@name{amount%unit}`: an ingredient with the amount this step uses, such as \
@@ -79,12 +87,16 @@ pan. Words in place of a number (to taste, a pinch, for frying) always take `=`.
 - `~{amount%unit}`: a time, such as `~{30%min}` or `~{1.5%h}`.
 - `^{amount%C}`: a temperature, such as `^{180%C}`, or `%F` if the source uses it.
 - `^setting{amount%C}`: a temperature for one oven setting. The settings are \
-`conventional` (top and bottom heat, Ober- und Unterhitze), `fan` (fan or \
-convection, Umluft, Heissluft), `top` (top heat only), `bottom` (bottom heat \
-only) and `grill` (grill or broil). Whenever the source names the setting, write \
-it, and when it gives a temperature for each setting, keep every one: \
-`at ^conventional{175%C} (^fan{155%C})`. The setting is shown to the reader in \
-their language, so do not repeat it in words beside the temperature.
+`conventional` (top and bottom heat, Ober- und Unterhitze), `top` (top heat, \
+Oberhitze), `bottom` (bottom heat, Unterhitze), `fan` (fan or convection, \
+Umluft), `hot_air` (hot air with the ring element, Heissluft or Heißluft), \
+`fan_bottom` (fan with bottom heat, Umluft mit Unterhitze, Pizzastufe), \
+`fan_conventional` (fan with top and bottom heat), `grill` (grill or broil, \
+Grillfunktion) and `fan_grill` (fan grill, Grill mit Umluft). Whenever the \
+source names the setting, write it, and when it gives a temperature for each \
+setting, keep every one: `at ^conventional{175%C} (^fan{155%C})`. The setting is \
+shown to the reader in their language, so do not repeat it in words beside the \
+temperature.
 - `=> name` at the very end of a step names what the step makes, when a later \
 step uses it. That later step refers to it as `@&{name}`, spelled exactly the \
 same. This is how a recipe records which parts are prepared separately and \

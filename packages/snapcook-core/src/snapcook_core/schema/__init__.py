@@ -37,7 +37,7 @@ from snapcook_core.schema.quantity import (
     UnitRef,
     approx_spec,
 )
-from snapcook_core.schema.recipe import Recipe, Visibility
+from snapcook_core.schema.recipe import Recipe, RecipeTime, Visibility
 
 __all__ = [
     "Action",
@@ -64,6 +64,7 @@ __all__ = [
     "SizeGrade",
     "SnapcookModel",
     "StateChunk",
+    "RecipeTime",
     "Temperature",
     "TemperatureChunk",
     "TextChunk",

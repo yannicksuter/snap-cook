@@ -24,6 +24,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from snapcook_core.canonical.encode import encode_decimal
+from snapcook_core.durations import TIME_KEYS, minutes_text
 from snapcook_core.registry import IngredientRegistry, default_registry
 from snapcook_core.render.toposort import topological_actions
 from snapcook_core.schema.graph import (
@@ -50,6 +51,10 @@ _FRONTMATTER_ORDER = (
     "title",
     "description",
     "servings",
+    "prep time",
+    "cook time",
+    "rest time",
+    "total time",
     "lang",
     "visibility",
     "tags",
@@ -84,6 +89,11 @@ def _frontmatter(recipe: Recipe, lang: str) -> dict:
         values["description"], _ = recipe.description.resolve(lang, source=recipe.source_lang)
     if recipe.servings is not None:
         values["servings"] = recipe.servings
+    if recipe.time is not None:
+        for key, field in TIME_KEYS.items():
+            minutes = getattr(recipe.time, field)
+            if minutes is not None:
+                values[key] = minutes_text(minutes)
     values["lang"] = lang
     values["visibility"] = recipe.visibility
     if recipe.tags:

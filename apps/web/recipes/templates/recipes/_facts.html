@@ -1,0 +1,44 @@
+{% comment %}
+SPDX-License-Identifier: AGPL-3.0-or-later
+
+What a cook wants to know before starting: how long it takes and how the oven
+is set. Times as the source states them; without a stated total, the longest
+chain of timed steps, shown as "at least" because untimed work is not counted.
+{% endcomment %}{% load i18n recipe_extras %}
+{% if model.time or model.oven %}
+  <div class="mt-4 flex flex-wrap gap-2">
+    {% if model.time.total %}
+      <div class="inline-flex items-center gap-2.5 rounded-2xl bg-surface pl-3 pr-4 py-2">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="flex-none text-herb"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        <span class="flex flex-col leading-tight">
+          <span class="text-[14px] font-bold text-ink-3">{% if model.time.at_least %}{% translate "Takes at least" %}{% else %}{% translate "Ready in" %}{% endif %}</span>
+          <span class="text-[19px] font-extrabold">{{ model.time.total }}</span>
+        </span>
+      </div>
+    {% endif %}
+    {% if model.time.prep %}
+      <div class="inline-flex flex-col justify-center leading-tight rounded-2xl bg-surface px-4 py-2">
+        <span class="text-[14px] font-bold text-ink-3">{% translate "Hands-on" %}</span>
+        <span class="text-[19px] font-extrabold">{{ model.time.prep }}</span>
+      </div>
+    {% endif %}
+    {% if model.time.cook %}
+      <div class="inline-flex flex-col justify-center leading-tight rounded-2xl bg-surface px-4 py-2">
+        <span class="text-[14px] font-bold text-ink-3">{% translate "Cooking" %}</span>
+        <span class="text-[19px] font-extrabold">{{ model.time.cook }}</span>
+      </div>
+    {% endif %}
+    {% if model.time.rest %}
+      <div class="inline-flex flex-col justify-center leading-tight rounded-2xl bg-surface px-4 py-2">
+        <span class="text-[14px] font-bold text-ink-3">{% translate "Resting" %}</span>
+        <span class="text-[19px] font-extrabold">{{ model.time.rest }}</span>
+      </div>
+    {% endif %}
+    {% for temperature in model.oven %}
+      <div class="inline-flex items-center gap-2.5 rounded-2xl bg-ember-tint text-ember pl-3 pr-4 py-2">
+        <span class="flex-none">{% oven_icon temperature.mode 30 %}</span>
+        <span class="text-[17px] font-bold leading-tight">{{ temperature.display }}</span>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}

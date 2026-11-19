@@ -62,10 +62,17 @@ def _label(node: RenderNode) -> str:
     if node.number is not None:
         text = f"<span class=n>{node.number}</span> {text}"
     chips = [f"<span class=time>{_escape(time)}</span>" for time in node.times]
-    chips += [f"<span class=temp>{_escape(temp)}</span>" for temp in node.temperatures]
+    chips += [_temperature_chip(temp) for temp in node.temperatures]
     if chips:
         text = f"{text}<br>{''.join(chips)}"
     return text
+
+
+def _temperature_chip(temperature) -> str:
+    """A temperature, with its oven setting as a class (``m-fan``) to draw its symbol."""
+    if temperature.mode:
+        return f"<span class='temp m-{temperature.mode}'>{_escape(temperature.display)}</span>"
+    return f"<span class=temp>{_escape(temperature.display)}</span>"
 
 
 def _safe_id(node_id: str) -> str:
