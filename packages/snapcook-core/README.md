@@ -59,8 +59,8 @@ rule set, each with its reason.
 ```python
 from snapcook_core.canonical import content_hash, canonical_bytes
 
-h = content_hash(recipe)          # "sc1:9f2a…"
-raw = canonical_bytes(recipe)     # the exact bytes that were hashed
+h = content_hash(recipe)  # "sc1:9f2a…"
+raw = canonical_bytes(recipe)  # the exact bytes that were hashed
 ```
 
 The bytes a client verifies are the bytes we hashed — there is no
