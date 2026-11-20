@@ -82,14 +82,14 @@ def test_a_search_without_matches_says_so(seeded, cook, client) -> None:
 def test_a_recipe_opens_at_the_servings_it_was_written_for(seeded, cook, client) -> None:
     page = _page(client, "/r/tomato-sauce/")
     assert "for 4 servings" in page
-    assert "30 ml" in page
+    assert "2 tbsp" in page  # as the recipe says it, not 30 ml
 
 
 def test_servings_scale_every_amount(seeded, cook, client) -> None:
     page = _page(client, "/r/tomato-sauce/?servings=8")
     assert "for 8 servings" in page
-    assert "60 ml" in page
-    assert "Warm 60 ml olive oil" in page, "amounts inside the steps scale too"
+    assert "4 tbsp" in page
+    assert "Warm 4 tbsp olive oil" in page, "amounts inside the steps scale too"
 
 
 @pytest.mark.parametrize(("asked", "shown"), [("0", "for 1 serving"), ("lots", "for 4 servings")])
@@ -159,9 +159,9 @@ def test_one_recipe_can_be_read_in_another_language(seeded, cook, client) -> Non
 
 def test_units_follow_the_saved_settings(seeded, cook, client) -> None:
     UserPreferences.objects.create(user=cook, unit_system="us")
-    page = _page(client, "/r/tomato-sauce/")
-    assert "2 tbsp" in page
-    assert "30 ml" not in page
+    page = _page(client, "/r/rosti/")
+    assert "800 g" not in page
+    assert " lb" in page or " oz" in page
 
 
 # -- the chart --------------------------------------------------------------------

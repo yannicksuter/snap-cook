@@ -222,7 +222,8 @@ representation, not two.
 | `#stand mixer{}` | cookware |
 | `~{30%min}` / `~proof{2%h}` | timer, optionally named |
 | `^{220%C}` | **snap-cook**: temperature |
-| `^fan{200%C}` | **snap-cook**: temperature for one oven setting: `conventional`, `fan`, `top`, `bottom` or `grill` |
+| `^fan{200%C}` | **snap-cook**: temperature for one oven setting: `conventional`, `top`, `bottom`, `fan`, `hot_air`, `fan_bottom`, `fan_conventional`, `grill` or `fan_grill` |
+| `prep time: 25 min` | **snap-cook** frontmatter, with `cook time`, `rest time` and `total time`: the times the source states, in hours and minutes |
 | `=> dough` | **snap-cook**: names this action's output state |
 | `@&{dough}` | **snap-cook**: consumes a named state |
 

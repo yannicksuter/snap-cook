@@ -47,6 +47,14 @@ Every quantity carries a policy: `linear`, `invariant`, `manual`, `nonlinear`.
 Scaling is a **render-time operation**. Doubling a recipe does not create a
 commit.
 
+## Volumes a reader can measure
+
+In metric, a volume stays in the recipe's own unit while its number reads well:
+dl from 0.5 to 9.9 dl ("2 dl Rahm" is how a Swiss recipe says it), spoons up to
+six (EL and TL in German), litres from 0.25 l. Outside those ranges it moves to
+ml or l, and a recipe written in ml stays in ml. US readers get cups and spoons
+as before (`_choose_display_unit` in `snapcook_core/render/build.py`).
+
 ## Translation
 
 - Ingredient names resolve through the registry at render time, per language.

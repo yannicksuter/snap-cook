@@ -21,6 +21,7 @@ from decimal import Decimal, InvalidOperation
 
 from snapcook_core import ids
 from snapcook_core.cooklang.frontmatter import parse_document
+from snapcook_core.durations import TIME_KEYS, parse_minutes
 from snapcook_core.registry import IngredientRegistry, default_registry
 from snapcook_core.schema.cookware import CookwareUse
 from snapcook_core.schema.graph import (
@@ -51,7 +52,7 @@ from snapcook_core.schema.quantity import (
     SizeGrade,
     UnitRef,
 )
-from snapcook_core.schema.recipe import Recipe
+from snapcook_core.schema.recipe import Recipe, RecipeTime
 from snapcook_core.units.registry import resolve_unit
 
 __all__ = ["parse_cook"]
@@ -60,20 +61,44 @@ _SIZE_VALUES = {grade.value for grade in SizeGrade}
 # The oven setting named in ``^fan{160%C}``. The keywords are what the printer
 # writes; the rest are the words a model or a person may write instead, in
 # English and German, compared with case, spaces and punctuation removed.
+# Casefolding turns "ß" into "ss", so "Heißluft" arrives as "heissluft".
 _OVEN_MODES: dict[str, OvenMode] = {
     **dict.fromkeys(
         ("conventional", "topandbottomheat", "topbottomheat", "static",
-         "oberunterhitze", "oberundunterhitze", "ounterhitze", "ouhitze"),
+         "oberunterhitze", "oberundunterhitze", "unteroberhitze", "unterundoberhitze",
+         "ounterhitze", "ouhitze"),
         "conventional",
-    ),
-    **dict.fromkeys(
-        ("fan", "fanoven", "fanforced", "fanassisted", "convection", "convectionoven",
-         "umluft", "heissluft", "heißluft"),
-        "fan",
     ),
     **dict.fromkeys(("top", "topheat", "oberhitze"), "top"),
     **dict.fromkeys(("bottom", "bottomheat", "unterhitze"), "bottom"),
-    **dict.fromkeys(("grill", "broil", "broiler", "grillen"), "grill"),
+    **dict.fromkeys(
+        ("fan", "fanoven", "fanforced", "fanassisted", "convection", "convectionoven",
+         "umluft"),
+        "fan",
+    ),
+    **dict.fromkeys(
+        ("hotair", "hot_air", "truefan", "heissluft", "circotherm", "3dheissluft",
+         "4dheissluft"),
+        "hot_air",
+    ),
+    **dict.fromkeys(
+        ("fanbottom", "fan_bottom", "fanwithbottomheat", "umluftmitunterhitze",
+         "unterhitzemitumluft", "pizzastufe", "pizza"),
+        "fan_bottom",
+    ),
+    **dict.fromkeys(
+        ("fanconventional", "fan_conventional", "fanwithtopandbottomheat",
+         "umluftmitoberunterhitze", "umluftmitunteroberhitze",
+         "umluftmitoberundunterhitze", "umluftmitunterundoberhitze",
+         "oberunterhitzemitumluft"),
+        "fan_conventional",
+    ),
+    **dict.fromkeys(("grill", "broil", "broiler", "grillen", "grillfunktion"), "grill"),
+    **dict.fromkeys(
+        ("fangrill", "fan_grill", "grillmitumluft", "grillfunktionmitumluft", "umluftgrill",
+         "umluftgrillen"),
+        "fan_grill",
+    ),
 }  # fmt: skip
 _PRODUCE = re.compile(r"\s*=>\s*(?P<name>[^{}@#~^]+?)\s*$")
 
@@ -122,6 +147,7 @@ def parse_cook(text: str, *, registry: IngredientRegistry | None = None) -> Reci
             LocalizedText.mono(lang, front["description"]) if front.get("description") else None
         ),
         servings=front.get("servings"),
+        time=_recipe_time(front),
         visibility=front.get("visibility", "private"),
         tags=list(front.get("tags", []) or []),
         provenance=Provenance(
@@ -334,6 +360,14 @@ class _StepScanner:
         index = len(self.temperatures)
         self.temperatures.append(temp)
         return TemperatureChunk(index=index), end
+
+
+def _recipe_time(front: dict) -> RecipeTime | None:
+    """``prep time``, ``cook time``, ``rest time`` and ``total time``, as stated."""
+    minutes = {field: parse_minutes(front.get(key)) for key, field in TIME_KEYS.items()}
+    if not any(value is not None for value in minutes.values()):
+        return None
+    return RecipeTime(**minutes)
 
 
 def _parse_quantity(body: str, *, invariant: bool) -> QuantitySpec | None:

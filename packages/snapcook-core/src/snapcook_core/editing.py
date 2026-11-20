@@ -29,7 +29,17 @@ __all__ = ["Revision", "carry_translations", "revise", "text_for_editing"]
 
 # What the text may set. Visibility is not among them: sharing is a decision
 # of its own, not a line someone edits by accident.
-_EDITABLE_FRONT = ("title", "description", "servings", "lang", "tags")
+_EDITABLE_FRONT = (
+    "title",
+    "description",
+    "servings",
+    "prep time",
+    "cook time",
+    "rest time",
+    "total time",
+    "lang",
+    "tags",
+)
 
 
 @dataclass(frozen=True)

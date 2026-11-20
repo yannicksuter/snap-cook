@@ -19,6 +19,31 @@ change** and says so explicitly here.
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-11-19
+
+### Added
+
+- The top of a recipe says how long it takes: ready in, hands-on, cooking and
+  resting time, as the source states them, which the importer now reads.
+  Without a stated total, the timers along the longest chain of steps give a
+  lower bound, shown as "takes at least".
+- Every oven setting has its own symbol, drawn like an oven's dial, on the
+  recipe, on its steps and in the chart. New settings: hot air (Heissluft, no
+  longer counted as fan), fan with bottom heat, fan with top and bottom heat,
+  and fan grill.
+
+### Changed
+
+- The chart keeps the steps' order from left to right, with softly rounded
+  lines.
+- Volumes stay in the recipe's own unit while they read well: 2 dl stays 2 dl,
+  2 EL stays 2 EL, 0.5 l stays 0.5 l. A recipe written in ml stays in ml.
+
+### Notes
+
+- A recipe that has times or one of the new oven settings cannot be opened by
+  0.6.0 or older.
+
 ## [0.6.0] - 2026-11-18
 
 ### Added
@@ -210,7 +235,8 @@ under the existing canonical form, not a new wire contract.
 - Documentation: README, AGENTS, CLAUDE, CONTRIBUTING, LICENSING,
   THIRD_PARTY_DATA, SECURITY, RECIPE_SPEC
 
-[Unreleased]: https://github.com/yannicksuter/snap-cook/compare/v0.6.0...main
+[Unreleased]: https://github.com/yannicksuter/snap-cook/compare/v0.7.0...main
+[0.7.0]: https://github.com/yannicksuter/snap-cook/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/yannicksuter/snap-cook/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/yannicksuter/snap-cook/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/yannicksuter/snap-cook/compare/v0.3.0...v0.4.0

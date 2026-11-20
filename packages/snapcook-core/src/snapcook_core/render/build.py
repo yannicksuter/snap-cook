@@ -19,6 +19,7 @@ from __future__ import annotations
 from dataclasses import dataclass, replace
 from decimal import Decimal
 
+from snapcook_core.durations import minutes_text
 from snapcook_core.errors import (
     CODE_INGREDIENT_UNBOUND,
     CODE_UNIT_UNRESOLVED,
@@ -31,6 +32,7 @@ from snapcook_core.render.model import (
     RenderedQuantity,
     RenderedStep,
     RenderedTemperature,
+    RenderedTime,
     RenderedTimer,
     RenderGraph,
     RenderModel,
@@ -72,6 +74,14 @@ from snapcook_core.units.scaling import scale_spec
 __all__ = ["RenderOptions", "build_render_model"]
 
 _QUARTER_CUP_ML = Decimal("59")  # promote to cups above ~1/4 cup
+# A metric reader keeps the recipe's own unit while its number reads well:
+# "2 dl Rahm" is how a Swiss recipe says it, and two spoons are easier to
+# measure than 30 ml. Outside these ranges an amount moves to ml or l.
+_SPOONS_UP_TO_ML = Decimal(90)  # six tablespoons
+_DL_FROM_ML, _DL_BELOW_ML = Decimal(50), Decimal(1000)  # 0.5 dl to 9.9 dl
+_LITRES_FROM_ML = Decimal(250)  # 0.25 l, for a recipe that says litres
+# Spoons as a German cook writes them; other units read the same everywhere.
+_UNIT_LABELS = {"de": {"unit:tbsp": "EL", "unit:tsp": "TL"}}
 
 
 @dataclass(frozen=True, slots=True)
@@ -129,6 +139,8 @@ def build_render_model(recipe: Recipe, options: RenderOptions | None = None) -> 
         side_by_side=_side_by_side(steps),
         graph=_build_graph(recipe, ordered, steps_by_action, state_names, title),
         warnings=tuple(issues.issues),
+        time=_render_time(recipe, ordered),
+        oven=_oven_settings(steps),
     )
 
 
@@ -443,7 +455,7 @@ def _render_quantity(
 
     if isinstance(quantity, Scalar):
         target, value = _choose_display_unit(quantity.value, unit_id, opts.system)
-        shown = Scalar(value=value, unit=_unit_ref(target))
+        shown = Scalar(value=value, unit=_unit_ref(target, opts.lang))
         return (
             RenderedQuantity(
                 display=format_quantity(shown, profile, divisible=divisible),
@@ -457,7 +469,7 @@ def _render_quantity(
         target, _ = _choose_display_unit(quantity.high, unit_id, opts.system)
         low = convert_value(quantity.low, unit_id, target)
         high = convert_value(quantity.high, unit_id, target)
-        shown = Range(low=low, high=high, unit=_unit_ref(target))
+        shown = Range(low=low, high=high, unit=_unit_ref(target, opts.lang))
         return (
             RenderedQuantity(
                 display=format_quantity(shown, profile, divisible=divisible),
@@ -470,10 +482,11 @@ def _render_quantity(
     return RenderedQuantity(display=format_quantity(quantity, profile)), False
 
 
-def _unit_ref(unit_id: str) -> UnitRef:
+def _unit_ref(unit_id: str, lang: str = "en") -> UnitRef:
     definition = unit_def(unit_id)
     symbol = definition.symbol if definition else unit_id
-    return UnitRef(unit_id=unit_id, surface=symbol)
+    label = _UNIT_LABELS.get(lang.split("-", 1)[0], {}).get(unit_id, symbol)
+    return UnitRef(unit_id=unit_id, surface=label)
 
 
 def _choose_display_unit(value: Decimal, source_unit: str, system: System) -> tuple[str, Decimal]:
@@ -506,7 +519,13 @@ def _choose_display_unit(value: Decimal, source_unit: str, system: System) -> tu
             if abs(millilitres) >= 15:
                 return "unit:tbsp", convert_value(value, source_unit, "unit:tbsp")
             return "unit:tsp", convert_value(value, source_unit, "unit:tsp")
-        if abs(millilitres) >= 1000:
+        size = abs(millilitres)
+        if source_unit in ("unit:tsp", "unit:tbsp") and size <= _SPOONS_UP_TO_ML:
+            spoon = "unit:tsp" if size < 15 else "unit:tbsp"
+            return spoon, convert_value(value, source_unit, spoon)
+        if source_unit == "unit:dl" and _DL_FROM_ML <= size < _DL_BELOW_ML:
+            return "unit:dl", convert_value(value, source_unit, "unit:dl")
+        if size >= 1000 or (source_unit == "unit:l" and size >= _LITRES_FROM_ML):
             return "unit:l", convert_value(value, source_unit, "unit:l")
         return "unit:ml", millilitres
 
@@ -537,17 +556,25 @@ def _render_timer(
 _OVEN_MODE_LABELS: dict[str, dict[str, str]] = {
     "en": {
         "conventional": "conventional",
-        "fan": "fan",
         "top": "top heat",
         "bottom": "bottom heat",
+        "fan": "fan",
+        "hot_air": "hot air",
+        "fan_bottom": "fan with bottom heat",
+        "fan_conventional": "fan with top and bottom heat",
         "grill": "grill",
+        "fan_grill": "fan grill",
     },
     "de": {
         "conventional": "Ober-/Unterhitze",
-        "fan": "Umluft",
         "top": "Oberhitze",
         "bottom": "Unterhitze",
+        "fan": "Umluft",
+        "hot_air": "Heissluft",
+        "fan_bottom": "Umluft mit Unterhitze",
+        "fan_conventional": "Umluft mit Ober-/Unterhitze",
         "grill": "Grill",
+        "fan_grill": "Grill mit Umluft",
     },
 }
 
@@ -629,7 +656,7 @@ def _build_graph(
                     f"{timer.label + ' ' if timer.label else ''}{timer.display}"
                     for timer in step.timers
                 ),
-                temperatures=tuple(temperature.display for temperature in step.temperatures),
+                temperatures=step.temperatures,
             )
         )
         for use, rendered in zip(action.ingredients, step.ingredients):
@@ -676,6 +703,65 @@ def _summary(text: str, limit: int = 90) -> str:
     head = sentence[: limit * 3 // 5].rsplit(" ", 1)[0].rstrip(",;:")
     tail = sentence[-(limit * 2 // 5) :].split(" ", 1)[-1]
     return f"{head} … {tail}"
+
+
+# -- time and oven ------------------------------------------------------------
+
+
+def _render_time(recipe: Recipe, ordered: list[Action]) -> RenderedTime | None:
+    """The stated times; without a stated total, a lower bound from the timers."""
+    stated = recipe.time
+    prep = stated.prep if stated else None
+    cook = stated.cook if stated else None
+    rest = stated.rest if stated else None
+    total = stated.total if stated else None
+    at_least = False
+    if total is None:
+        parts = sum(minutes for minutes in (prep, cook, rest) if minutes)
+        best = max(_timed_path_minutes(ordered), parts)
+        if best:
+            total, at_least = best, True
+    if total is None and prep is None and cook is None and rest is None:
+        return None
+
+    def shown(minutes: int | None) -> str | None:
+        return minutes_text(minutes) if minutes is not None else None
+
+    return RenderedTime(
+        total=shown(total), at_least=at_least, prep=shown(prep), cook=shown(cook), rest=shown(rest)
+    )
+
+
+def _timed_path_minutes(ordered: list[Action]) -> int:
+    """The longest chain of timed steps, in minutes: steps side by side overlap.
+
+    Only timers count -- chopping and stirring have none -- which is why the
+    result is shown as "at least". A range counts with its lower end.
+    """
+    finish: dict[str, Decimal] = {}
+    for action in ordered:
+        start = max((finish.get(used, Decimal(0)) for used in action.uses), default=Decimal(0))
+        own = Decimal(0)
+        for timer in action.timers:
+            quantity = timer.quantity
+            value = quantity.value if isinstance(quantity, Scalar) else quantity.low
+            unit = quantity.unit.unit_id if quantity.unit else "unit:min"
+            try:
+                own += convert_value(value, unit or "unit:min", "unit:min")
+            except Exception:  # noqa: BLE001 - an odd timer must not cost the whole page
+                continue
+        finish[action.produces.id] = start + own
+    longest = max(finish.values(), default=Decimal(0))
+    return int(longest.to_integral_value())
+
+
+def _oven_settings(steps: list[RenderedStep]) -> tuple[RenderedTemperature, ...]:
+    seen: dict[str, RenderedTemperature] = {}
+    for step in steps:
+        for temperature in step.temperatures:
+            if temperature.mode:
+                seen.setdefault(temperature.display, temperature)
+    return tuple(seen.values())
 
 
 # -- helpers ------------------------------------------------------------------

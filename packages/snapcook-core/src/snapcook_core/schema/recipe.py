@@ -37,7 +37,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import model_validator
+from pydantic import Field, model_validator
 
 from snapcook_core.errors import CyclicGraphError, DanglingReferenceError, GraphError
 from snapcook_core.ids import ActionId, FoodStateId, RecipeId
@@ -47,9 +47,26 @@ from snapcook_core.schema.i18n import LocalizedText
 from snapcook_core.schema.ingredient import IngredientUse
 from snapcook_core.schema.provenance import Provenance
 
-__all__ = ["Recipe", "Visibility"]
+__all__ = ["Recipe", "RecipeTime", "Visibility"]
 
 Visibility = Literal["private", "unlisted", "public"]
+
+
+class RecipeTime(SnapcookModel):
+    """How long the recipe takes, in whole minutes, as its source states it.
+
+    Never estimated: where the source gives no total, a renderer works out a
+    lower bound from the timers and says that it is one.
+    """
+
+    prep: int | None = Field(default=None, ge=0)
+    """The hands-on work: Arbeitszeit, Zubereitungszeit, prep time."""
+    cook: int | None = Field(default=None, ge=0)
+    """In the oven or on the stove: Backzeit, Kochzeit, cook time."""
+    rest: int | None = Field(default=None, ge=0)
+    """Resting, chilling, rising: Ruhezeit, Kühlzeit."""
+    total: int | None = Field(default=None, ge=0)
+    """From the start to the finished dish: Gesamtzeit, Fertig in, total time."""
 
 
 class Recipe(SnapcookModel):
@@ -71,6 +88,7 @@ class Recipe(SnapcookModel):
     title: LocalizedText
     description: LocalizedText | None = None
     servings: int | None = None
+    time: RecipeTime | None = None
 
     visibility: Visibility = "private"
     tags: list[str] = []

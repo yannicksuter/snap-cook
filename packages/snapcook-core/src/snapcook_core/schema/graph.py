@@ -63,9 +63,21 @@ _F_PER_C = Decimal("1.8")
 _F_OFFSET = Decimal("32")
 
 
-OvenMode = Literal["conventional", "fan", "top", "bottom", "grill"]
-"""The oven setting a temperature is meant for: top and bottom heat, fan
-(convection), top heat only, bottom heat only, or the grill (broiler)."""
+OvenMode = Literal[
+    "conventional",
+    "top",
+    "bottom",
+    "fan",
+    "hot_air",
+    "fan_bottom",
+    "fan_conventional",
+    "grill",
+    "fan_grill",
+]
+"""The oven setting a temperature is meant for, as the symbols on an oven's dial
+name them: top and bottom heat (Ober-/Unterhitze), top heat, bottom heat, fan
+(Umluft), hot air with the ring element (Heissluft), fan with bottom heat, fan
+with top and bottom heat, the grill, and the grill with the fan."""
 
 
 class Temperature(SnapcookModel):

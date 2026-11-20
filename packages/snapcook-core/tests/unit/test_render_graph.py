@@ -65,8 +65,18 @@ def test_amounts_times_and_oven_settings_are_parts_of_their_shapes() -> None:
     assert (quark.amount, quark.amount_after) == ("1 kg", False)
     last = _nodes("step")[-1]
     assert last.times == ("55 min",)
-    assert last.temperatures == ("175 °C Ober-/Unterhitze", "155 °C Umluft")
-    assert _nodes("step", lang="en")[-1].temperatures == ("175 °C conventional", "155 °C fan")
+    assert [(t.display, t.mode) for t in last.temperatures] == [
+        ("175 °C Ober-/Unterhitze", "conventional"),
+        ("155 °C Umluft", "fan"),
+    ]
+    english = _nodes("step", lang="en")[-1].temperatures
+    assert [t.display for t in english] == ["175 °C conventional", "155 °C fan"]
+
+
+def test_a_temperature_chip_names_its_oven_setting_for_its_symbol() -> None:
+    chart = render_mermaid(build_render_model(parse_cook(_KAESEKUCHEN), RenderOptions(lang="de")))
+    assert "<span class='temp m-conventional'>175 °C Ober-/Unterhitze</span>" in chart
+    assert "<span class='temp m-fan'>155 °C Umluft</span>" in chart
 
 
 def test_a_recipes_words_never_become_markup() -> None:

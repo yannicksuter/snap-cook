@@ -23,6 +23,7 @@ from ruamel.yaml import YAMLError
 
 from snapcook_core.cooklang import parse_cook
 from snapcook_core.cooklang.frontmatter import dump_frontmatter, parse_document
+from snapcook_core.durations import TIME_KEYS, minutes_text, parse_minutes
 from snapcook_core.errors import SnapcookError
 from snapcook_core.importing.contracts import Answer, CupSize, ImportSource, RawExtraction
 from snapcook_core.schema.provenance import Provenance
@@ -59,7 +60,17 @@ _REFERENCE = re.compile(r"@&\{(?P<name>[^{}]*)\}")
 _CUPS = ("cup", "cups")
 # What the model may set in frontmatter. Visibility and attribution are not the
 # model's to decide: imports land private, and provenance comes from the import.
-_FRONT_KEYS = ("title", "description", "servings", "lang", "tags")
+_FRONT_KEYS = (
+    "title",
+    "description",
+    "servings",
+    "prep time",
+    "cook time",
+    "rest time",
+    "total time",
+    "lang",
+    "tags",
+)
 
 
 @dataclass(frozen=True)
@@ -189,6 +200,10 @@ def _tidy_front(front: dict[str, Any]) -> dict[str, Any]:
         servings = int(match.group()) if match else None
     if isinstance(servings, int) and not isinstance(servings, bool) and servings > 0:
         tidy["servings"] = servings
+    for key in TIME_KEYS:
+        minutes = parse_minutes(front.get(key))
+        if minutes is not None:
+            tidy[key] = minutes_text(minutes)
     lang = str(front.get("lang") or "en").strip().lower()[:2]
     tidy["lang"] = lang if lang.isalpha() else "en"
     tags = front.get("tags")

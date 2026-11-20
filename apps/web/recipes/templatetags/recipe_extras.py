@@ -9,7 +9,10 @@ side, is decided in the core render model (``RenderedStep.after``,
 from __future__ import annotations
 
 from django import template
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _
+
+from recipes.oven import oven_mask_css, oven_svg
 
 register = template.Library()
 
@@ -45,3 +48,15 @@ def builds_on(step) -> str:
         "last": after[-1],
     }
     return _("Uses what you made in steps %(numbers)s.") % {"numbers": numbers}
+
+
+@register.simple_tag
+def oven_icon(mode: str | None, size: int = 22) -> str:
+    """An oven setting's symbol, inline. Built from constants, so safe to emit."""
+    return mark_safe(oven_svg(mode, size))  # noqa: S308
+
+
+@register.simple_tag
+def oven_icon_styles() -> str:
+    """The chart chips' symbols, as CSS masks; see recipes.oven."""
+    return mark_safe(oven_mask_css())  # noqa: S308

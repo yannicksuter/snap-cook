@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: snap-cook\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-17 23:09+0000\n"
+"POT-Creation-Date: 2026-11-19 22:25+0000\n"
 "PO-Revision-Date: 2026-11-16 21:30+0100\n"
 "Last-Translator: snap-cook\n"
 "Language-Team: German\n"
@@ -431,6 +431,26 @@ msgstr "Vergrössern"
 msgid "Fit"
 msgstr "Einpassen"
 
+#: recipes/templates/recipes/_facts.html
+msgid "Takes at least"
+msgstr "Dauert mindestens"
+
+#: recipes/templates/recipes/_facts.html
+msgid "Ready in"
+msgstr "Fertig in"
+
+#: recipes/templates/recipes/_facts.html
+msgid "Hands-on"
+msgstr "Arbeitszeit"
+
+#: recipes/templates/recipes/_facts.html
+msgid "Cooking"
+msgstr "Back-/Kochzeit"
+
+#: recipes/templates/recipes/_facts.html
+msgid "Resting"
+msgstr "Ruhezeit"
+
 #: recipes/templates/recipes/_render.html
 msgid "Edit"
 msgstr "Bearbeiten"
@@ -516,7 +536,9 @@ msgstr "Rezept bearbeiten"
 msgid ""
 "Saving keeps the earlier version, and translations of what you did not "
 "change."
-msgstr "Beim Speichern bleibt die frühere Fassung erhalten, ebenso die Übersetzungen von allem, was du nicht änderst."
+msgstr ""
+"Beim Speichern bleibt die frühere Fassung erhalten, ebenso die Übersetzungen "
+"von allem, was du nicht änderst."
 
 #: recipes/templates/recipes/index.html
 msgid "Search recipes"
@@ -620,13 +642,17 @@ msgstr "Verwendet, was du in den Schritten %(numbers)s zubereitet hast."
 msgid ""
 "Times and oven temperatures stay as in the recipe. Check them when you cook "
 "more or less."
-msgstr "Zeiten und Ofentemperaturen bleiben wie im Rezept. Prüfe sie, wenn du mehr oder weniger kochst."
+msgstr ""
+"Zeiten und Ofentemperaturen bleiben wie im Rezept. Prüfe sie, wenn du mehr "
+"oder weniger kochst."
 
 #: recipes/views.py
 msgid ""
 "Some amounts cannot be shown in cups and ounces, so they stay as in the "
 "recipe."
-msgstr "Manche Mengen lassen sich nicht in Cups und Unzen zeigen und bleiben wie im Rezept."
+msgstr ""
+"Manche Mengen lassen sich nicht in Cups und Unzen zeigen und bleiben wie im "
+"Rezept."
 
 #: recipes/views.py
 #, python-format

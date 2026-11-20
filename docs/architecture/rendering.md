@@ -41,7 +41,14 @@ by its first sentence, shortened in the middle so a German verb at the end
 survives. Nodes and label parts carry classes (`step`, `n`, `qty`, `time`, …)
 and no colours: the web app styles them (`recipes/_chart_assets.html`), shows
 the chart on every recipe page with a full-screen view, and prints it alone on
-an A4 page (`/r/<slug>/chart/`).
+an A4 page (`/r/<slug>/chart/`). The page lays the chart out with ELK, which
+keeps the order it is written in, so parallel branches read left to right in
+step order; Mermaid's default layout reorders them to cross fewer lines.
+
+Above the recipe, the page shows how long it takes and how the oven is set:
+the times the source states (`Recipe.time`), or, without a stated total, the
+longest chain of timed steps as a lower bound ("at least"), and each oven
+setting with the symbol on an oven's dial (`recipes/oven.py`).
 
 **print** is the hardest and lands last, but it is the **design constraint** on
 the model. Pagination, typography and image placement are unforgiving, and if

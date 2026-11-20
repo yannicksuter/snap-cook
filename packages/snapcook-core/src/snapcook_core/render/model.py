@@ -80,6 +80,19 @@ class RenderedTemperature:
 
 
 @dataclass(frozen=True, slots=True)
+class RenderedTime:
+    """The recipe's times as a reader sees them: "2 h 10 min"."""
+
+    total: str | None = None
+    at_least: bool = False
+    """True when ``total`` is a lower bound worked out from the timers along
+    the longest chain of steps, because the source states none."""
+    prep: str | None = None
+    cook: str | None = None
+    rest: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
 class RenderedStep:
     """One step: its prose already substituted, plus its structured parts."""
 
@@ -120,7 +133,7 @@ class RenderNode:
     amount_after: bool = False
     times: tuple[str, ...] = ()
     """A step's timers, as displayed."""
-    temperatures: tuple[str, ...] = ()
+    temperatures: tuple[RenderedTemperature, ...] = ()
     """A step's temperatures, each with its oven setting."""
 
 
@@ -159,3 +172,6 @@ class RenderModel:
     4 are independent" is true of many recipes and useful in none."""
     graph: RenderGraph = field(default_factory=RenderGraph)
     warnings: tuple[ValidationIssue, ...] = ()
+    time: RenderedTime | None = None
+    oven: tuple[RenderedTemperature, ...] = ()
+    """The oven settings the recipe uses, each once, in the order it uses them."""
