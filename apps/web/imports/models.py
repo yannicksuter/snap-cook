@@ -63,6 +63,13 @@ class ImportJob(models.Model):
     left_out = models.JSONField(default=list, blank=True)
 
     recipe_slug = models.CharField(max_length=200, blank=True, help_text="Set once saved")
+    recipe_id = models.CharField(
+        max_length=40,
+        blank=True,
+        db_default="",  # so 0.7.0, which never sets it, can still save imports
+        db_index=True,
+        help_text="Set once saved; unlike the slug, never changes",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

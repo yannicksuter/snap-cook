@@ -77,6 +77,10 @@ class RenderedTemperature:
     display: str
     """The value with its oven setting, if any: "155 °C fan", "155 °C Umluft"."""
     mode: str | None = None
+    value: str = ""
+    """The value alone, "155 °C", for where the setting is named apart from it."""
+    setting: str | None = None
+    """The setting's name alone, in the reader's language: "Umluft"."""
 
 
 @dataclass(frozen=True, slots=True)

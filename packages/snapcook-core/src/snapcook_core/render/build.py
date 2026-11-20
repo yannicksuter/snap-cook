@@ -581,15 +581,20 @@ _OVEN_MODE_LABELS: dict[str, dict[str, str]] = {
 
 def _render_temperature(temperature: Temperature, opts: RenderOptions) -> RenderedTemperature:
     unit = "F" if opts.system in ("us", "imperial") else "C"
-    value = temperature.value_in(unit)
     # Ovens are set in steps, not to the exact conversion; snapping to 5°
     # turns 356 °F into a dial a reader actually has.
-    rounded = (value / 5).quantize(Decimal(1)) * 5
-    display = f"{rounded} °{unit}"
+    rounded = (temperature.value_in(unit) / 5).quantize(Decimal(1)) * 5
+    shown = f"{rounded} °{unit}"
+    setting = None
     if temperature.mode:
         labels = _OVEN_MODE_LABELS.get(opts.lang.split("-", 1)[0], _OVEN_MODE_LABELS["en"])
-        display = f"{display} {labels[temperature.mode]}"
-    return RenderedTemperature(display=display, mode=temperature.mode)
+        setting = labels[temperature.mode]
+    return RenderedTemperature(
+        display=f"{shown} {setting}" if setting else shown,
+        mode=temperature.mode,
+        value=shown,
+        setting=setting,
+    )
 
 
 # -- graph --------------------------------------------------------------------

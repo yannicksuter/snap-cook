@@ -19,6 +19,29 @@ change** and says so explicitly here.
 
 ## [Unreleased]
 
+### Added
+
+- The owner can delete a recipe, at the end of its edit page, after a second
+  tap to confirm. It disappears for everyone it was shared with. On the server
+  it moves to a trash folder and can be brought back
+  (`docs/runbooks/restore-a-recipe.md`); the photos or files it was imported
+  from are deleted.
+
+### Changed
+
+- A calmer recipe page, with nothing taken away: times and oven settings in one
+  strip between thin lines, the servings control beside the ingredients, steps
+  without boxes, and chart buttons without frames.
+- A calmer add page: the same five ways to add a recipe, with fewer boxes.
+- Updates: django-allauth 65.22.1 (security fixes; none affects a Google-only
+  setup), gunicorn 27 (stricter HTTP parsing), pydantic 2.14, and the CI
+  actions on Node 24.
+
+### Notes
+
+- Rolling back to 0.7.0 is safe. A deleted recipe stays deleted there, as 0.7.0
+  does not read the trash either.
+
 ## [0.7.0] - 2026-11-19
 
 ### Added

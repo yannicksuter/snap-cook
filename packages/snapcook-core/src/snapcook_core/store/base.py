@@ -122,6 +122,15 @@ class RecipeStore(ABC):
     @abstractmethod
     def list_recipe_ids(self) -> list[str]: ...
 
+    @abstractmethod
+    def remove(self, recipe_id: str) -> bool:
+        """Take a recipe out of the store, history and all; ``False`` if absent.
+
+        Afterwards nothing here lists it, reads it or counts it as existing, so
+        a full reindex does not bring it back. The filesystem store moves the
+        files aside rather than deleting them, so a mistake can be undone.
+        """
+
     # -- shared lineage logic -------------------------------------------------
 
     def commit(

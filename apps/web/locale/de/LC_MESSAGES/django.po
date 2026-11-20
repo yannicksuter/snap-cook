@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: snap-cook\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-19 22:25+0000\n"
+"POT-Creation-Date: 2026-11-20 22:15+0000\n"
 "PO-Revision-Date: 2026-11-16 21:30+0100\n"
 "Last-Translator: snap-cook\n"
 "Language-Team: German\n"
@@ -209,10 +209,10 @@ msgstr ""
 msgid "Add a recipe"
 msgstr "Rezept hinzufügen"
 
-#: imports/templates/imports/add.html imports/templates/imports/review.html
-#: recipes/templates/recipes/_chart.html
-msgid "Close"
-msgstr "Schliessen"
+#: imports/templates/imports/add.html imports/templates/imports/status.html
+#: recipes/templates/recipes/detail.html recipes/templates/recipes/index.html
+msgid "Recipes"
+msgstr "Rezepte"
 
 #: imports/templates/imports/add.html imports/views.py
 msgid "Reading recipes is not set up on this server yet."
@@ -270,10 +270,6 @@ msgid "Get the recipe"
 msgstr "Rezept holen"
 
 #: imports/templates/imports/add.html
-msgid "Other ways"
-msgstr "Andere Wege"
-
-#: imports/templates/imports/add.html
 msgid "Choose photos or a PDF"
 msgstr "Fotos oder ein PDF wählen"
 
@@ -316,6 +312,10 @@ msgstr "Wird gesendet…"
 msgid "Check the recipe"
 msgstr "Rezept prüfen"
 
+#: imports/templates/imports/review.html recipes/templates/recipes/_chart.html
+msgid "Close"
+msgstr "Schliessen"
+
 #: imports/templates/imports/review.html
 msgid "Draft, only you"
 msgstr "Entwurf, nur für dich"
@@ -356,11 +356,6 @@ msgstr "Vorschau aktualisieren"
 #: imports/templates/imports/review.html
 msgid "Delete this draft"
 msgstr "Diesen Entwurf löschen"
-
-#: imports/templates/imports/status.html recipes/templates/recipes/detail.html
-#: recipes/templates/recipes/index.html
-msgid "Recipes"
-msgstr "Rezepte"
 
 #: imports/views.py
 msgid "That link leads into a private network, so it cannot be read."
@@ -452,18 +447,6 @@ msgid "Resting"
 msgstr "Ruhezeit"
 
 #: recipes/templates/recipes/_render.html
-msgid "Edit"
-msgstr "Bearbeiten"
-
-#: recipes/templates/recipes/_render.html
-msgid "Servings"
-msgstr "Portionen"
-
-#: recipes/templates/recipes/_render.html
-msgid "Amount"
-msgstr "Menge"
-
-#: recipes/templates/recipes/_render.html
 msgid "Fewer servings"
 msgstr "Weniger Portionen"
 
@@ -472,19 +455,19 @@ msgid "Less"
 msgstr "Weniger"
 
 #: recipes/templates/recipes/_render.html
+#, python-format
+msgid "%(counter)s serving"
+msgid_plural "%(counter)s servings"
+msgstr[0] "%(counter)s Portion"
+msgstr[1] "%(counter)s Portionen"
+
+#: recipes/templates/recipes/_render.html
 msgid "More servings"
 msgstr "Mehr Portionen"
 
 #: recipes/templates/recipes/_render.html
 msgid "More"
 msgstr "Mehr"
-
-#: recipes/templates/recipes/_render.html recipes/templates/recipes/chart.html
-#, python-format
-msgid "for %(counter)s serving"
-msgid_plural "for %(counter)s servings"
-msgstr[0] "für %(counter)s Portion"
-msgstr[1] "für %(counter)s Portionen"
 
 #: recipes/templates/recipes/_render.html
 msgid "Not recognised: please check this ingredient"
@@ -528,6 +511,17 @@ msgstr "Deine Einstellungen: Sprache und Einheiten"
 msgid "Back to the recipe"
 msgstr "Zurück zum Rezept"
 
+#: recipes/templates/recipes/chart.html
+#, python-format
+msgid "for %(counter)s serving"
+msgid_plural "for %(counter)s servings"
+msgstr[0] "für %(counter)s Portion"
+msgstr[1] "für %(counter)s Portionen"
+
+#: recipes/templates/recipes/detail.html
+msgid "Edit"
+msgstr "Bearbeiten"
+
 #: recipes/templates/recipes/edit.html
 msgid "Edit recipe"
 msgstr "Rezept bearbeiten"
@@ -539,6 +533,23 @@ msgid ""
 msgstr ""
 "Beim Speichern bleibt die frühere Fassung erhalten, ebenso die Übersetzungen "
 "von allem, was du nicht änderst."
+
+#: recipes/templates/recipes/edit.html
+msgid "Delete recipe"
+msgstr "Rezept löschen"
+
+#: recipes/templates/recipes/edit.html
+#, python-format
+msgid ""
+"“%(title)s” disappears from your recipes, and for everyone you shared it "
+"with."
+msgstr ""
+"„%(title)s“ verschwindet aus deinen Rezepten und bei allen, mit denen du es "
+"geteilt hast."
+
+#: recipes/templates/recipes/edit.html
+msgid "Yes, delete it"
+msgstr "Ja, löschen"
 
 #: recipes/templates/recipes/index.html
 msgid "Search recipes"
@@ -658,6 +669,11 @@ msgstr ""
 #, python-format
 msgid "This text cannot be read: %(detail)s"
 msgstr "Dieser Text lässt sich nicht lesen: %(detail)s"
+
+#: recipes/views.py
+#, python-format
+msgid "“%(title)s” was deleted."
+msgstr "„%(title)s“ wurde gelöscht."
 
 #: translations/templates/translations/_progress.html
 msgid ""

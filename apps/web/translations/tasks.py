@@ -73,8 +73,12 @@ def _translate(job: TranslationJob) -> None:
 
         with transaction.atomic():
             # One commit at a time per recipe: the row lock orders two runs.
-            row = CatalogRecipe.objects.select_for_update().get(recipe_id=job.recipe_id)
-            head = store.head(job.recipe_id)
+            row = CatalogRecipe.objects.select_for_update().filter(recipe_id=job.recipe_id).first()
+            head = store.head(job.recipe_id) if row else None
+            if head is None:
+                # Deleted while the model was answering; a commit would bring it back.
+                _fail(job, "gone", "the recipe was deleted")
+                return
             recipe, refused = apply_translation(head.recipe, job.lang, done)
             if refused:
                 logger.warning("translation %s left %s as written", job.pk, ", ".join(refused))

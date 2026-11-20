@@ -106,11 +106,11 @@ def test_saving_makes_a_private_recipe_for_the_reader(cook, client, reader) -> N
     assert response["Location"] == f"/r/{recipe.slug}/"
     assert (recipe.owner, recipe.visibility, recipe.title) == (cook, "private", "Nonna's sauce")
     job.refresh_from_db()
-    assert (job.status, job.recipe_slug) == ("saved", recipe.slug)
+    assert (job.status, job.recipe_slug, job.recipe_id) == ("saved", recipe.slug, recipe.recipe_id)
 
     page = client.get(response["Location"]).content.decode()
     assert "Saved. Only you can see this recipe." in page
-    assert "for 6 servings" in page
+    assert "6 servings" in page
 
 
 def test_photos_are_kept_as_the_source(cook, client, reader) -> None:

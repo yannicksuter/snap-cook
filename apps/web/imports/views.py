@@ -255,7 +255,7 @@ def _save(request: HttpRequest, job: ImportJob, recipe) -> HttpResponse:
     )
     with transaction.atomic():
         row = project_recipe(store, recipe.id, request.user)
-        job.status, job.recipe_slug = ImportJob.Status.SAVED, row.slug
-        job.save(update_fields=["status", "recipe_slug", "updated_at"])
+        job.status, job.recipe_slug, job.recipe_id = ImportJob.Status.SAVED, row.slug, recipe.id
+        job.save(update_fields=["status", "recipe_slug", "recipe_id", "updated_at"])
     messages.success(request, _("Saved. Only you can see this recipe."))
     return redirect("recipes:detail", row.slug)

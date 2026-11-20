@@ -84,7 +84,8 @@ docker exec snap-cook python manage.py seed_corpus
 
 Other `manage.py` commands, such as `reindex --full --yes`
 ([reindex](runbooks/reindex.md)), run the same way, with `docker exec snap-cook`
-in front, or typed into the container's **Console**.
+in front, or typed into the container's **Console**. A deleted recipe can be
+brought back the same way: [restore a recipe](runbooks/restore-a-recipe.md).
 
 ## Google sign-in
 

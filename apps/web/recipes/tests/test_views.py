@@ -81,18 +81,18 @@ def test_a_search_without_matches_says_so(seeded, cook, client) -> None:
 
 def test_a_recipe_opens_at_the_servings_it_was_written_for(seeded, cook, client) -> None:
     page = _page(client, "/r/tomato-sauce/")
-    assert "for 4 servings" in page
+    assert "4 servings" in page
     assert "2 tbsp" in page  # as the recipe says it, not 30 ml
 
 
 def test_servings_scale_every_amount(seeded, cook, client) -> None:
     page = _page(client, "/r/tomato-sauce/?servings=8")
-    assert "for 8 servings" in page
+    assert "8 servings" in page
     assert "4 tbsp" in page
     assert "Warm 4 tbsp olive oil" in page, "amounts inside the steps scale too"
 
 
-@pytest.mark.parametrize(("asked", "shown"), [("0", "for 1 serving"), ("lots", "for 4 servings")])
+@pytest.mark.parametrize(("asked", "shown"), [("0", "1 serving"), ("lots", "4 servings")])
 def test_unusable_servings_fall_back(seeded, cook, client, asked: str, shown: str) -> None:
     assert shown in _page(client, f"/r/tomato-sauce/?servings={asked}")
 
@@ -118,7 +118,7 @@ def test_a_linear_recipe_gets_no_structure_hints(seeded, cook, client) -> None:
 def test_htmx_gets_only_the_fragment(seeded, cook, client) -> None:
     page = _page(client, "/r/tomato-sauce/?servings=2", HTTP_HX_REQUEST="true")
     assert "<html" not in page
-    assert "for 2 servings" in page
+    assert "2 servings" in page
 
 
 # -- languages and units ------------------------------------------------------------

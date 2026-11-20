@@ -219,6 +219,32 @@ def edit(request: HttpRequest, slug: str) -> HttpResponse:
     return render(request, "recipes/edit.html", context)
 
 
+@require_http_methods(["POST"])
+def delete(request: HttpRequest, slug: str) -> HttpResponse:
+    """The owner deletes a recipe, for everyone it was shared with too.
+
+    The store moves its files aside rather than away (``RecipeStore.remove``), so
+    whoever runs the server can bring it back: docs/runbooks/restore-a-recipe.md.
+    What it was imported from goes with it, as when a draft is deleted: photos
+    and files someone uploaded are not kept for a recipe they deleted.
+    """
+    row = get_recipe_or_404(request.user, slug)
+    if row.owner_id != request.user.pk:
+        raise Http404  # someone else's recipe, shared with this reader: not theirs to delete
+    store = FilesystemStore(settings.SNAPCOOK_STORE_DIR)
+    with transaction.atomic():
+        # The lock a translation takes before it commits, so one waits for the
+        # other; the row goes first, so a store that fails rolls it back.
+        locked = CatalogRecipe.objects.select_for_update().get(pk=row.pk)
+        locked.delete()
+        store.remove(row.recipe_id)
+    for job in ImportJob.objects.filter(owner=request.user, recipe_id=row.recipe_id):
+        job.delete_sources()
+        job.delete()
+    messages.success(request, _("“%(title)s” was deleted.") % {"title": row.title})
+    return redirect("recipes:index")
+
+
 def _edit_fields(text: str) -> dict:
     try:
         front, _body = parse_document(text)
