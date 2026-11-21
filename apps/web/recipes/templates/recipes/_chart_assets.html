@@ -3,7 +3,8 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 The chart's look and behaviour, shared by the recipe page and its print page.
 
-The core renderer gives every node a class (ingredient, step, state, dish) and
+The core renderer gives every node a class (ingredient: a step's card of
+ingredients, step, state, dish) and
 every part of a label one too (n: a step's number, qty: an amount, time and
 temp: a step's chips), and no colours; they are set here. Label styles are not
 scoped to #chart: Mermaid measures each label to size its shape, and they must
@@ -55,6 +56,9 @@ page waits for.
     --icon: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 14.8V4a2 2 0 0 0-4 0v10.8a4 4 0 1 0 4 0z'/%3E%3C/svg%3E");
   }
   .nodeLabel .qty { font-weight: 800; color: #2F6B3A; }
+  /* A step's ingredients: a list, one to a line, read from the left. */
+  .node.ingredient .nodeLabel { line-height: 1.5; }
+  .node.ingredient foreignObject > div { text-align: left !important; }
   .node.step .nodeLabel { font-weight: 600; }
   .node.state .nodeLabel { font-style: italic; font-weight: 700; }
   .node.dish .nodeLabel { font-size: 1.15em; font-weight: 800; letter-spacing: 0.01em; }
@@ -72,7 +76,10 @@ page waits for.
   #chart .nodeLabel .qty { color: #2F6B3A !important; }
   #chart .nodeLabel .time { color: #9A4A12 !important; }
   #chart .nodeLabel .temp { color: #A3361B !important; }
-  #chart .node.ingredient :is(rect, path) { fill: #E7F0E9 !important; stroke: #2F6B3A !important; stroke-width: 1.2px !important; }
+  #chart .node.ingredient :is(rect, path) {
+    fill: #E7F0E9 !important; stroke: #2F6B3A !important; stroke-width: 1.2px !important;
+    rx: 14px; ry: 14px;
+  }
   #chart .node.step :is(rect, path) {
     fill: #FFFFFF !important; stroke: #1C1F1D !important; stroke-width: 1.5px !important;
     rx: 18px; ry: 18px; filter: drop-shadow(0 5px 9px rgba(28, 31, 29, 0.10));
@@ -113,7 +120,9 @@ page waits for.
   // ELK keeps the order the chart is written in -- the steps' own order -- so
   // step 1's branch sits left of step 3's. Mermaid's own layout places branches
   // wherever crosses fewest lines. Without ELK the chart is the same, only in
-  // that order.
+  // that order. LINEAR_SEGMENTS keeps each line straight and the branches close
+  // together: centring every step between its inputs pushed later branches ever
+  // further out, and a cinnamon-roll chart came out three times wider than tall.
   let layout = 'dagre';
   try {
     const elk = await import('https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@1/dist/mermaid-layout-elk.esm.min.mjs');
@@ -127,7 +136,7 @@ page waits for.
     startOnLoad: false,
     securityLevel: 'strict',
     layout,
-    elk: { considerModelOrder: 'NODES_AND_EDGES', forceNodeModelOrder: true, nodePlacementStrategy: 'NETWORK_SIMPLEX', nodePlacementAlignment: 'BALANCED' },
+    elk: { considerModelOrder: 'NODES_AND_EDGES', forceNodeModelOrder: true, nodePlacementStrategy: 'LINEAR_SEGMENTS' },
     theme: 'base',
     themeVariables: {
       fontFamily: '"Atkinson Hyperlegible Next", system-ui, sans-serif',

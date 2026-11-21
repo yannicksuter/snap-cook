@@ -18,7 +18,7 @@ These are three independent numbers and conflating them causes real damage:
     silently ambiguous. Stored as part of every hash string.
 """
 
-LIB_VERSION = "0.6.0"
+LIB_VERSION = "0.6.1"
 
 FORMAT_VERSION = 1
 

@@ -3,14 +3,18 @@
 
 Unlike the text renderer, this one walks the graph rather than reading the
 method top to bottom. Every step is a numbered box with its times and
-temperatures on a second line; its ingredients, stadiums, flow into it; a result
-a later step names is a box of its own; and the dish the recipe ends with closes
-the chart. The build step decides all of that, and this renderer just draws what
-it is given.
+temperatures on a second line; its ingredients flow into it on one card, one
+line each; a result a later step names is a box of its own; and the dish the
+recipe ends with closes the chart. The build step decides all of that, and this
+renderer just draws what it is given.
 
-Each node carries a class -- ``ingredient``, ``step``, ``state`` or ``dish`` --
-and so does each part of a label: ``n`` a step's number, ``qty`` an amount,
-``time`` and ``temp`` a step's timers and temperatures. There are no colours:
+One card per step, not a shape per ingredient: a dough of eight ingredients
+would otherwise stand eight shapes wide above its step, and the chart grows
+sideways until a phone shows it too small to read. A card grows downwards.
+
+Each node carries a class -- ``ingredient`` (a step's card), ``step``, ``state``
+or ``dish`` -- and so does each part of a label: ``n`` a step's number, ``qty``
+an amount, ``time`` and ``temp`` a step's timers and temperatures. There are no colours:
 how they look is the page's business (``recipes/_chart_assets.html``), so the
 same text pastes into the Mermaid live editor as plain shapes.
 
@@ -38,15 +42,44 @@ _SHAPES = {
 def render_mermaid(model: RenderModel) -> str:
     lines = ["flowchart TD"]
     graph: RenderGraph = model.graph
+    cards = _cards(graph)
+    on_a_card = {node.id for card in cards.values() for node in card}
 
     for node in graph.nodes:
+        if node.id in on_a_card:
+            continue
         lines.append(f"    {_node(node)}")
+        if node.id in cards:
+            lines.append(f"    {_card(node.id, cards[node.id])}")
     if graph.nodes and graph.edges:
         lines.append("")
     for edge in graph.edges:
-        lines.append(f"    {_safe_id(edge.src)} --> {_safe_id(edge.dst)}")
+        if edge.src not in on_a_card:
+            lines.append(f"    {_safe_id(edge.src)} --> {_safe_id(edge.dst)}")
+        elif edge.src == cards[edge.dst][0].id:
+            lines.append(f"    {_card_id(edge.dst)} --> {_safe_id(edge.dst)}")
 
     return "\n".join(lines).rstrip() + "\n"
+
+
+def _cards(graph: RenderGraph) -> dict[str, list[RenderNode]]:
+    """The ingredients flowing into each step, in the method's order, by step id."""
+    nodes = {node.id: node for node in graph.nodes}
+    cards: dict[str, list[RenderNode]] = {}
+    for edge in graph.edges:
+        node = nodes.get(edge.src)
+        if node is not None and node.kind == "ingredient":
+            cards.setdefault(edge.dst, []).append(node)
+    return cards
+
+
+def _card(step_id: str, ingredients: list[RenderNode]) -> str:
+    lines = "<br>".join(_label(node) for node in ingredients)
+    return f'{_card_id(step_id)}("{lines}"):::ingredient'
+
+
+def _card_id(step_id: str) -> str:
+    return f"in_{_safe_id(step_id)}"
 
 
 def _node(node: RenderNode) -> str:

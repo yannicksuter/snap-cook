@@ -85,3 +85,17 @@ def test_a_recipes_words_never_become_markup() -> None:
     assert "<b>" not in chart
     assert "#lt;b#gt;Salz#lt;/b#gt;" in chart
     assert "#quot;einrühren#quot;" in chart
+
+
+def test_a_steps_ingredients_flow_in_on_one_card() -> None:
+    """One card per step, a line per ingredient, so a long list grows down, not sideways."""
+    chart = render_mermaid(build_render_model(parse_cook(_KAESEKUCHEN), RenderOptions(lang="de")))
+    first = _nodes("step")[0].id
+    card = (
+        f'in_{first}("<span class=qty>250 g</span> Mehl<br><span class=qty>125 g</span> Butter")'
+        ":::ingredient"
+    )
+    assert card in chart
+    assert chart.count(":::ingredient") == 2, "steps 1 and 3 take ingredients, 2 and 4 do not"
+    assert f"in_{first} --> {first}" in chart
+    assert "iuse_" not in chart
