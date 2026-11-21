@@ -38,18 +38,20 @@ def stored(settings, tmp_path, django_user_model):
     return rows
 
 
-def test_anyone_sees_the_shared_recipes(client, stored) -> None:
+def test_anyone_sees_every_recipe(client, stored) -> None:
+    """A family cookbook: even a recipe its source marked private is open to read."""
     page = client.get("/").content.decode()
-    assert "Geteilt" in page and "Geheim" not in page
+    assert "Geteilt" in page and "Geheim" in page
     assert "/add/" not in page, "no way in to adding for someone not signed in"
     assert "/accounts/login/" in page
 
 
-def test_anyone_reads_a_shared_recipe_and_its_chart(client, stored) -> None:
-    slug = stored["public"].slug
-    assert client.get(f"/r/{slug}/").status_code == 200
-    assert client.get(f"/r/{slug}/chart/").status_code == 200
-    assert client.get(f"/r/{stored['private'].slug}/").status_code == 404
+def test_anyone_reads_a_recipe_and_its_chart_but_never_edits_it(client, stored) -> None:
+    for row in stored.values():
+        assert client.get(f"/r/{row.slug}/").status_code == 200
+        assert client.get(f"/r/{row.slug}/chart/").status_code == 200
+        assert client.get(f"/r/{row.slug}/edit/").status_code == 302, "to the sign-in page"
+    assert client.get("/r/no-such-recipe/").status_code == 404
 
 
 def test_reading_in_another_language_spends_nothing(client, stored) -> None:

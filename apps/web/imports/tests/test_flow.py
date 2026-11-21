@@ -92,7 +92,7 @@ def test_keeping_it_as_it_is_closes_the_question(cook, client, reader) -> None:
     assert (job.cooklang, job.questions) == (before, [])
 
 
-def test_saving_makes_a_private_recipe_for_the_reader(cook, client, reader) -> None:
+def test_saving_makes_a_recipe_owned_by_the_reader(cook, client, reader) -> None:
     client.post("/add/", {"kind": "text", "text": "x"})
     job = _job()
     response = client.post(
@@ -107,12 +107,12 @@ def test_saving_makes_a_private_recipe_for_the_reader(cook, client, reader) -> N
     )
     recipe = Recipe.objects.get()
     assert response["Location"] == f"/r/{recipe.slug}/"
-    assert (recipe.owner, recipe.visibility, recipe.title) == (cook, "private", "Nonna's sauce")
+    assert (recipe.owner, recipe.title) == (cook, "Nonna's sauce")
     job.refresh_from_db()
     assert (job.status, job.recipe_slug, job.recipe_id) == ("saved", recipe.slug, recipe.recipe_id)
 
     page = client.get(response["Location"]).content.decode()
-    assert "Saved. Only you can see this recipe." in page
+    assert "Saved. Everyone can read it now." in page
     assert "6 servings" in page
 
 

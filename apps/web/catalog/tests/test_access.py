@@ -2,8 +2,8 @@
 """The visibility funnel.
 
 This is the single most security-relevant module in the web app: every view and
-endpoint that returns recipes goes through it. If it is wrong, private content
-leaks everywhere at once.
+endpoint that returns recipes goes through it. Every recipe is open to read, to
+everyone, whatever its own visibility says; only its owner edits it.
 """
 
 from __future__ import annotations
@@ -43,39 +43,15 @@ class VisibilityTests(TestCase):
         cls.unlisted = _recipe(cls.alice, "unlisted-loaf", Visibility.UNLISTED)
         cls.private = _recipe(cls.alice, "private-loaf", Visibility.PRIVATE)
 
-    def test_anonymous_sees_only_public(self) -> None:
+    def test_everyone_reads_every_recipe(self) -> None:
+        """A family cookbook: a recipe's own visibility no longer hides it."""
         from django.contrib.auth.models import AnonymousUser
 
-        self.assertEqual(
-            set(visible_recipes(AnonymousUser()).values_list("slug", flat=True)),
-            {"public-loaf"},
-        )
-
-    def test_other_user_does_not_see_private_recipes(self) -> None:
-        """The whole point of private-by-default."""
-        self.assertEqual(
-            set(visible_recipes(self.bob).values_list("slug", flat=True)),
-            {"public-loaf"},
-        )
-
-    def test_owner_sees_everything_they_own(self) -> None:
-        self.assertEqual(
-            set(visible_recipes(self.alice).values_list("slug", flat=True)),
-            {"public-loaf", "unlisted-loaf", "private-loaf"},
-        )
-
-    def test_unlisted_is_excluded_from_listings(self) -> None:
-        """Unlisted means 'reachable with the link', not 'browsable'."""
-        self.assertNotIn(
-            "unlisted-loaf",
-            set(visible_recipes(self.bob).values_list("slug", flat=True)),
-        )
-
-    def test_unlisted_is_reachable_by_direct_address(self) -> None:
-        self.assertIn(
-            "unlisted-loaf",
-            set(addressable_recipes(self.bob).values_list("slug", flat=True)),
-        )
+        every = {"public-loaf", "unlisted-loaf", "private-loaf"}
+        for reader in (AnonymousUser(), self.bob, self.alice):
+            listed = set(visible_recipes(reader).values_list("slug", flat=True))
+            reachable = set(addressable_recipes(reader).values_list("slug", flat=True))
+            self.assertEqual((listed, reachable), (every, every))
 
 
 class NotFoundTests(TestCase):
@@ -83,20 +59,16 @@ class NotFoundTests(TestCase):
     def setUpTestData(cls) -> None:
         users = get_user_model().objects
         cls.alice = users.create_user(username="alice", email="a@example.com")
-        cls.bob = users.create_user(username="bob", email="b@example.com")
         cls.private = _recipe(cls.alice, "secret-loaf", Visibility.PRIVATE)
 
-    def test_private_recipe_raises_404_for_a_stranger_not_403(self) -> None:
-        """403 would confirm the slug exists.
-
-        That leaks the existence of private content one guess at a time, which
-        is why the convention is 404 everywhere a caller may not see something.
-        """
+    def test_a_missing_recipe_is_a_404(self) -> None:
         with self.assertRaises(Http404):
-            get_recipe_or_404(self.bob, "secret-loaf")
+            get_recipe_or_404(self.alice, "no-such-loaf")
 
-    def test_owner_can_fetch_their_own_private_recipe(self) -> None:
-        self.assertEqual(get_recipe_or_404(self.alice, "secret-loaf").slug, "secret-loaf")
+    def test_a_stranger_reads_a_recipe_marked_private(self) -> None:
+        from django.contrib.auth.models import AnonymousUser
+
+        self.assertEqual(get_recipe_or_404(AnonymousUser(), "secret-loaf").slug, "secret-loaf")
 
 
 class EditPermissionTests(TestCase):

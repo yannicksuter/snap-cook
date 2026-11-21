@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: snap-cook\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-21 19:27+0000\n"
+"POT-Creation-Date: 2026-11-21 19:34+0000\n"
 "PO-Revision-Date: 2026-11-16 21:30+0100\n"
 "Last-Translator: snap-cook\n"
 "Language-Team: German\n"
@@ -211,20 +211,12 @@ msgstr "Ja, %(initials)s löschen"
 msgid "No one has an account yet."
 msgstr "Noch niemand hat ein Konto."
 
-#: backoffice/templates/backoffice/recipes.html:18
-msgid "Shared"
-msgstr "Geteilt"
-
-#: backoffice/templates/backoffice/recipes.html:18
-msgid "Private"
-msgstr "Privat"
-
 #: backoffice/templates/backoffice/recipes.html:27
 msgid "Read again"
 msgstr "Neu einlesen"
 
 #: backoffice/templates/backoffice/recipes.html:33
-#: recipes/templates/recipes/index.html:78
+#: recipes/templates/recipes/index.html:73
 msgid "No recipes yet."
 msgstr "Noch keine Rezepte."
 
@@ -237,11 +229,11 @@ msgstr "Dich selbst kannst du nicht löschen."
 msgid "%(initials)s was deleted."
 msgstr "%(initials)s wurde gelöscht."
 
-#: backoffice/views.py:172
+#: backoffice/views.py:170
 msgid "Nothing of this recipe’s original was kept."
 msgstr "Vom Original dieses Rezepts ist nichts gespeichert."
 
-#: backoffice/views.py:243
+#: backoffice/views.py:241
 #, python-format
 msgid "“%(title)s” belongs to %(initials)s now."
 msgstr "„%(title)s“ gehört jetzt %(initials)s."
@@ -387,7 +379,7 @@ msgstr ""
 "Ein Schritt pro Absatz. Zutaten, Zeiten und Temperaturen werden so markiert:"
 
 #: imports/templates/imports/add.html:17 imports/templates/imports/add.html:28
-#: recipes/templates/recipes/index.html:87
+#: recipes/templates/recipes/index.html:82
 msgid "Add a recipe"
 msgstr "Rezept hinzufügen"
 
@@ -607,8 +599,8 @@ msgstr ""
 "Diese Antwort passt nicht mehr zum Text. Bearbeite stattdessen den Text."
 
 #: imports/views.py:271
-msgid "Saved. Only you can see this recipe."
-msgstr "Gespeichert. Nur du siehst dieses Rezept."
+msgid "Saved. Everyone can read it now."
+msgstr "Gespeichert. Alle können es jetzt lesen."
 
 #: imports/views.py:287
 msgid "That recipe was deleted meanwhile, so nothing was saved."
@@ -836,24 +828,16 @@ msgstr "Konnte nicht gelesen werden"
 msgid "Reading…"
 msgstr "Wird gelesen…"
 
-#: recipes/templates/recipes/index.html:62
-msgid "Only you can see this"
-msgstr "Nur du kannst das sehen"
-
-#: recipes/templates/recipes/index.html:64
-msgid "Anyone with the link can see this"
-msgstr "Alle mit dem Link können das sehen"
-
-#: recipes/templates/recipes/index.html:73
+#: recipes/templates/recipes/index.html:68
 #, python-format
 msgid "No recipe matches “%(query)s”."
 msgstr "Kein Rezept passt zu „%(query)s“."
 
-#: recipes/templates/recipes/index.html:74
+#: recipes/templates/recipes/index.html:69
 msgid "Show all recipes"
 msgstr "Alle Rezepte anzeigen"
 
-#: recipes/templates/recipes/index.html:79
+#: recipes/templates/recipes/index.html:74
 msgid "Recipes appear here as soon as they are added."
 msgstr "Rezepte erscheinen hier, sobald sie hinzugefügt sind."
 
