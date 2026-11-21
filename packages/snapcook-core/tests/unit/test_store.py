@@ -95,3 +95,76 @@ def test_filesystem_recipe_json_is_the_hashed_bytes(tmp_path: Path) -> None:
     written = (tmp_path / recipe.id / "recipe.json").read_bytes()
     assert written == canonical_bytes(recipe)
     assert hash_bytes(written) == content_hash(recipe)
+
+
+# -- removing a recipe --------------------------------------------------------------
+
+
+def test_a_removed_recipe_is_gone(store) -> None:
+    egg, roesti = get_recipe("001-boiled-egg"), get_recipe("006-roesti")
+    _commit(store, egg)
+    _commit(store, roesti)
+    assert store.remove(egg.id) is True
+    assert store.list_recipe_ids() == [roesti.id]
+    assert not store.exists(egg.id)
+    with pytest.raises(RefNotFoundError):
+        store.head_recipe(egg.id)
+    assert store.remove(egg.id) is False, "removing twice finds nothing the second time"
+
+
+def test_removing_what_was_never_there_finds_nothing(store) -> None:
+    assert store.remove("rcp_does_not_exist") is False
+
+
+def test_the_filesystem_store_keeps_a_removed_recipe_in_its_trash(tmp_path: Path) -> None:
+    """Moved aside whole, so whoever runs the server can move it back."""
+    recipe = get_recipe("006-roesti")
+    store = FilesystemStore(tmp_path)
+    store.commit(recipe, author="user:alice", created_at="2026-07-20T10:00:00")
+    store.remove(recipe.id)
+    assert not (tmp_path / recipe.id).exists()
+    kept = tmp_path / ".trash" / recipe.id
+    assert (kept / "recipe.json").is_file() and (kept / ".snapcook").is_dir()
+    assert FilesystemStore(tmp_path).list_recipe_ids() == []
+
+    (kept).rename(tmp_path / recipe.id)
+    assert content_hash(FilesystemStore(tmp_path).head_recipe(recipe.id)) == content_hash(recipe)
+
+
+def test_a_second_removal_of_the_same_id_does_not_overwrite_the_first(tmp_path: Path) -> None:
+    recipe = get_recipe("006-roesti")
+    store = FilesystemStore(tmp_path)
+    for at in ("2026-07-20T10:00:00", "2026-07-21T10:00:00"):
+        store.commit(recipe, author="user:alice", created_at=at)
+        store.remove(recipe.id)
+    assert sorted(p.name for p in (tmp_path / ".trash").iterdir()) == [recipe.id, f"{recipe.id}.2"]
+
+
+# -- handing a recipe to someone else -----------------------------------------------
+
+
+def test_reassigning_makes_a_version_with_the_same_content_and_a_new_author(store) -> None:
+    recipe = get_recipe("006-roesti")
+    first = _commit(store, recipe)
+    moved = store.reassign(recipe.id, author="user:bob", created_at="2026-07-21T10:00:00")
+    assert (moved.author, moved.origin, moved.parents) == (
+        "user:bob",
+        "reassigned",
+        [first.version_id],
+    )
+    assert moved.content_hash == first.content_hash
+    assert moved.version_id != first.version_id
+    assert store.head(recipe.id).author == "user:bob"
+    assert len(store.history(recipe.id)) == 2
+
+
+def test_reassigning_to_the_author_already_there_changes_nothing(store) -> None:
+    recipe = get_recipe("006-roesti")
+    first = _commit(store, recipe)
+    assert store.reassign(recipe.id, author="user:alice", created_at="2026-07-21T10:00:00") == first
+    assert len(store.history(recipe.id)) == 1
+
+
+def test_reassigning_what_is_not_there_raises(store) -> None:
+    with pytest.raises(RefNotFoundError):
+        store.reassign("rcp_does_not_exist", author="user:bob", created_at="2026-07-21T10:00:00")

@@ -203,6 +203,11 @@ the pushed repository contains the full lineage.
 `.snapcook/versions/**` is committed, so a `git clone` is a complete replica of
 the lineage DAG.
 
+A deleted recipe's directory moves unchanged to `<store>/.trash/<recipe_id>/`
+(`.2`, `.3` … if that id was deleted before). Only directories directly under
+`<store>` that hold a `.snapcook/` are recipes, so nothing reads the trash, and
+moving a directory back restores the recipe with its whole lineage.
+
 ---
 
 ## 6. Authoring syntax

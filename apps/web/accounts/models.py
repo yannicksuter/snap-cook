@@ -134,3 +134,24 @@ class ApiToken(models.Model):
             expires_at=expires_at,
         )
         return token, f"{PAT_PREFIX}_{prefix}_{secret}"
+
+
+class Profile(models.Model):
+    """What snap-cook keeps about a person beyond the sign-in itself.
+
+    ``initials`` is how they appear everywhere (see ``accounts.identity``).
+    ``can_cook`` is the admin's switch: adding, editing and translating
+    recipes spends API credit, so a new member only reads until switched on.
+    ``former_handle`` is the name an account had before uids, which older
+    recipe versions carry as their author, so they still find their owner.
+    """
+
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="profile"
+    )
+    initials = models.CharField(max_length=3, unique=True)
+    can_cook = models.BooleanField(default=False)
+    former_handle = models.CharField(max_length=150, blank=True, db_index=True)
+
+    def __str__(self) -> str:
+        return self.initials

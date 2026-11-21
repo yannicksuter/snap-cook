@@ -22,7 +22,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlsplit
 
 from django.conf import settings
 from django.contrib import messages
@@ -39,6 +39,7 @@ from ruamel.yaml import YAMLError
 from catalog.access import get_recipe_or_404, visible_recipes
 from catalog.models import Recipe as CatalogRecipe
 from catalog.projection import project_recipe
+from imports import sources
 from imports.forms import DetailsForm
 from imports.models import ImportJob
 from snapcook_core.cooklang.frontmatter import parse_document
@@ -89,7 +90,9 @@ def index(request: HttpRequest) -> HttpResponse:
         )
     # The reader's own unsaved imports: where a draft waits after they left the
     # page that was reading it.
-    drafts = ImportJob.objects.filter(owner=request.user).exclude(status=ImportJob.Status.SAVED)
+    drafts = ImportJob.objects.none()
+    if request.access.cook:
+        drafts = ImportJob.objects.filter(owner=request.user).exclude(status=ImportJob.Status.SAVED)
     context = {"recipes": recipes[:50], "query": query, "drafts": drafts[:10]}
     return render(request, "recipes/index.html", context)
 
@@ -100,14 +103,19 @@ def detail(request: HttpRequest, slug: str) -> HttpResponse:
     recipe = head.recipe
     context = {
         "recipe": catalog_recipe,
+        "eyebrow": _eyebrow(catalog_recipe, recipe),
         "model": model,
         "view": view,
         "mermaid": render_mermaid(model),
         "notes": _notes(model, view),
-        # Shown in another language, a recipe is translated once, in the worker.
+        # Shown in another language, a recipe is translated once, in the worker --
+        # for someone who may cook, as it spends API credit. Anyone else reads
+        # whatever translations there are, and the rest as written.
         "translation": progress_for(
             request.user, catalog_recipe.recipe_id, recipe, head.version_id, view.lang
-        ),
+        )
+        if request.access.cook
+        else None,
     }
     is_htmx = request.headers.get("HX-Request")
     template = "recipes/_render.html" if is_htmx else "recipes/detail.html"
@@ -217,6 +225,50 @@ def edit(request: HttpRequest, slug: str) -> HttpResponse:
         problem = _("This text cannot be read: %(detail)s") % {"detail": revision.detail}
     context = {"recipe": row, "form": form, "model": model, "problem": problem}
     return render(request, "recipes/edit.html", context)
+
+
+@require_http_methods(["POST"])
+def delete(request: HttpRequest, slug: str) -> HttpResponse:
+    """The owner deletes a recipe, for everyone it was shared with too.
+
+    The store moves its files aside rather than away (``RecipeStore.remove``),
+    and the original it was read from goes aside with it (``imports.sources``),
+    so whoever runs the server can bring both back:
+    docs/runbooks/restore-a-recipe.md.
+    """
+    row = get_recipe_or_404(request.user, slug)
+    if row.owner_id != request.user.pk:
+        raise Http404  # someone else's recipe, shared with this reader: not theirs to delete
+    store = FilesystemStore(settings.SNAPCOOK_STORE_DIR)
+    with transaction.atomic():
+        # The lock a translation takes before it commits, so one waits for the
+        # other; the row goes first, so a store that fails rolls it back.
+        locked = CatalogRecipe.objects.select_for_update().get(pk=row.pk)
+        locked.delete()
+        store.remove(row.recipe_id)
+    sources.trash(row.recipe_id)
+    ImportJob.objects.filter(recipe_id=row.recipe_id).delete()
+    messages.success(request, _("“%(title)s” was deleted.") % {"title": row.title})
+    return redirect("recipes:index")
+
+
+def _eyebrow(row: CatalogRecipe, recipe) -> str:
+    """The line over the title: who added it, and where it is from.
+
+    "by YS · Betty Bossi". People by their initials only (accounts.identity); a
+    source by its name, or failing that its web address's host.
+    """
+    parts = []
+    initials = getattr(getattr(row.owner, "profile", None), "initials", "")
+    if initials:
+        parts.append(_("by %(initials)s") % {"initials": initials})
+    provenance = recipe.provenance
+    source = provenance.source_title or ""
+    if not source and provenance.source_url:
+        source = (urlsplit(provenance.source_url).hostname or "").removeprefix("www.")
+    if source:
+        parts.append(source)
+    return " · ".join(parts)
 
 
 def _edit_fields(text: str) -> dict:

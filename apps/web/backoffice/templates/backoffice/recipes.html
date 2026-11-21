@@ -1,0 +1,36 @@
+{% extends "backoffice/base.html" %}
+{% comment %}
+SPDX-License-Identifier: AGPL-3.0-or-later
+
+Every recipe, newest change first, with what it was read from. "Read again"
+reads that original once more into a draft to check; saving it makes a new
+version. A kept copy is always used before the live link, which may be gone.
+{% endcomment %}
+{% load i18n %}
+
+{% block admin %}
+  <ul class="mt-2">
+    {% for recipe in recipes %}
+      <li class="py-4 border-b border-line-soft flex items-center gap-4">
+        <div class="min-w-0 flex-1">
+          <p class="text-[18px] font-bold leading-snug">{{ recipe.title }}</p>
+          <p class="mt-0.5 text-[15px] leading-snug text-ink-3">
+            {{ recipe.owner }} · {% if recipe.public %}{% translate "Shared" %}{% else %}{% translate "Private" %}{% endif %}
+            · {% include "backoffice/_original.html" with kind=recipe.original %}
+          </p>
+        </div>
+        {% if recipe.original %}
+          <form method="post" action="{% url 'backoffice:read_again' recipe.recipe_id %}" class="flex-none">
+            {% csrf_token %}
+            <button type="submit" class="inline-flex h-11 px-3.5 items-center gap-2 rounded-full bg-surface text-[15px] font-bold hover:bg-line-soft">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg>
+              {% translate "Read again" %}
+            </button>
+          </form>
+        {% endif %}
+      </li>
+    {% empty %}
+      <li class="py-6 text-[17px] text-ink-2">{% translate "No recipes yet." %}</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

@@ -25,10 +25,19 @@ Database (a DERIVED PROJECTION -- see below)
 Storage
     SNAPCOOK_DATA_DIR       Root of the authoritative recipe store.
                             Default "/data" in the container, "./data" locally.
+    SNAPCOOK_SOURCES_DIR    The originals recipes were read from. Default
+                            /sources when mounted, else <data>/sources.
 
-Google SSO
+Accounts
     GOOGLE_CLIENT_ID        From Google Cloud Console
     GOOGLE_CLIENT_SECRET
+    SNAPCOOK_ADMIN_EMAILS   Comma-separated; who may open /admin.
+    SNAPCOOK_UID_KEY        Keys people's ids. Optional: made once in the data
+                            folder otherwise. Never change it.
+    SNAPCOOK_SMTP_HOST      For confirmation and reset mails; without it only
+                            Google sign-in is offered. Also _PORT (587),
+                            _USER, _PASSWORD; SNAPCOOK_MAIL_FROM.
+    SNAPCOOK_PUBLIC_HOST    The host mails link to; default from ALLOWED_HOSTS.
 
 Product API
     SNAPCOOK_API_ENABLED    "1" (default) mounts /api/v1/
@@ -90,6 +99,29 @@ def _csv(name: str, default: str) -> list[str]:
     return [item.strip() for item in os.environ.get(name, default).split(",") if item.strip()]
 
 
+_SOURCES_MOUNT = Path("/sources")
+
+
+def _sources_dir(data_dir: Path) -> Path:
+    """Where the originals recipes were read from are kept.
+
+    ``SNAPCOOK_SOURCES_DIR`` if set; else ``/sources`` when something is mounted
+    there (one Path entry in Unraid, no variable); else ``<data>/sources``. Never
+    an unmounted ``/sources``: the files would live in the container and be
+    gone with its next update.
+    """
+    configured = os.environ.get("SNAPCOOK_SOURCES_DIR")
+    if configured:
+        return Path(configured)
+    try:
+        mounts = Path("/proc/self/mountinfo").read_text().splitlines()
+    except OSError:
+        mounts = []
+    if any(line.split()[4] == str(_SOURCES_MOUNT) for line in mounts if len(line.split()) > 4):
+        return _SOURCES_MOUNT
+    return data_dir / "sources"
+
+
 # ---------------------------------------------------------------- core Django
 
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "insecure-dev-key-change-me")
@@ -108,7 +140,6 @@ WSGI_APPLICATION = "snapcookweb.wsgi.application"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -130,6 +161,7 @@ INSTALLED_APPS = [
     "translations",  # DB-authoritative: translation runs (the words go to the store)
     "social",  # DB-authoritative: follows, likes, comments
     "api",  # presentation only: django-ninja routers
+    "backoffice",  # presentation only: the admin pages at /admin
 ]
 
 MIDDLEWARE = [
@@ -147,8 +179,8 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
-    # Registered last so it sees an authenticated request.user.
-    "accounts.middleware.LoginRequiredMiddleware",
+    # Registered last so it sees an authenticated request.user and the resolved view.
+    "accounts.middleware.AccessMiddleware",
 ]
 
 TEMPLATES = [
@@ -162,6 +194,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "snapcookweb.context_processors.deployment",
+                "accounts.context_processors.access",
             ],
         },
     },
@@ -173,7 +206,7 @@ TEMPLATES = [
 # Postgres is reconstructible from it.
 SNAPCOOK_DATA_DIR = Path(os.environ.get("SNAPCOOK_DATA_DIR", BASE_DIR.parent.parent / "data"))
 SNAPCOOK_STORE_DIR = SNAPCOOK_DATA_DIR / "store"
-SNAPCOOK_SOURCES_DIR = SNAPCOOK_DATA_DIR / "sources"
+SNAPCOOK_SOURCES_DIR = _sources_dir(SNAPCOOK_DATA_DIR)
 SNAPCOOK_LOGS_DIR = SNAPCOOK_DATA_DIR / "logs"
 
 for _directory in (SNAPCOOK_STORE_DIR, SNAPCOOK_SOURCES_DIR, SNAPCOOK_LOGS_DIR):
@@ -204,13 +237,31 @@ DATABASES = {
 SITE_ID = 1
 AUTHENTICATION_BACKENDS = ["allauth.account.auth_backends.AuthenticationBackend"]
 
-# SSO only for now; classic email+password and other providers come later.
+# Two ways in, one kind of account (accounts.identity): Google, or an email
+# address with a password. Either way the address must be verified before the
+# account counts for anything; until then it reads as anyone does.
+ACCOUNT_ADAPTER = "accounts.adapters.AccountAdapter"
+SOCIALACCOUNT_ADAPTER = "accounts.adapters.SocialAccountAdapter"
+ACCOUNT_USER_DISPLAY = "accounts.identity.display"
 ACCOUNT_LOGIN_METHODS = {"email"}
-ACCOUNT_SIGNUP_FIELDS = ["email*"]
-ACCOUNT_EMAIL_VERIFICATION = "none"
-SOCIALACCOUNT_ONLY = True
-SOCIALACCOUNT_LOGIN_ON_GET = True
+ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+# A plain link in the mail, which confirms when opened and signs the person in.
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
+ACCOUNT_EMAIL_SUBJECT_PREFIX = "snap-cook: "
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
+ACCOUNT_LOGOUT_ON_PASSWORD_CHANGE = False
+# A family app on personal phones: stay signed in, and no "remember me" box.
+ACCOUNT_SESSION_REMEMBER = True
 SOCIALACCOUNT_AUTO_SIGNUP = True
+# Google vouches for the address, so signing in with Google opens the account
+# that address already has. Safe since allauth 65.22.1 parses the claim strictly.
+SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+# Signing in with Google is a POST from our own page, never a bare link.
+SOCIALACCOUNT_LOGIN_ON_GET = False
 
 # Credentials come from the environment, not a DB SocialApp row. Creating both
 # raises MultipleObjectsReturned at login time, which is a confusing failure.
@@ -226,14 +277,59 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-# Straight to Google -- no intermediate "choose a login method" page while SSO
-# is the only method.
-LOGIN_URL = "/accounts/google/login/"
+LOGIN_URL = "/accounts/login/"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 
-# No local passwords exist, so validators would never run.
-AUTH_PASSWORD_VALIDATORS: list[dict[str, str]] = []
+# "Decent quality": long, not a common one, not the address, not just digits.
+AUTH_PASSWORD_VALIDATORS = [
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "OPTIONS": {"min_length": 12},
+    },
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+]
+
+# Who may open /admin: a comma-separated list of addresses, set in Docker.
+SNAPCOOK_ADMIN_EMAILS = _csv("SNAPCOOK_ADMIN_EMAILS", "")
+# The key the uids are hashed with (accounts.identity). Optional: without it
+# one is made on first start and kept in the data folder. Never change it.
+SNAPCOOK_UID_KEY = os.environ.get("SNAPCOOK_UID_KEY", "")
+# The host the mails link to and name.
+SNAPCOOK_PUBLIC_HOST = os.environ.get("SNAPCOOK_PUBLIC_HOST") or next(
+    (host for host in ALLOWED_HOSTS if host not in ("localhost", "127.0.0.1", "*")), "localhost"
+)
+
+# ---------------------------------------------------------------- mail
+
+# Verification and password-reset mails go out over SMTP. Without a host there
+# is no mail, so signing up with a password is closed and only Google works.
+_SMTP_HOST = os.environ.get("SNAPCOOK_SMTP_HOST", "")
+_SMTP_PORT = int(os.environ.get("SNAPCOOK_SMTP_PORT", "587"))
+_SMTP_USER = os.environ.get("SNAPCOOK_SMTP_USER", "")
+SNAPCOOK_MAIL_ENABLED = bool(_SMTP_HOST)
+MAILERS = {
+    "default": (
+        {
+            "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+            "OPTIONS": {
+                "host": _SMTP_HOST,
+                "port": _SMTP_PORT,
+                "username": _SMTP_USER,
+                "password": os.environ.get("SNAPCOOK_SMTP_PASSWORD", ""),
+                # 465 is TLS from the first byte; anything else upgrades with STARTTLS.
+                "use_ssl": _SMTP_PORT == 465,
+                "use_tls": _SMTP_PORT != 465,
+                "timeout": 20,
+            },
+        }
+        if SNAPCOOK_MAIL_ENABLED
+        else {"BACKEND": "accounts.mail.MailOffBackend"}
+    )
+}
+DEFAULT_FROM_EMAIL = os.environ.get("SNAPCOOK_MAIL_FROM", _SMTP_USER or "snap-cook@localhost")
 
 # ---------------------------------------------------------------- API surfaces
 

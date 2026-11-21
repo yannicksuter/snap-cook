@@ -222,9 +222,11 @@ def main() -> None:
         wait_healthy(web)
         status, _, body = fetch(web, "/up")
         assert status == 200 and json.loads(body) == {"status": "ok", "commit": commit}, body
-        status, location, _ = fetch(web, "/")
-        assert status == 302 and location.startswith("/accounts/google/login/"), location
-        status, _, _ = fetch(web, "/static/admin/css/base.css")
+        status, _, _ = fetch(web, "/")
+        assert status == 200, status  # anyone reads
+        status, location, _ = fetch(web, "/add/")
+        assert status == 302 and location.startswith("/accounts/login/"), location
+        status, _, _ = fetch(web, "/static/account/js/account.js")
         assert status == 200, status
         debug = docker(
             "exec", web, "python", "manage.py", "shell", "-c",
@@ -232,8 +234,8 @@ def main() -> None:
         )  # fmt: skip
         assert debug.splitlines()[-1] == "False", debug
         print(
-            "web migrates, serves /up with the commit, static files and the sign-in "
-            "redirect, with DEBUG off by default, and no internet.",
+            "web migrates, serves /up with the commit, the open recipe list, static "
+            "files and the sign-in redirect, with DEBUG off by default, and no internet.",
             flush=True,
         )
 

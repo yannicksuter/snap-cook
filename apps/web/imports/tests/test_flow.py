@@ -13,6 +13,7 @@ import re
 import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 
+from accounts.testing import verified
 from catalog.models import Recipe
 from imports import forms, views
 from imports.models import ImportJob
@@ -26,7 +27,9 @@ _PDF = b"%PDF-1.7\n" + b"0" * 128
 
 @pytest.fixture
 def cook(client, django_user_model):
-    user = django_user_model.objects.create_user(username="cook", email="cook@example.com")
+    user = verified(
+        django_user_model.objects.create_user(username="cook", email="cook@example.com")
+    )
     client.force_login(user)
     return user
 
@@ -106,11 +109,11 @@ def test_saving_makes_a_private_recipe_for_the_reader(cook, client, reader) -> N
     assert response["Location"] == f"/r/{recipe.slug}/"
     assert (recipe.owner, recipe.visibility, recipe.title) == (cook, "private", "Nonna's sauce")
     job.refresh_from_db()
-    assert (job.status, job.recipe_slug) == ("saved", recipe.slug)
+    assert (job.status, job.recipe_slug, job.recipe_id) == ("saved", recipe.slug, recipe.recipe_id)
 
     page = client.get(response["Location"]).content.decode()
     assert "Saved. Only you can see this recipe." in page
-    assert "for 6 servings" in page
+    assert "6 servings" in page
 
 
 def test_photos_are_kept_as_the_source(cook, client, reader) -> None:
@@ -220,7 +223,7 @@ def test_unreadable_text_can_be_fixed_by_hand(cook, client, reader) -> None:
 
 
 def test_someone_elses_draft_does_not_exist(cook, client, django_user_model) -> None:
-    other = django_user_model.objects.create_user(username="other", email="o@example.com")
+    other = verified(django_user_model.objects.create_user(username="other", email="o@example.com"))
     job = ImportJob.objects.create(owner=other, kind="text", source_text="secret family recipe")
     for url in (f"/drafts/{job.pk}/", f"/drafts/{job.pk}/check/"):
         assert client.get(url).status_code == 404

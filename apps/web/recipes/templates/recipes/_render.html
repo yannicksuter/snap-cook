@@ -6,150 +6,167 @@ language, unit system and servings, and the controls that change them. HTMX
 GETs the detail URL with new query params and swaps this whole block. Every
 control is also a plain link, so the page works without JavaScript. Nothing
 here is stored -- it is one view of one immutable recipe.
+
+Laid out as a cook reads it: what it is and how long it takes; what you need,
+in a card you can tick off; how to make it, step by numbered step; and the
+whole recipe at a glance. On a phone that is one column; on a wide screen the
+ingredients sit beside the steps and stay in view while you scroll them.
 {% endcomment %}{% load i18n recipe_extras %}
 
-<div class="px-5 pt-5">
-  <div class="flex items-start justify-between gap-3">
-    <h1 class="text-[32px] leading-tight font-extrabold tracking-tight">{{ model.title }}</h1>
-    {% if recipe.owner_id == user.id %}
-      <a href="{% url 'recipes:edit' recipe.slug %}" class="flex-none mt-1 inline-flex h-11 px-3.5 items-center gap-2 rounded-xl border-2 border-line-strong text-[16px] font-bold hover:border-ink-3 print:hidden">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4zM14 6l4 4"/></svg>
-        {% translate "Edit" %}
-      </a>
+<header class="px-5 pt-2 lg:pt-6 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:gap-14 lg:items-end">
+  <div>
+    {% if eyebrow %}<p class="text-[13px] font-extrabold uppercase tracking-[0.16em] text-herb">{{ eyebrow }}</p>{% endif %}
+    <h1 class="mt-2 text-[36px] lg:text-[52px] leading-[1.05] font-extrabold tracking-[-0.02em] text-herb-dark">{{ model.title }}</h1>
+    {% if model.description %}
+      <p class="mt-4 text-[18px] lg:text-[20px] leading-relaxed text-ink-2">{{ model.description }}</p>
     {% endif %}
   </div>
-  {% if model.description %}
-    <p class="mt-2 text-[18px] leading-relaxed text-ink-2">{{ model.description }}</p>
-  {% endif %}
   {% include "recipes/_facts.html" %}
-</div>
+</header>
 
 {% include "translations/_progress.html" %}
 
-<div class="mx-5 mt-5 flex items-center justify-between gap-3 rounded-2xl bg-surface py-2.5 pr-2.5 pl-[18px]">
-  <span class="text-[18px] font-bold">{% if view.servings %}{% translate "Servings" %}{% else %}{% translate "Amount" %}{% endif %}</span>
-  <div class="flex items-center gap-1.5">
-    {% if view.fewer %}
-      <a href="{{ view.fewer }}" hx-get="{{ view.fewer }}" hx-target="#render" hx-push-url="true"
-         aria-label="{% if view.servings %}{% translate 'Fewer servings' %}{% else %}{% translate 'Less' %}{% endif %}"
-         class="w-12 h-12 rounded-full border border-line-strong bg-white flex items-center justify-center hover:border-ink-3">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg>
-      </a>
-    {% else %}
-      <span aria-hidden="true" class="w-12 h-12 rounded-full border border-line flex items-center justify-center text-line-strong">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 12h14"/></svg>
-      </span>
-    {% endif %}
-    <span class="min-w-12 text-center text-[26px] font-extrabold">{{ view.amount }}</span>
-    {% if view.more %}
-      <a href="{{ view.more }}" hx-get="{{ view.more }}" hx-target="#render" hx-push-url="true"
-         aria-label="{% if view.servings %}{% translate 'More servings' %}{% else %}{% translate 'More' %}{% endif %}"
-         class="w-12 h-12 rounded-full border border-line-strong bg-white flex items-center justify-center hover:border-ink-3">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
-      </a>
-    {% else %}
-      <span aria-hidden="true" class="w-12 h-12 rounded-full border border-line flex items-center justify-center text-line-strong">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-      </span>
-    {% endif %}
-  </div>
-</div>
-
-{% for note in notes %}
-  <p class="mx-5 mt-2.5 flex gap-2 text-[16px] leading-snug text-ink-2" role="status">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="flex-none mt-px text-herb"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
-    <span>{{ note }}</span>
-  </p>
-{% endfor %}
-
-<section class="px-5 pt-7" aria-labelledby="ingredients">
-  <div class="flex items-baseline justify-between gap-3">
-    <h2 id="ingredients" class="text-[24px] font-extrabold">{% translate "Ingredients" %}</h2>
-    {% if view.servings %}
-      <span class="text-[16px] text-ink-3">{% blocktranslate trimmed count counter=view.servings %}
-        for {{ counter }} serving
-      {% plural %}
-        for {{ counter }} servings
-      {% endblocktranslate %}</span>
-    {% endif %}
-  </div>
-  <ul class="mt-2.5">
-    {% for ingredient in model.ingredients %}
-      <li class="grid grid-cols-[6.5rem_minmax(0,1fr)] gap-3.5 items-baseline py-3 border-b border-line-soft">
-        {% comment %}
-          A measured amount leads, in its own column. An approximation ("to
-          taste", "nach Geschmack") reads after the name instead: core decides
-          which with `after_name`, and a long phrase would not fit the column.
-        {% endcomment %}
-        {% if ingredient.quantity and not ingredient.quantity.after_name %}
-          <span class="text-right text-[18px] font-extrabold text-herb">{{ ingredient.quantity.display }}</span>
-        {% else %}
-          <span></span>
-        {% endif %}
-        <span class="text-[18px]">
-          {{ ingredient.name }}{% if ingredient.quantity.after_name %} <span class="text-ink-3">{{ ingredient.quantity.display }}</span>{% endif %}{% if ingredient.prep %}<span class="text-ink-2">, {{ ingredient.prep }}</span>{% endif %}
-          {% if ingredient.optional %}<span class="text-ink-3">({% translate "optional" %})</span>{% endif %}
-          {% if ingredient.unresolved and view.system == "us" %}
-            <svg role="img" aria-label="{% translate 'Not recognised: please check this ingredient' %}" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9A4A12" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="inline align-[-3px]"><path d="M12 3 2 21h20L12 3z"/><path d="M12 10v5M12 18h.01"/></svg>
+<div class="px-5 pt-8 lg:pt-12 lg:grid lg:grid-cols-[minmax(0,25rem)_minmax(0,1fr)] lg:gap-12 lg:items-start">
+  <div class="lg:sticky lg:top-6">
+    <section class="rounded-3xl bg-white border border-line-soft shadow-[0_1px_2px_rgba(28,31,29,0.04),0_10px_30px_-12px_rgba(28,31,29,0.10)] px-5 pt-6 pb-3 print:shadow-none print:border-0 print:px-0" aria-labelledby="ingredients">
+      <p class="text-[13px] font-extrabold uppercase tracking-[0.16em] text-herb">01 / {% translate "What you need" %}</p>
+      <div class="mt-1.5 flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
+        <h2 id="ingredients" class="text-[28px] font-extrabold tracking-[-0.01em] text-herb-dark">{% translate "Ingredients" %}</h2>
+        <div class="inline-flex items-center gap-1 rounded-full bg-surface p-1 print:hidden">
+          {% if view.fewer %}
+            <a href="{{ view.fewer }}" hx-get="{{ view.fewer }}" hx-target="#render" hx-push-url="true"
+               aria-label="{% if view.servings %}{% translate 'Fewer servings' %}{% else %}{% translate 'Less' %}{% endif %}"
+               class="w-11 h-11 rounded-full bg-white shadow-[0_1px_3px_rgba(28,31,29,0.14)] flex items-center justify-center hover:text-herb">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg>
+            </a>
+          {% else %}
+            <span aria-hidden="true" class="w-11 h-11 rounded-full flex items-center justify-center text-line-strong">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 12h14"/></svg>
+            </span>
           {% endif %}
-          {% if ingredient.notes %}<span class="block text-[16px] text-ink-3">{{ ingredient.notes }}</span>{% endif %}
-        </span>
-      </li>
-    {% endfor %}
-  </ul>
-</section>
-
-<section class="px-5 pt-8" aria-labelledby="steps">
-  <h2 id="steps" class="text-[24px] font-extrabold">{% translate "Steps" %}</h2>
-  {% for run in model.side_by_side %}
-    <p class="mt-3 rounded-[14px] bg-herb-tint px-4 py-3.5 text-[17px] leading-relaxed">
-      <strong class="font-extrabold text-herb">{% translate "Save time:" %}</strong> {% side_by_side_hint run %}
-    </p>
-  {% endfor %}
-  <ol class="mt-1.5">
-    {% for step in model.steps %}
-      <li class="flex gap-3.5 py-4{% if not forloop.last %} border-b border-line-soft{% endif %}">
-        <span aria-hidden="true" class="flex-none w-9 h-9 rounded-full bg-ink text-white flex items-center justify-center text-[18px] font-extrabold">{{ step.index }}</span>
-        <div class="min-w-0 pt-1 flex flex-col gap-2.5">
-          <p class="text-[19px] leading-normal"><span class="sr-only">{% blocktranslate trimmed with number=step.index %}Step {{ number }}:{% endblocktranslate %} </span>{{ step.text }}</p>
-          {% builds_on step as hint %}
-          {% if hint %}<p class="text-[16px] text-ink-3">{{ hint }}</p>{% endif %}
-          {% if step.timers or step.temperatures %}
-            <div class="flex flex-wrap gap-2">
-              {% for timer in step.timers %}
-                <span class="inline-flex items-center gap-2 h-9 px-3.5 rounded-full bg-ember-tint text-ember text-[16px] font-bold">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-                  {{ timer.display }}
-                </span>
-              {% endfor %}
-              {% for temperature in step.temperatures %}
-                <span class="inline-flex items-center gap-2 h-9 px-3.5 rounded-full bg-ember-tint text-ember text-[16px] font-bold">
-                  {% if temperature.mode %}{% oven_icon temperature.mode 20 %}{% else %}<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 14.8V4a2 2 0 0 0-4 0v10.8a4 4 0 1 0 4 0z"/></svg>{% endif %}
-                  {{ temperature.display }}
-                </span>
-              {% endfor %}
-            </div>
+          <span class="min-w-[5.5rem] px-1 text-center text-[17px] font-bold tabular-nums">
+            {% if view.servings %}{% blocktranslate trimmed count counter=view.servings %}
+              {{ counter }} serving
+            {% plural %}
+              {{ counter }} servings
+            {% endblocktranslate %}{% else %}{{ view.amount }}{% endif %}
+          </span>
+          {% if view.more %}
+            <a href="{{ view.more }}" hx-get="{{ view.more }}" hx-target="#render" hx-push-url="true"
+               aria-label="{% if view.servings %}{% translate 'More servings' %}{% else %}{% translate 'More' %}{% endif %}"
+               class="w-11 h-11 rounded-full bg-white shadow-[0_1px_3px_rgba(28,31,29,0.14)] flex items-center justify-center hover:text-herb">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+            </a>
+          {% else %}
+            <span aria-hidden="true" class="w-11 h-11 rounded-full flex items-center justify-center text-line-strong">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            </span>
           {% endif %}
         </div>
-      </li>
-    {% endfor %}
-  </ol>
-</section>
+      </div>
 
-<section class="pt-9 pb-10" aria-labelledby="glance">
-  <div class="px-5 flex flex-wrap items-center justify-between gap-3">
-    <h2 id="glance" class="text-[24px] font-extrabold">{% translate "At a glance" %}</h2>
-    <div class="flex items-center gap-2">
-      <button type="button" data-chart="open" class="inline-flex h-11 px-3.5 items-center gap-2 rounded-xl border-2 border-line-strong text-[16px] font-bold hover:border-ink-3">
+      {% for note in notes %}
+        <p class="mt-3 flex gap-2 text-[16px] leading-snug text-ink-2" role="status">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="flex-none mt-px text-herb"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+          <span>{{ note }}</span>
+        </p>
+      {% endfor %}
+
+      {% comment %}
+        Each line can be ticked off while cooking; the page's script keeps the
+        ticks through a change of servings. A measured amount leads, in its own
+        column; an approximation ("to taste") reads after the name instead.
+      {% endcomment %}
+      <ul class="mt-3">
+        {% for ingredient in model.ingredients %}
+          <li class="border-b border-line-soft last:border-b-0">
+            <label class="group flex items-baseline gap-3 py-3 cursor-pointer">
+              <input type="checkbox" data-ingredient="{{ forloop.counter0 }}" class="peer flex-none w-5 h-5 translate-y-[3px] rounded accent-herb print:hidden">
+              <span class="flex-1 grid grid-cols-[6.75rem_minmax(0,1fr)] gap-3 items-baseline peer-checked:opacity-45 peer-checked:[&_.name]:line-through">
+                {% if ingredient.quantity and not ingredient.quantity.after_name %}
+                  <span class="text-right text-[18px] font-bold text-herb tabular-nums">{{ ingredient.quantity.display }}</span>
+                {% else %}
+                  <span></span>
+                {% endif %}
+                <span class="text-[18px]">
+                  <span class="name">{{ ingredient.name }}</span>{% if ingredient.quantity.after_name %} <span class="text-ink-3">{{ ingredient.quantity.display }}</span>{% endif %}{% if ingredient.prep %}<span class="text-ink-2">, {{ ingredient.prep }}</span>{% endif %}
+                  {% if ingredient.optional %}<span class="text-ink-3">({% translate "optional" %})</span>{% endif %}
+                  {% if ingredient.unresolved and view.system == "us" %}
+                    <svg role="img" aria-label="{% translate 'Not recognised: please check this ingredient' %}" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9A4A12" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="inline align-[-3px]"><path d="M12 3 2 21h20L12 3z"/><path d="M12 10v5M12 18h.01"/></svg>
+                  {% endif %}
+                  {% if ingredient.notes %}<span class="block text-[16px] text-ink-3">{{ ingredient.notes }}</span>{% endif %}
+                </span>
+              </span>
+            </label>
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+    <p class="mt-3 px-2 text-[15px] leading-snug text-ink-3 print:hidden">{% translate "Tip: tick off what you have ready." %}</p>
+  </div>
+
+  <section class="mt-12 lg:mt-0" aria-labelledby="steps">
+    <p class="text-[13px] font-extrabold uppercase tracking-[0.16em] text-herb">02 / {% translate "Let’s cook" %}</p>
+    <h2 id="steps" class="mt-1.5 text-[28px] lg:text-[34px] font-extrabold tracking-[-0.01em] text-herb-dark">{% translate "Steps" %}</h2>
+    {% for run in model.side_by_side %}
+      <p class="mt-4 flex gap-3 rounded-2xl bg-herb-tint px-4 py-3.5 text-[17px] leading-snug">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="flex-none mt-0.5 text-herb"><path d="M4 7h14M15 4l3 3-3 3M4 17h14M15 14l3 3-3 3"/></svg>
+        <span><strong class="font-bold text-herb-dark">{% translate "Save time:" %}</strong> {% side_by_side_hint run %}</span>
+      </p>
+    {% endfor %}
+    <ol class="mt-3">
+      {% for step in model.steps %}
+        <li class="flex gap-4 py-5 border-b border-line-soft last:border-b-0">
+          <span aria-hidden="true" class="flex-none min-w-12 h-10 px-2 rounded-xl bg-herb-tint text-herb-dark flex items-center justify-center text-[17px] font-extrabold tabular-nums">{{ step.index|stringformat:"02d" }}</span>
+          <div class="min-w-0 pt-1 flex flex-col gap-2">
+            <p class="text-[19px] leading-relaxed"><span class="sr-only">{% blocktranslate trimmed with number=step.index %}Step {{ number }}:{% endblocktranslate %} </span>{{ step.text }}</p>
+            {% builds_on step as hint %}
+            {% if hint %}<p class="text-[15px] leading-snug text-ink-3">{{ hint }}</p>{% endif %}
+            {% if step.timers or step.temperatures %}
+              <p class="flex flex-wrap gap-x-4 gap-y-1.5 text-[16px] font-bold text-ember">
+                {% for timer in step.timers %}
+                  <span class="inline-flex items-center gap-1.5">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                    {{ timer.display }}
+                  </span>
+                {% endfor %}
+                {% comment %}
+                  The setting's symbol and the value; the step's words and the
+                  facts at the top name the setting, so here it is only a tooltip
+                  and, for screen readers, hidden text.
+                {% endcomment %}
+                {% for temperature in step.temperatures %}
+                  <span class="inline-flex items-center gap-1.5"{% if temperature.setting %} title="{{ temperature.display }}"{% endif %}>
+                    {% if temperature.mode %}{% oven_icon temperature.mode 20 %}{% else %}<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 14.8V4a2 2 0 0 0-4 0v10.8a4 4 0 1 0 4 0z"/></svg>{% endif %}
+                    {% if temperature.setting %}{{ temperature.value }}<span class="sr-only"> {{ temperature.setting }}</span>{% else %}{{ temperature.display }}{% endif %}
+                  </span>
+                {% endfor %}
+              </p>
+            {% endif %}
+          </div>
+        </li>
+      {% endfor %}
+    </ol>
+  </section>
+</div>
+
+<section class="pt-14 pb-12" aria-labelledby="glance">
+  <div class="px-5 flex flex-wrap items-end justify-between gap-x-3 gap-y-2">
+    <div>
+      <p class="text-[13px] font-extrabold uppercase tracking-[0.16em] text-herb">03 / {% translate "The whole recipe" %}</p>
+      <h2 id="glance" class="mt-1.5 text-[28px] lg:text-[34px] font-extrabold tracking-[-0.01em] text-herb-dark">{% translate "At a glance" %}</h2>
+    </div>
+    <div class="flex items-center -mx-3">
+      <button type="button" data-chart="open" class="inline-flex h-11 px-3 items-center gap-2 rounded-full text-[16px] font-bold text-ink-2 hover:bg-white hover:text-ink">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
         {% translate "Full screen" %}
       </button>
-      <a href="{{ view.print_chart }}" class="inline-flex h-11 px-3.5 items-center gap-2 rounded-xl border-2 border-line-strong text-[16px] font-bold hover:border-ink-3">
+      <a href="{{ view.print_chart }}" class="inline-flex h-11 px-3 items-center gap-2 rounded-full text-[16px] font-bold text-ink-2 hover:bg-white hover:text-ink">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg>
         {% translate "Print" %}
       </a>
     </div>
   </div>
-  <p class="px-5 mt-1.5 text-[16px] text-ink-3">{% translate "The recipe as a chart: the ingredients in green go into the numbered steps, and the dark green shape at the end is the finished dish." %}</p>
   {% include "recipes/_chart.html" %}
+  <p class="px-5 mt-3 text-[15px] leading-snug text-ink-3">{% translate "The recipe as a chart: the ingredients in green go into the numbered steps, and the dark green shape at the end is the finished dish." %}</p>
 </section>

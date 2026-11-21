@@ -122,6 +122,15 @@ class RecipeStore(ABC):
     @abstractmethod
     def list_recipe_ids(self) -> list[str]: ...
 
+    @abstractmethod
+    def remove(self, recipe_id: str) -> bool:
+        """Take a recipe out of the store, history and all; ``False`` if absent.
+
+        Afterwards nothing here lists it, reads it or counts it as existing, so
+        a full reindex does not bring it back. The filesystem store moves the
+        files aside rather than deleting them, so a mistake can be undone.
+        """
+
     # -- shared lineage logic -------------------------------------------------
 
     def commit(
@@ -157,6 +166,34 @@ class RecipeStore(ABC):
         )
         self._put_version(recipe.id, record)
         self._write_head_ref(recipe.id, record.version_id)
+        return record
+
+    def reassign(
+        self, recipe_id: str, *, author: str, created_at: str, message: str = "reassign"
+    ) -> VersionRecord:
+        """A version with HEAD's content and another author: a change of owner.
+
+        The one deliberate exception to the no-op rule. A recipe's owner is the
+        author of its HEAD -- ``reindex`` reads it there -- so handing a recipe to
+        someone else has to be a version of its own, in the lineage like any
+        other change: the same content hash, a new version id. Returns HEAD
+        unchanged when ``author`` already wrote it.
+        """
+        head = self.head(recipe_id)
+        if head is None:
+            raise RefNotFoundError(f"no such recipe in store: {recipe_id}")
+        if head.author == author:
+            return head
+        record = build_version_record(
+            head.recipe,
+            parents=[head.version_id],
+            author=author,
+            created_at=created_at,
+            message=message,
+            origin="reassigned",
+        )
+        self._put_version(recipe_id, record)
+        self._write_head_ref(recipe_id, record.version_id)
         return record
 
     def head(self, recipe_id: str) -> VersionRecord | None:

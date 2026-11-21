@@ -15,4 +15,5 @@ urlpatterns = [
     path("r/<slug:slug>/", views.detail, name="detail"),
     path("r/<slug:slug>/chart/", views.chart, name="chart"),
     path("r/<slug:slug>/edit/", views.edit, name="edit"),
+    path("r/<slug:slug>/delete/", views.delete, name="delete"),
 ]

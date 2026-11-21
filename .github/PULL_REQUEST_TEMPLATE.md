@@ -31,5 +31,5 @@ A `contract` job failure means every recipe hash in every store changed.
 ### If an API endpoint was added
 
 - [ ] It declares its auth explicitly (`/api/` and `/ops/api/` get **no**
-      protection from `LoginRequiredMiddleware`)
+      protection from `AccessMiddleware`)
 - [ ] Product endpoints start from `catalog.access.visible_recipes(user)`

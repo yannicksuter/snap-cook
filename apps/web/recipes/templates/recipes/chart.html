@@ -12,9 +12,9 @@ print dialog's own settings decide paper and margins beyond the A4 default.
 
 {% block content %}
   <div class="pb-10 print:pb-0">
-    <div class="px-2 border-b border-line flex items-center justify-between gap-2 print:hidden">
-      <a href="{{ view.here }}" class="inline-flex items-center gap-1 h-12 px-3 text-[18px] font-bold text-ink hover:text-herb">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+    <div class="px-3 pt-3 flex items-center justify-between gap-2 print:hidden">
+      <a href="{{ view.here }}" class="inline-flex items-center gap-1 h-11 pl-1 pr-3 rounded-full text-[17px] font-bold text-ink-2 hover:bg-surface hover:text-ink">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
         {% translate "Back to the recipe" %}
       </a>
       <button type="button" onclick="window.print()" class="inline-flex h-11 px-3.5 mr-1 items-center gap-2 rounded-xl bg-ink text-white text-[16px] font-bold hover:bg-ink-2">

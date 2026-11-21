@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: snap-cook\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-19 22:25+0000\n"
+"POT-Creation-Date: 2026-11-21 09:14+0000\n"
 "PO-Revision-Date: 2026-11-16 21:30+0100\n"
 "Last-Translator: snap-cook\n"
 "Language-Team: German\n"
@@ -31,6 +31,25 @@ msgstr "US: Cups und Unzen"
 msgid "Units"
 msgstr "Einheiten"
 
+#: accounts/templates/accounts/not_yet.html
+msgid "Not yet"
+msgstr "Noch nicht"
+
+#: accounts/templates/accounts/not_yet.html
+#: backoffice/templates/backoffice/base.html imports/templates/imports/add.html
+#: imports/templates/imports/status.html recipes/templates/recipes/detail.html
+#: recipes/templates/recipes/index.html
+msgid "Recipes"
+msgstr "Rezepte"
+
+#: accounts/templates/accounts/not_yet.html
+msgid ""
+"Adding and changing recipes is switched on by an admin, one person at a "
+"time. Until then you can read every shared recipe."
+msgstr ""
+"Rezepte hinzufügen und ändern schaltet ein Admin frei, für jede Person "
+"einzeln. Bis dahin kannst du alle geteilten Rezepte lesen."
+
 #: accounts/templates/accounts/settings.html
 msgid "Settings"
 msgstr "Einstellungen"
@@ -46,9 +65,27 @@ msgid "Save"
 msgstr "Speichern"
 
 #: accounts/templates/accounts/settings.html
-#, python-format
-msgid "Signed in as %(email)s"
-msgstr "Angemeldet als %(email)s"
+msgid "Your account"
+msgstr "Dein Konto"
+
+#: accounts/templates/accounts/settings.html
+msgid "You can add and change recipes."
+msgstr "Du kannst Rezepte hinzufügen und ändern."
+
+#: accounts/templates/accounts/settings.html
+msgid "You can read every shared recipe. An admin can let you add your own."
+msgstr ""
+"Du kannst alle geteilten Rezepte lesen. Eigene hinzufügen kannst du, sobald "
+"ein Admin dich freischaltet."
+
+#: accounts/templates/accounts/settings.html
+msgid "Change password"
+msgstr "Passwort ändern"
+
+#: accounts/templates/accounts/settings.html
+#: backoffice/templates/backoffice/base.html
+msgid "Admin"
+msgstr "Verwaltung"
 
 #: accounts/templates/accounts/settings.html
 msgid "Sign out"
@@ -58,12 +95,152 @@ msgstr "Abmelden"
 msgid "Saved."
 msgstr "Gespeichert."
 
-#
+#: backoffice/templates/backoffice/_original.html
+msgid "Photos or PDF"
+msgstr "Fotos oder PDF"
+
+#: backoffice/templates/backoffice/_original.html
+msgid "Web page"
+msgstr "Webseite"
+
+#: backoffice/templates/backoffice/_original.html
+msgid "Text"
+msgstr "Text"
+
+#: backoffice/templates/backoffice/_original.html
+msgid "Link only"
+msgstr "Nur Link"
+
+#: backoffice/templates/backoffice/_original.html
+msgid "No original kept"
+msgstr "Kein Original gespeichert"
+
+#: backoffice/templates/backoffice/archive.html
+msgid ""
+"Recipes of deleted accounts. No one sees them until you give them to someone."
+msgstr ""
+"Rezepte gelöschter Konten. Niemand sieht sie, bis du sie jemandem gibst."
+
+#: backoffice/templates/backoffice/archive.html
+msgid "Give to"
+msgstr "Geben an"
+
+#: backoffice/templates/backoffice/archive.html
+msgid "Give to…"
+msgstr "Geben an …"
+
+#: backoffice/templates/backoffice/archive.html
+msgid "Give"
+msgstr "Geben"
+
+#: backoffice/templates/backoffice/archive.html
+msgid "Nothing in the archive."
+msgstr "Das Archiv ist leer."
+
+#: backoffice/templates/backoffice/base.html
+msgid "People"
+msgstr "Personen"
+
+#: backoffice/templates/backoffice/base.html
+msgid "Archive"
+msgstr "Archiv"
+
+#: backoffice/templates/backoffice/people.html
+msgctxt "role"
+msgid "Admin"
+msgstr "Admin"
+
+#: backoffice/templates/backoffice/people.html
+msgid "Not confirmed yet"
+msgstr "Noch nicht bestätigt"
+
+#: backoffice/templates/backoffice/people.html
+msgid "Email and password"
+msgstr "E-Mail und Passwort"
+
+#: backoffice/templates/backoffice/people.html
+#: recipes/templates/recipes/index.html
+#, python-format
+msgid "%(counter)s recipe"
+msgid_plural "%(counter)s recipes"
+msgstr[0] "%(counter)s Rezept"
+msgstr[1] "%(counter)s Rezepte"
+
+#: backoffice/templates/backoffice/people.html
+#, python-format
+msgid "Last signed in %(when)s"
+msgstr "Zuletzt angemeldet %(when)s"
+
+#: backoffice/templates/backoffice/people.html
+msgid "Never signed in"
+msgstr "Nie angemeldet"
+
+#: backoffice/templates/backoffice/people.html
+msgid "May cook"
+msgstr "Darf kochen"
+
+#: backoffice/templates/backoffice/people.html
+#: imports/templates/imports/_progress.html
+msgid "Delete"
+msgstr "Löschen"
+
+#: backoffice/templates/backoffice/people.html
+#, python-format
+msgid ""
+"%(initials)s can no longer sign in. Their recipes go to the archive, where "
+"you can give them to someone else."
+msgstr ""
+"%(initials)s kann sich nicht mehr anmelden. Die Rezepte kommen ins Archiv, "
+"wo du sie jemand anderem geben kannst."
+
+#: backoffice/templates/backoffice/people.html
+#, python-format
+msgid "Yes, delete %(initials)s"
+msgstr "Ja, %(initials)s löschen"
+
+#: backoffice/templates/backoffice/people.html
+msgid "No one has an account yet."
+msgstr "Noch niemand hat ein Konto."
+
+#: backoffice/templates/backoffice/recipes.html
+msgid "Shared"
+msgstr "Geteilt"
+
+#: backoffice/templates/backoffice/recipes.html
+msgid "Private"
+msgstr "Privat"
+
+#: backoffice/templates/backoffice/recipes.html
+msgid "Read again"
+msgstr "Neu einlesen"
+
+#: backoffice/templates/backoffice/recipes.html
+#: recipes/templates/recipes/index.html
+msgid "No recipes yet."
+msgstr "Noch keine Rezepte."
+
+#: backoffice/views.py
+msgid "You cannot delete yourself."
+msgstr "Dich selbst kannst du nicht löschen."
+
+#: backoffice/views.py
+#, python-format
+msgid "%(initials)s was deleted."
+msgstr "%(initials)s wurde gelöscht."
+
+#: backoffice/views.py
+msgid "Nothing of this recipe’s original was kept."
+msgstr "Vom Original dieses Rezepts ist nichts gespeichert."
+
+#: backoffice/views.py
+#, python-format
+msgid "“%(title)s” belongs to %(initials)s now."
+msgstr "„%(title)s“ gehört jetzt %(initials)s."
+
 #: imports/forms.py
 msgid "Link to a recipe"
 msgstr "Link zu einem Rezept"
 
-#
 #: imports/forms.py imports/templates/imports/add.html
 msgid "Recipe text"
 msgstr "Rezepttext"
@@ -123,7 +300,6 @@ msgstr "Name"
 msgid "Short description"
 msgstr "Kurze Beschreibung"
 
-#
 #: imports/forms.py
 msgid "Serves"
 msgstr "Portionen"
@@ -174,10 +350,6 @@ msgstr "Ansehen, was gelesen wurde"
 msgid "Try again"
 msgstr "Nochmals versuchen"
 
-#: imports/templates/imports/_progress.html
-msgid "Delete"
-msgstr "Löschen"
-
 #: imports/templates/imports/_recipe_form.html
 #: recipes/templates/recipes/_render.html
 msgid "Ingredients"
@@ -204,15 +376,9 @@ msgid ""
 msgstr ""
 "Ein Schritt pro Absatz. Zutaten, Zeiten und Temperaturen werden so markiert:"
 
-#
 #: imports/templates/imports/add.html recipes/templates/recipes/index.html
 msgid "Add a recipe"
 msgstr "Rezept hinzufügen"
-
-#: imports/templates/imports/add.html imports/templates/imports/review.html
-#: recipes/templates/recipes/_chart.html
-msgid "Close"
-msgstr "Schliessen"
 
 #: imports/templates/imports/add.html imports/views.py
 msgid "Reading recipes is not set up on this server yet."
@@ -264,14 +430,9 @@ msgstr "Foto einlesen"
 msgid "Or paste a link"
 msgstr "Oder einen Link einfügen"
 
-#
 #: imports/templates/imports/add.html
 msgid "Get the recipe"
 msgstr "Rezept holen"
-
-#: imports/templates/imports/add.html
-msgid "Other ways"
-msgstr "Andere Wege"
 
 #: imports/templates/imports/add.html
 msgid "Choose photos or a PDF"
@@ -311,14 +472,25 @@ msgstr "Hier loslassen zum Einlesen"
 msgid "Sending…"
 msgstr "Wird gesendet…"
 
-#
 #: imports/templates/imports/review.html
 msgid "Check the recipe"
 msgstr "Rezept prüfen"
 
+#: imports/templates/imports/review.html recipes/templates/recipes/_chart.html
+msgid "Close"
+msgstr "Schliessen"
+
 #: imports/templates/imports/review.html
 msgid "Draft, only you"
 msgstr "Entwurf, nur für dich"
+
+#: imports/templates/imports/review.html
+msgid ""
+"Read again from its original. Saving makes this the recipe’s new version; "
+"the one before is kept."
+msgstr ""
+"Neu eingelesen aus dem Original. Speichern macht dies zur neuen Fassung des "
+"Rezepts; die bisherige bleibt erhalten."
 
 #: imports/templates/imports/review.html
 msgid "Change anything that looks wrong, then save."
@@ -344,7 +516,10 @@ msgstr ""
 msgid "Keep it as it is"
 msgstr "So lassen"
 
-#
+#: imports/templates/imports/review.html
+msgid "Save as new version"
+msgstr "Als neue Fassung speichern"
+
 #: imports/templates/imports/review.html
 msgid "Save recipe"
 msgstr "Rezept speichern"
@@ -356,11 +531,6 @@ msgstr "Vorschau aktualisieren"
 #: imports/templates/imports/review.html
 msgid "Delete this draft"
 msgstr "Diesen Entwurf löschen"
-
-#: imports/templates/imports/status.html recipes/templates/recipes/detail.html
-#: recipes/templates/recipes/index.html
-msgid "Recipes"
-msgstr "Rezepte"
 
 #: imports/views.py
 msgid "That link leads into a private network, so it cannot be read."
@@ -380,7 +550,6 @@ msgstr ""
 msgid "The page is too large to read."
 msgstr "Die Seite ist zu umfangreich zum Lesen."
 
-#
 #: imports/views.py
 msgid "No recipe was found in it."
 msgstr "Darin wurde kein Rezept gefunden."
@@ -406,6 +575,14 @@ msgid "Reading took too long and was stopped."
 msgstr "Das Einlesen hat zu lange gedauert und wurde abgebrochen."
 
 #: imports/views.py
+msgid ""
+"Nothing of the original was kept, and its link no longer loads, so it cannot "
+"be read again."
+msgstr ""
+"Vom Original ist nichts gespeichert, und der Link lädt nicht mehr. Darum "
+"lässt es sich nicht neu einlesen."
+
+#: imports/views.py
 msgid "The draft was deleted."
 msgstr "Der Entwurf wurde gelöscht."
 
@@ -414,10 +591,18 @@ msgid "That answer no longer fits the text. Edit the text instead."
 msgstr ""
 "Diese Antwort passt nicht mehr zum Text. Bearbeite stattdessen den Text."
 
-#
 #: imports/views.py
 msgid "Saved. Only you can see this recipe."
 msgstr "Gespeichert. Nur du siehst dieses Rezept."
+
+#: imports/views.py
+msgid "That recipe was deleted meanwhile, so nothing was saved."
+msgstr "Das Rezept wurde inzwischen gelöscht, darum wurde nichts gespeichert."
+
+#: imports/views.py
+#, python-format
+msgid "Saved as a new version of “%(title)s”."
+msgstr "Als neue Fassung von „%(title)s“ gespeichert."
 
 #: recipes/templates/recipes/_chart.html
 msgid "Zoom out"
@@ -452,16 +637,8 @@ msgid "Resting"
 msgstr "Ruhezeit"
 
 #: recipes/templates/recipes/_render.html
-msgid "Edit"
-msgstr "Bearbeiten"
-
-#: recipes/templates/recipes/_render.html
-msgid "Servings"
-msgstr "Portionen"
-
-#: recipes/templates/recipes/_render.html
-msgid "Amount"
-msgstr "Menge"
+msgid "What you need"
+msgstr "Was du brauchst"
 
 #: recipes/templates/recipes/_render.html
 msgid "Fewer servings"
@@ -472,6 +649,13 @@ msgid "Less"
 msgstr "Weniger"
 
 #: recipes/templates/recipes/_render.html
+#, python-format
+msgid "%(counter)s serving"
+msgid_plural "%(counter)s servings"
+msgstr[0] "%(counter)s Portion"
+msgstr[1] "%(counter)s Portionen"
+
+#: recipes/templates/recipes/_render.html
 msgid "More servings"
 msgstr "Mehr Portionen"
 
@@ -479,16 +663,17 @@ msgstr "Mehr Portionen"
 msgid "More"
 msgstr "Mehr"
 
-#: recipes/templates/recipes/_render.html recipes/templates/recipes/chart.html
-#, python-format
-msgid "for %(counter)s serving"
-msgid_plural "for %(counter)s servings"
-msgstr[0] "für %(counter)s Portion"
-msgstr[1] "für %(counter)s Portionen"
-
 #: recipes/templates/recipes/_render.html
 msgid "Not recognised: please check this ingredient"
 msgstr "Nicht erkannt: Bitte diese Zutat prüfen"
+
+#: recipes/templates/recipes/_render.html
+msgid "Tip: tick off what you have ready."
+msgstr "Tipp: Hake ab, was du schon bereit hast."
+
+#: recipes/templates/recipes/_render.html
+msgid "Let’s cook"
+msgstr "Los geht’s"
 
 #: recipes/templates/recipes/_render.html
 msgid "Save time:"
@@ -498,6 +683,10 @@ msgstr "Zeit sparen:"
 #, python-format
 msgid "Step %(number)s:"
 msgstr "Schritt %(number)s:"
+
+#: recipes/templates/recipes/_render.html
+msgid "The whole recipe"
+msgstr "Das ganze Rezept"
 
 #: recipes/templates/recipes/_render.html
 msgid "At a glance"
@@ -523,10 +712,24 @@ msgstr ""
 msgid "Your settings: language and units"
 msgstr "Deine Einstellungen: Sprache und Einheiten"
 
-#
+#: recipes/templates/recipes/base.html templates/account/login.html
+msgid "Sign in"
+msgstr "Anmelden"
+
 #: recipes/templates/recipes/chart.html recipes/templates/recipes/edit.html
 msgid "Back to the recipe"
 msgstr "Zurück zum Rezept"
+
+#: recipes/templates/recipes/chart.html
+#, python-format
+msgid "for %(counter)s serving"
+msgid_plural "for %(counter)s servings"
+msgstr[0] "für %(counter)s Portion"
+msgstr[1] "für %(counter)s Portionen"
+
+#: recipes/templates/recipes/detail.html
+msgid "Edit"
+msgstr "Bearbeiten"
 
 #: recipes/templates/recipes/edit.html
 msgid "Edit recipe"
@@ -539,6 +742,23 @@ msgid ""
 msgstr ""
 "Beim Speichern bleibt die frühere Fassung erhalten, ebenso die Übersetzungen "
 "von allem, was du nicht änderst."
+
+#: recipes/templates/recipes/edit.html
+msgid "Delete recipe"
+msgstr "Rezept löschen"
+
+#: recipes/templates/recipes/edit.html
+#, python-format
+msgid ""
+"“%(title)s” disappears from your recipes, and for everyone you shared it "
+"with."
+msgstr ""
+"„%(title)s“ verschwindet aus deinen Rezepten und bei allen, mit denen du es "
+"geteilt hast."
+
+#: recipes/templates/recipes/edit.html
+msgid "Yes, delete it"
+msgstr "Ja, löschen"
 
 #: recipes/templates/recipes/index.html
 msgid "Search recipes"
@@ -556,7 +776,6 @@ msgstr "Suchen"
 msgid "Waiting for you"
 msgstr "Wartet auf dich"
 
-#
 #: recipes/templates/recipes/index.html
 msgid "New recipe"
 msgstr "Neues Rezept"
@@ -574,13 +793,6 @@ msgid "Reading…"
 msgstr "Wird gelesen…"
 
 #: recipes/templates/recipes/index.html
-#, python-format
-msgid "%(counter)s recipe"
-msgid_plural "%(counter)s recipes"
-msgstr[0] "%(counter)s Rezept"
-msgstr[1] "%(counter)s Rezepte"
-
-#: recipes/templates/recipes/index.html
 msgid "Only you can see this"
 msgstr "Nur du kannst das sehen"
 
@@ -596,10 +808,6 @@ msgstr "Kein Rezept passt zu „%(query)s“."
 #: recipes/templates/recipes/index.html
 msgid "Show all recipes"
 msgstr "Alle Rezepte anzeigen"
-
-#: recipes/templates/recipes/index.html
-msgid "No recipes yet."
-msgstr "Noch keine Rezepte."
 
 #: recipes/templates/recipes/index.html
 msgid "Recipes appear here as soon as they are added."
@@ -658,6 +866,80 @@ msgstr ""
 #, python-format
 msgid "This text cannot be read: %(detail)s"
 msgstr "Dieser Text lässt sich nicht lesen: %(detail)s"
+
+#: recipes/views.py
+#, python-format
+msgid "“%(title)s” was deleted."
+msgstr "„%(title)s“ wurde gelöscht."
+
+#: recipes/views.py
+#, python-format
+msgid "by %(initials)s"
+msgstr "von %(initials)s"
+
+#: templates/account/_google.html
+msgid "Continue with Google"
+msgstr "Weiter mit Google"
+
+#: templates/account/login.html
+msgid ""
+"Anyone can read the recipes. Sign in to keep your settings, and to add "
+"recipes of your own."
+msgstr ""
+"Die Rezepte kann jede und jeder lesen. Melde dich an, um deine Einstellungen "
+"zu behalten und eigene Rezepte hinzuzufügen."
+
+#: templates/account/login.html templates/account/signup.html
+msgid "or with your email"
+msgstr "oder mit deiner E-Mail"
+
+#: templates/account/login.html templates/account/signup.html
+msgid "Email"
+msgstr "E-Mail"
+
+#: templates/account/login.html templates/account/signup.html
+msgid "Password"
+msgstr "Passwort"
+
+#: templates/account/login.html
+msgid "Forgot your password?"
+msgstr "Passwort vergessen?"
+
+#: templates/account/login.html templates/account/signup.html
+msgid "Create an account"
+msgstr "Konto erstellen"
+
+#: templates/account/messages/email_confirmation_failed.txt
+msgid "That address is already confirmed by another account."
+msgstr "Diese Adresse ist schon bei einem anderen Konto bestätigt."
+
+#: templates/account/messages/email_confirmation_sent.txt
+msgid "We sent you a link to confirm your email."
+msgstr "Wir haben dir einen Link geschickt, um deine E-Mail zu bestätigen."
+
+#: templates/account/messages/email_confirmed.txt
+msgid "Your email is confirmed."
+msgstr "Deine E-Mail ist bestätigt."
+
+#: templates/account/signup.html
+msgid ""
+"We send you a link to confirm your email. Your address is never shown to "
+"anyone; you appear by your initials."
+msgstr ""
+"Wir schicken dir einen Link, um deine E-Mail zu bestätigen. Deine Adresse "
+"sieht niemand; du erscheinst mit deinen Initialen."
+
+#: templates/account/signup.html
+msgid "At least 12 characters, and not a common one."
+msgstr "Mindestens 12 Zeichen, und kein gängiges."
+
+#: templates/account/signup.html
+msgid "Password again"
+msgstr "Passwort nochmals"
+
+#: templates/account/signup.html
+msgid "I already have an account"
+msgstr "Ich habe schon ein Konto"
 
 #: translations/templates/translations/_progress.html
 msgid ""

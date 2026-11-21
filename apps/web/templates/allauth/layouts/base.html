@@ -1,0 +1,11 @@
+{% extends "recipes/base.html" %}
+{% comment %}
+SPDX-License-Identifier: AGPL-3.0-or-later
+
+Every page of the sign-in library (allauth: sign in, sign up, verify, reset)
+inside the site's own frame. The library builds its pages from small "elements"
+(templates/allauth/elements/), restyled here to the site's calm look; the two
+pages people see most, signing in and signing up, are written out in full
+(templates/account/).
+{% endcomment %}
+{% block title %}{% block head_title %}{% endblock %} · snap-cook{% endblock %}

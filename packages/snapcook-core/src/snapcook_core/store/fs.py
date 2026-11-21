@@ -14,6 +14,9 @@ the full lineage with no export step (see ``RECIPE_SPEC.md`` section 5):
     ├── recipe.cook                    Cooklang projection of HEAD
     └── README.md                      generated; renders on GitHub
 
+A deleted recipe's directory moves, unchanged, into ``<store>/.trash/``. The
+trash has no ``.snapcook`` of its own, so nothing lists or reads what is in it.
+
 ``recipe.json``, ``recipe.cook`` and ``README.md`` are **projections** of HEAD,
 rewritten on every commit; the authoritative record is the immutable JSON under
 ``versions/``. The version files are sharded two hex levels deep by digest, the
@@ -41,6 +44,7 @@ if TYPE_CHECKING:
 __all__ = ["FilesystemStore"]
 
 _STORE_VERSION = 1
+_TRASH = ".trash"
 
 
 class FilesystemStore(RecipeStore):
@@ -102,6 +106,26 @@ class FilesystemStore(RecipeStore):
             for child in self.root.iterdir()
             if child.is_dir() and (child / ".snapcook").is_dir()
         )
+
+    def remove(self, recipe_id: str) -> bool:
+        """Move the recipe's directory into ``.trash/``, where nothing reads it.
+
+        A rename within the store, so it is atomic and the files stay in every
+        backup of the store. Moving the directory back and reindexing restores
+        the recipe with its whole history (docs/runbooks/restore-a-recipe.md).
+        """
+        source = self._recipe_dir(recipe_id)
+        if not (source / ".snapcook").is_dir():
+            return False
+        trash = self.root / _TRASH
+        trash.mkdir(exist_ok=True)
+        target = trash / recipe_id
+        count = 1
+        while target.exists():
+            count += 1
+            target = trash / f"{recipe_id}.{count}"
+        source.rename(target)
+        return True
 
     # -- projections ----------------------------------------------------------
 

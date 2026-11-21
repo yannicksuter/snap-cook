@@ -90,7 +90,12 @@ LABEL org.opencontainers.image.revision="${GIT_COMMIT}"
 # recipe) and, in the one-container setup, the database in /data/postgres.
 # THIS is the volume that must be backed up.
 # On Unraid: /mnt/user/appdata/snap-cook -> /data
-RUN mkdir -p /data
+#
+# The originals recipes were read from (photos, PDFs, pages) go to /sources when
+# a folder is mounted there, else to /data/sources (see imports.sources). /sources
+# is deliberately not a VOLUME: an unmapped one would be an anonymous volume, and
+# its files would be lost with the next update of the container.
+RUN mkdir -p /data /sources
 VOLUME ["/data"]
 
 EXPOSE 8931

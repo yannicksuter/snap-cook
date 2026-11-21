@@ -4,41 +4,47 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 What a cook wants to know before starting: how long it takes and how the oven
 is set. Times as the source states them; without a stated total, the longest
 chain of timed steps, shown as "at least" because untimed work is not counted.
+
+One quiet grid between two hairlines: a small label over each value, two to a
+row; on a wide screen it stands beside the title.
 {% endcomment %}{% load i18n recipe_extras %}
 {% if model.time or model.oven %}
-  <div class="mt-4 flex flex-wrap gap-2">
+  <dl class="mt-6 lg:mt-0 grid grid-cols-2 gap-x-6 gap-y-5 border-y border-line-soft py-5">
     {% if model.time.total %}
-      <div class="inline-flex items-center gap-2.5 rounded-2xl bg-surface pl-3 pr-4 py-2">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="flex-none text-herb"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-        <span class="flex flex-col leading-tight">
-          <span class="text-[14px] font-bold text-ink-3">{% if model.time.at_least %}{% translate "Takes at least" %}{% else %}{% translate "Ready in" %}{% endif %}</span>
-          <span class="text-[19px] font-extrabold">{{ model.time.total }}</span>
-        </span>
+      <div>
+        <dt class="text-[15px] text-ink-3">{% if model.time.at_least %}{% translate "Takes at least" %}{% else %}{% translate "Ready in" %}{% endif %}</dt>
+        <dd class="mt-0.5 flex items-center gap-2 text-[19px] font-bold text-herb-dark">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="flex-none text-herb"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          {{ model.time.total }}
+        </dd>
       </div>
     {% endif %}
     {% if model.time.prep %}
-      <div class="inline-flex flex-col justify-center leading-tight rounded-2xl bg-surface px-4 py-2">
-        <span class="text-[14px] font-bold text-ink-3">{% translate "Hands-on" %}</span>
-        <span class="text-[19px] font-extrabold">{{ model.time.prep }}</span>
+      <div>
+        <dt class="text-[15px] text-ink-3">{% translate "Hands-on" %}</dt>
+        <dd class="mt-0.5 text-[19px] font-bold text-herb-dark">{{ model.time.prep }}</dd>
       </div>
     {% endif %}
     {% if model.time.cook %}
-      <div class="inline-flex flex-col justify-center leading-tight rounded-2xl bg-surface px-4 py-2">
-        <span class="text-[14px] font-bold text-ink-3">{% translate "Cooking" %}</span>
-        <span class="text-[19px] font-extrabold">{{ model.time.cook }}</span>
+      <div>
+        <dt class="text-[15px] text-ink-3">{% translate "Cooking" %}</dt>
+        <dd class="mt-0.5 text-[19px] font-bold text-herb-dark">{{ model.time.cook }}</dd>
       </div>
     {% endif %}
     {% if model.time.rest %}
-      <div class="inline-flex flex-col justify-center leading-tight rounded-2xl bg-surface px-4 py-2">
-        <span class="text-[14px] font-bold text-ink-3">{% translate "Resting" %}</span>
-        <span class="text-[19px] font-extrabold">{{ model.time.rest }}</span>
+      <div>
+        <dt class="text-[15px] text-ink-3">{% translate "Resting" %}</dt>
+        <dd class="mt-0.5 text-[19px] font-bold text-herb-dark">{{ model.time.rest }}</dd>
       </div>
     {% endif %}
     {% for temperature in model.oven %}
-      <div class="inline-flex items-center gap-2.5 rounded-2xl bg-ember-tint text-ember pl-3 pr-4 py-2">
-        <span class="flex-none">{% oven_icon temperature.mode 30 %}</span>
-        <span class="text-[17px] font-bold leading-tight">{{ temperature.display }}</span>
+      <div>
+        <dt class="text-[15px] text-ink-3">{{ temperature.setting }}</dt>
+        <dd class="mt-0.5 flex items-center gap-2 text-[19px] font-bold text-herb-dark">
+          <span class="flex-none text-ember">{% oven_icon temperature.mode 24 %}</span>
+          {{ temperature.value }}
+        </dd>
       </div>
     {% endfor %}
-  </div>
+  </dl>
 {% endif %}

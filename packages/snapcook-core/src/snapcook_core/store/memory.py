@@ -38,3 +38,7 @@ class MemoryStore(RecipeStore):
 
     def list_recipe_ids(self) -> list[str]:
         return sorted(self._heads)
+
+    def remove(self, recipe_id: str) -> bool:
+        self._versions.pop(recipe_id, None)
+        return self._heads.pop(recipe_id, None) is not None

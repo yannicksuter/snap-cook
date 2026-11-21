@@ -22,7 +22,11 @@ else. Nothing is stored as a recipe until "Save recipe".
 
   <div class="px-5 pt-5">
     <h1 class="text-[28px] font-extrabold tracking-tight">{% translate "Check the recipe" %}</h1>
-    <p class="mt-2 text-[17px] leading-relaxed text-ink-2">{% translate "Change anything that looks wrong, then save." %}</p>
+    {% if job.replaces %}
+      <p class="mt-2 text-[17px] leading-relaxed text-ink-2">{% translate "Read again from its original. Saving makes this the recipe’s new version; the one before is kept." %}</p>
+    {% else %}
+      <p class="mt-2 text-[17px] leading-relaxed text-ink-2">{% translate "Change anything that looks wrong, then save." %}</p>
+    {% endif %}
     {% if job.left_out %}
       <p class="mt-4 rounded-[14px] bg-surface px-4 py-3 text-[16px] leading-relaxed text-ink-2">{% translate "Left out:" %} {{ job.left_out|join:", " }}</p>
     {% endif %}
@@ -76,7 +80,7 @@ else. Nothing is stored as a recipe until "Save recipe".
     {% for error in form.non_field_errors %}<p class="text-[16px] text-ember" role="alert">{{ error }}</p>{% endfor %}
     {% include "imports/_recipe_form.html" %}
 
-    <button type="submit" name="action" value="save" class="h-14 rounded-2xl bg-herb text-white text-[19px] font-extrabold hover:bg-herb-dark">{% translate "Save recipe" %}</button>
+    <button type="submit" name="action" value="save" class="h-14 rounded-2xl bg-herb text-white text-[19px] font-extrabold hover:bg-herb-dark">{% if job.replaces %}{% translate "Save as new version" %}{% else %}{% translate "Save recipe" %}{% endif %}</button>
     <button type="submit" name="action" value="update" class="h-12 rounded-[14px] border-2 border-line-strong text-[17px] font-bold hover:border-ink-3">{% translate "Update the preview" %}</button>
   </form>
 

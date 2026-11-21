@@ -103,6 +103,8 @@ case "$ROLE" in
       stop_all
       exit 1
     fi
+    # The originals recipes were read from, moved to /sources if mounted.
+    python manage.py tidy_sources || echo "Could not tidy the originals; see above." >&2
     # A short grace period, so web, worker and database all stop inside the
     # 30 seconds `--stop-timeout=30` gives the container.
     gunicorn "${gunicorn_args[@]}" --graceful-timeout 10 &
@@ -120,6 +122,7 @@ case "$ROLE" in
   web)
     echo web > "$ROLE_FILE"
     python manage.py migrate --noinput
+    python manage.py tidy_sources || echo "Could not tidy the originals; see above." >&2
     exec gunicorn "${gunicorn_args[@]}"
     ;;
   worker)

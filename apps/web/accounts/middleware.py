@@ -1,9 +1,11 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-"""Site-wide login gate, and the reader's interface language.
+"""Who may open which page, and the reader's interface language.
 
-A middleware rather than per-view decorators, so that a newly added view is
-private by default. Forgetting a decorator fails open; forgetting to add a
-prefix here fails closed, which is the direction you want the mistake to go.
+Anyone may read: the recipe list, a recipe and its chart are open without
+signing in. Everything else is decided per view by ``AccessMiddleware``, which
+fails closed: a view it does not know needs someone who **may cook**, so a newly
+added page is never public by mistake. Forgetting to list a view makes it too
+strict, which is the direction you want the mistake to go.
 
 .. warning::
    ``/api/`` and ``/ops/api/`` are exempt, so **neither API surface receives any
@@ -13,29 +15,35 @@ prefix here fails closed, which is the direction you want the mistake to go.
    explicit auth declaration publishes it to the internet.
 
    They are exempt because API clients authenticate with a bearer token and
-   must receive a 401 with a JSON body, not a 302 redirect to a Google login
-   page that a script cannot follow.
+   must receive a 401 with a JSON body, not a 302 to a sign-in page that a
+   script cannot follow.
 """
 
 from __future__ import annotations
 
 from collections.abc import Callable
+from urllib.parse import urlencode
 
 from django.conf import settings
-from django.http import HttpRequest, HttpResponse
-from django.shortcuts import redirect
+from django.http import Http404, HttpRequest, HttpResponse
+from django.shortcuts import redirect, render
 from django.utils import translation
 
+from accounts.identity import access_for
 
-class LoginRequiredMiddleware:
-    """Redirect anonymous users to Google SSO, except on exempt prefixes."""
+# Read-only pages anyone may open.
+PUBLIC_VIEWS = frozenset({"recipes:index", "recipes:detail", "recipes:chart", "up"})
+# Pages for any verified member, cook or not.
+MEMBER_VIEWS = frozenset({"accounts:settings"})
+
+
+class AccessMiddleware:
+    """Public, member, cook or admin, by view name; see the module docstring."""
 
     EXEMPT_PREFIXES = (
-        "/accounts/",  # allauth's own login flow
-        "/admin/",  # Django admin has its own auth
+        "/accounts/",  # allauth: signing in, up, out, verifying, resetting
         "/api/",  # bearer-token auth; must not 302
         "/ops/api/",  # bearer-token auth; must not 302
-        "/up",  # container health probe
         "/static/",
     )
 
@@ -43,12 +51,27 @@ class LoginRequiredMiddleware:
         self.get_response = get_response
 
     def __call__(self, request: HttpRequest) -> HttpResponse:
-        if not request.user.is_authenticated and not self._is_exempt(request.path):
-            return redirect(settings.LOGIN_URL)
+        request.access = access_for(request.user)
         return self.get_response(request)
 
-    def _is_exempt(self, path: str) -> bool:
-        return path.startswith(self.EXEMPT_PREFIXES)
+    def process_view(self, request: HttpRequest, view_func, view_args, view_kwargs):
+        if request.path.startswith(self.EXEMPT_PREFIXES):
+            return None
+        name = request.resolver_match.view_name if request.resolver_match else ""
+        access = request.access
+        if name in PUBLIC_VIEWS:
+            return None
+        if not access.member:
+            return redirect(f"{settings.LOGIN_URL}?{urlencode({'next': request.get_full_path()})}")
+        if name in MEMBER_VIEWS:
+            return None
+        if name.startswith("backoffice:"):
+            if access.admin:
+                return None
+            raise Http404  # no hint that /admin exists
+        if access.cook:
+            return None
+        return render(request, "accounts/not_yet.html", status=403)
 
 
 class UserLanguageMiddleware:
