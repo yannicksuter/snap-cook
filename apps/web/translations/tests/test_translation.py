@@ -155,11 +155,14 @@ def test_without_a_reader_the_page_says_so(settings, tmp_path, owner, reader, cl
     assert not TranslationJob.objects.exists()
 
 
-def test_a_run_is_only_visible_to_readers_of_its_recipe(
+def test_a_run_is_seen_by_readers_of_its_recipe_and_ends_with_it(
     translating, settings, owner, reader, client, monkeypatch
 ) -> None:
+    """Every recipe is open to read, a private one too, so its runs are as well."""
     monkeypatch.setattr(jobs, "_enqueue", lambda job: None)
     _store, row = _stored(settings, owner, visibility="private")
     job = jobs.start(owner, row.recipe_id, "en", "sc1:none")
+    assert client.get(f"/translations/{job.pk}/").status_code == 204, "running, nothing new"
+    row.delete()
     assert client.get(f"/translations/{job.pk}/").status_code == 404
     assert client.post(f"/translations/{job.pk}/retry/").status_code == 404

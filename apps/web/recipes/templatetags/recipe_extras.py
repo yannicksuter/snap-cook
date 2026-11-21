@@ -8,6 +8,8 @@ side, is decided in the core render model (``RenderedStep.after``,
 
 from __future__ import annotations
 
+from itertools import groupby
+
 from django import template
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _
@@ -60,3 +62,37 @@ def oven_icon(mode: str | None, size: int = 22) -> str:
 def oven_icon_styles() -> str:
     """The chart chips' symbols, as CSS masks; see recipes.oven."""
     return mark_safe(oven_mask_css())  # noqa: S308
+
+
+@register.filter
+def ingredient_groups(model) -> list[dict]:
+    """The ingredient list under the source's headings, or as one plain list.
+
+    A part whose steps use nothing of their own (bringing the parts together)
+    has no group: its heading would stand over nothing.
+    """
+    if not model.sections:
+        return [{"title": None, "ingredients": model.ingredients}]
+    return [
+        {"title": section.title, "ingredients": section.ingredients}
+        for section in model.sections
+        if section.ingredients
+    ]
+
+
+@register.filter
+def in_parts(steps) -> list[dict]:
+    """The method in runs of steps from one part, in order, each under its heading."""
+    return [
+        {"title": title, "steps": list(run)}
+        for title, run in groupby(steps, key=lambda step: step.section)
+    ]
+
+
+@register.simple_tag
+def side_by_side_from(model, step) -> tuple[int, ...] | None:
+    """The run of steps that can go side by side, if it starts at ``step``.
+
+    Its tip stands in that step, where the cook is when it helps.
+    """
+    return next((run for run in model.side_by_side if run[0] == step.index), None)

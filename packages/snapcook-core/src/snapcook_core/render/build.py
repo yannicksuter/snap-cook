@@ -30,6 +30,7 @@ from snapcook_core.render.model import (
     RenderEdge,
     RenderedIngredient,
     RenderedQuantity,
+    RenderedSection,
     RenderedStep,
     RenderedTemperature,
     RenderedTime,
@@ -136,6 +137,7 @@ def build_render_model(recipe: Recipe, options: RenderOptions | None = None) -> 
         servings=_scaled_servings(recipe.servings, opts.scale),
         ingredients=tuple(all_ingredient_lines),
         steps=tuple(steps),
+        sections=_sections(steps),
         side_by_side=_side_by_side(steps),
         graph=_build_graph(recipe, ordered, steps_by_action, state_names, title),
         warnings=tuple(issues.issues),
@@ -194,6 +196,11 @@ def _render_step(
         action_id=action.id,
         index=index,
         text=text,
+        section=(
+            action.section.resolve(opts.lang, source=recipe.source_lang)[0]
+            if action.section is not None
+            else None
+        ),
         summary=_summary(plain),
         verb=verb,
         ingredients=tuple(rendered_ings[use.id] for use in action.ingredients),
@@ -548,7 +555,19 @@ def _render_timer(
     scaled = scale_spec(spec, opts.scale, issues=issues, element_id=element_id)
     display = format_quantity(scaled.quantity, metric_profile())
     label = _resolve_localized(timer.name, recipe, opts) if timer.name else None
-    return RenderedTimer(label=label, display=display)
+    return RenderedTimer(label=label, display=display, seconds=_timer_seconds(timer))
+
+
+def _timer_seconds(timer: Timer) -> int | None:
+    """A timer's length for a countdown; a range counts from its lower end."""
+    quantity = timer.quantity
+    value = quantity.value if isinstance(quantity, Scalar) else quantity.low
+    unit = (quantity.unit.unit_id if quantity.unit else None) or "unit:min"
+    try:
+        seconds = int(convert_value(value, unit, "unit:s").to_integral_value())
+    except Exception:  # noqa: BLE001 - a time that is not a duration gets no countdown
+        return None
+    return seconds if seconds > 0 else None
 
 
 # The oven setting after a temperature, in the reader's language. English as
@@ -594,6 +613,21 @@ def _render_temperature(temperature: Temperature, opts: RenderOptions) -> Render
         mode=temperature.mode,
         value=shown,
         setting=setting,
+    )
+
+
+def _sections(steps: list[RenderedStep]) -> tuple[RenderedSection, ...]:
+    """The steps' parts, each once, in the order they start, with what they use."""
+    if not any(step.section for step in steps):
+        return ()
+    parts: dict[str | None, tuple[list[RenderedIngredient], list[int]]] = {}
+    for step in steps:
+        ingredients, indices = parts.setdefault(step.section, ([], []))
+        ingredients.extend(step.ingredients)
+        indices.append(step.index)
+    return tuple(
+        RenderedSection(title=title, ingredients=tuple(ingredients), steps=tuple(indices))
+        for title, (ingredients, indices) in parts.items()
     )
 
 

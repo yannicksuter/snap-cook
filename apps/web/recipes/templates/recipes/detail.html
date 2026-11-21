@@ -51,4 +51,135 @@ chart's look and behaviour (_chart_assets.html, shared with the print page).
       restore();
     })();
   </script>
+
+  <div id="timer-news" class="sr-only" aria-live="assertive"
+       data-done="{% translate 'Time’s up' %}" data-pause="{% translate 'Pause the timer' %}"
+       data-resume="{% translate 'Continue the timer' %}" data-dismiss="{% translate 'Time’s up: tap to stop the alarm' %}"></div>
+  <script>
+    // Step timers. A tap on a step's time counts it down, another pauses or
+    // continues it, and the cross beside it stops it. A timer is its end time,
+    // kept for this tab like the ticks, so it runs on through a change of
+    // servings, a reload or a look at another page. At the end it rings: a
+    // beep, a buzz on a phone and words for a screen reader, again every few
+    // seconds for two minutes or until tapped. While one runs, the screen stays on.
+    (() => {
+      const key = `timers:${location.pathname}`;
+      const news = document.getElementById("timer-news");
+      const words = news.dataset;
+      const timers = JSON.parse(sessionStorage.getItem(key) || "{}");
+      const save = () => sessionStorage.setItem(key, JSON.stringify(timers));
+      const rung = {};
+
+      const clock = (ms) => {
+        const total = Math.max(0, Math.ceil(ms / 1000));
+        const two = (n) => String(n).padStart(2, "0");
+        const [h, m, s] = [Math.floor(total / 3600), Math.floor(total / 60) % 60, total % 60];
+        return h ? `${h}:${two(m)}:${two(s)}` : `${m}:${two(s)}`;
+      };
+      const stateOf = (timer) =>
+        !timer ? "idle" : timer.rang ? "done" : timer.paused != null ? "paused" : "running";
+
+      // The sound is made here rather than loaded, and a browser lets it play
+      // only once a tap has allowed it.
+      let audio = null;
+      const allowSound = () => {
+        audio ??= new (window.AudioContext || window.webkitAudioContext)();
+        audio.resume();
+      };
+      const ring = () => {
+        navigator.vibrate?.([300, 150, 300]);
+        if (!audio) return;
+        const now = audio.currentTime;
+        for (const at of [0, 0.3, 0.6]) {
+          const tone = audio.createOscillator();
+          const level = audio.createGain();
+          tone.frequency.value = 880;
+          level.gain.setValueAtTime(0.0001, now + at);
+          level.gain.exponentialRampToValueAtTime(0.4, now + at + 0.02);
+          level.gain.exponentialRampToValueAtTime(0.0001, now + at + 0.25);
+          tone.connect(level).connect(audio.destination);
+          tone.start(now + at);
+          tone.stop(now + at + 0.3);
+        }
+      };
+
+      let lock = null;
+      const keepAwake = async () => {
+        const running = Object.values(timers).some((timer) => stateOf(timer) === "running");
+        if (running && !lock && document.visibilityState === "visible" && navigator.wakeLock) {
+          try {
+            lock = await navigator.wakeLock.request("screen");
+            lock.addEventListener("release", () => { lock = null; });
+          } catch { lock = null; }
+        } else if (!running && lock) {
+          lock.release();
+        }
+      };
+
+      const draw = () => {
+        for (const pill of document.querySelectorAll("[data-timer]")) {
+          const timer = timers[pill.dataset.timer];
+          const button = pill.querySelector("[data-timer-toggle]");
+          const state = stateOf(timer);
+          button.dataset.start ??= button.getAttribute("aria-label");
+          pill.querySelector("[data-timer-text]").textContent =
+            state === "idle" ? pill.dataset.display
+            : state === "done" ? words.done
+            : clock(timer.paused ?? timer.end - Date.now());
+          if (button.dataset.state !== state) {
+            button.dataset.state = state;
+            const label = { idle: button.dataset.start, running: words.pause, paused: words.resume, done: words.dismiss };
+            button.setAttribute("aria-label", label[state]);
+            pill.querySelector("[data-timer-stop]").hidden = state === "idle" || state === "done";
+          }
+        }
+      };
+
+      const tick = () => {
+        const now = Date.now();
+        for (const [id, timer] of Object.entries(timers)) {
+          if (stateOf(timer) === "running" && timer.end <= now) {
+            timer.rang = now;
+            news.textContent = `${words.done}: ${timer.display}`;
+            save();
+            keepAwake();
+          }
+          if (timer.rang && now - timer.rang < 120000 && now - (rung[id] || 0) >= 4000) {
+            rung[id] = now;
+            ring();
+          }
+        }
+        draw();
+      };
+
+      document.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-timer-toggle], [data-timer-stop]");
+        if (!button) return;
+        const pill = button.closest("[data-timer]");
+        const id = pill.dataset.timer;
+        const timer = timers[id];
+        allowSound();
+        if (button.matches("[data-timer-stop]") || stateOf(timer) === "done") {
+          delete timers[id];
+        } else if (!timer) {
+          timers[id] = { end: Date.now() + Number(pill.dataset.seconds) * 1000, display: pill.dataset.display };
+        } else if (timer.paused != null) {
+          timer.end = Date.now() + timer.paused;
+          delete timer.paused;
+        } else {
+          timer.paused = timer.end - Date.now();
+        }
+        save();
+        draw();
+        keepAwake();
+      });
+      // After a reload, the first tap anywhere lets a running timer ring.
+      document.addEventListener("pointerdown", () => { if (Object.keys(timers).length) allowSound(); });
+      document.addEventListener("visibilitychange", keepAwake);
+      document.addEventListener("htmx:afterSwap", draw);
+      setInterval(tick, 250);
+      tick();
+      keepAwake();
+    })();
+  </script>
 {% endblock %}

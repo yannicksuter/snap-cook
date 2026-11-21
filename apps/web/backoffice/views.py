@@ -131,7 +131,6 @@ class Listed:
     title: str
     slug: str
     owner: str
-    public: bool
     original: str | None
     updated: datetime | str
 
@@ -145,7 +144,6 @@ def recipes(request: HttpRequest) -> HttpResponse:
             title=row.title,
             slug=row.slug,
             owner=getattr(getattr(row.owner, "profile", None), "initials", ""),
-            public=row.visibility == "public",
             original=_original(row.recipe_id, row.source_url),
             updated=row.updated_at,
         )

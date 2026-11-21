@@ -76,6 +76,15 @@ def pending_pieces(
     localized("title", recipe.title, "the recipe's name")
     localized("description", recipe.description, "one sentence saying what the dish is")
     for action in recipe.actions:
+        if action.section is not None and f"section:{_text(action.section)}" not in {
+            piece.key for piece in pieces
+        }:
+            localized(
+                f"section:{_text(action.section)}",
+                action.section,
+                "the name of a part of the recipe, such as the dough or the glaze, "
+                "a heading over its ingredients and steps",
+            )
         step = _step_piece(action, recipe, lang)
         if step is not None:
             pieces.append(step)
@@ -133,6 +142,9 @@ def apply_translation(
 
     def action(item: Action) -> Action:
         update: dict[str, object] = {
+            "section": (
+                localized(f"section:{_text(item.section)}", item.section) if item.section else None
+            ),
             "verb": localized(f"verb:{item.id}", item.verb),
             "notes": localized(f"notes:{item.id}", item.notes),
             "produces": item.produces.model_copy(
@@ -303,6 +315,10 @@ def _new_literal(source_lang: str, lang: str, text: str) -> LocalizedText:
 
 def _needs(value: LocalizedText, lang: str) -> bool:
     return lang not in value.values or value.is_stale(lang)
+
+
+def _text(value: LocalizedText) -> str:
+    return value.values[value.source]
 
 
 def _base(lang: str) -> str:

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: snap-cook\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-21 09:14+0000\n"
+"POT-Creation-Date: 2026-11-21 19:34+0000\n"
 "PO-Revision-Date: 2026-11-16 21:30+0100\n"
 "Last-Translator: snap-cook\n"
 "Language-Team: German\n"
@@ -15,34 +15,38 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: accounts/forms.py
+#: accounts/forms.py:24
 msgid "Language"
 msgstr "Sprache"
 
-#: accounts/forms.py
+#: accounts/forms.py:27
 msgid "Metric: grams and millilitres"
 msgstr "Metrisch: Gramm und Milliliter"
 
-#: accounts/forms.py
+#: accounts/forms.py:28
 msgid "US: cups and ounces"
 msgstr "US: Cups und Unzen"
 
-#: accounts/forms.py
+#: accounts/forms.py:31
 msgid "Units"
 msgstr "Einheiten"
 
-#: accounts/templates/accounts/not_yet.html
+#: accounts/templates/accounts/not_yet.html:10
+#: accounts/templates/accounts/not_yet.html:20
 msgid "Not yet"
 msgstr "Noch nicht"
 
-#: accounts/templates/accounts/not_yet.html
-#: backoffice/templates/backoffice/base.html imports/templates/imports/add.html
-#: imports/templates/imports/status.html recipes/templates/recipes/detail.html
-#: recipes/templates/recipes/index.html
+#: accounts/templates/accounts/not_yet.html:16
+#: backoffice/templates/backoffice/base.html:18
+#: imports/templates/imports/add.html:23
+#: imports/templates/imports/status.html:12
+#: recipes/templates/recipes/detail.html:20
+#: recipes/templates/recipes/index.html:6
+#: recipes/templates/recipes/index.html:42
 msgid "Recipes"
 msgstr "Rezepte"
 
-#: accounts/templates/accounts/not_yet.html
+#: accounts/templates/accounts/not_yet.html:21
 msgid ""
 "Adding and changing recipes is switched on by an admin, one person at a "
 "time. Until then you can read every shared recipe."
@@ -50,141 +54,146 @@ msgstr ""
 "Rezepte hinzufügen und ändern schaltet ein Admin frei, für jede Person "
 "einzeln. Bis dahin kannst du alle geteilten Rezepte lesen."
 
-#: accounts/templates/accounts/settings.html
+#: accounts/templates/accounts/settings.html:11
+#: accounts/templates/accounts/settings.html:15
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: accounts/templates/accounts/settings.html
+#: accounts/templates/accounts/settings.html:22
 msgid "For menus and buttons, and the language recipes open in."
 msgstr ""
-"Für Menüs und Schaltflächen. Rezepte öffnen sich ebenfalls in dieser Sprache."
+"Für Menüs und Schaltflächen. Rezepte öffnen sich ebenfalls in dieser "
+"Sprache."
 
-#: accounts/templates/accounts/settings.html
-#: recipes/templates/recipes/edit.html
+#: accounts/templates/accounts/settings.html:45
+#: recipes/templates/recipes/edit.html:35
 msgid "Save"
 msgstr "Speichern"
 
-#: accounts/templates/accounts/settings.html
+#: accounts/templates/accounts/settings.html:49
 msgid "Your account"
 msgstr "Dein Konto"
 
-#: accounts/templates/accounts/settings.html
+#: accounts/templates/accounts/settings.html:54
 msgid "You can add and change recipes."
 msgstr "Du kannst Rezepte hinzufügen und ändern."
 
-#: accounts/templates/accounts/settings.html
+#: accounts/templates/accounts/settings.html:54
 msgid "You can read every shared recipe. An admin can let you add your own."
 msgstr ""
 "Du kannst alle geteilten Rezepte lesen. Eigene hinzufügen kannst du, sobald "
 "ein Admin dich freischaltet."
 
-#: accounts/templates/accounts/settings.html
+#: accounts/templates/accounts/settings.html:59
 msgid "Change password"
 msgstr "Passwort ändern"
 
-#: accounts/templates/accounts/settings.html
-#: backoffice/templates/backoffice/base.html
+#: accounts/templates/accounts/settings.html:62
+#: backoffice/templates/backoffice/base.html:10
+#: backoffice/templates/backoffice/base.html:14
+#: backoffice/templates/backoffice/base.html:15
 msgid "Admin"
 msgstr "Verwaltung"
 
-#: accounts/templates/accounts/settings.html
+#: accounts/templates/accounts/settings.html:66
 msgid "Sign out"
 msgstr "Abmelden"
 
-#: accounts/views.py recipes/views.py
+#: accounts/views.py:28 recipes/views.py:213
 msgid "Saved."
 msgstr "Gespeichert."
 
-#: backoffice/templates/backoffice/_original.html
+#: backoffice/templates/backoffice/_original.html:1
 msgid "Photos or PDF"
 msgstr "Fotos oder PDF"
 
-#: backoffice/templates/backoffice/_original.html
+#: backoffice/templates/backoffice/_original.html:1
 msgid "Web page"
 msgstr "Webseite"
 
-#: backoffice/templates/backoffice/_original.html
+#: backoffice/templates/backoffice/_original.html:1
 msgid "Text"
 msgstr "Text"
 
-#: backoffice/templates/backoffice/_original.html
+#: backoffice/templates/backoffice/_original.html:1
 msgid "Link only"
 msgstr "Nur Link"
 
-#: backoffice/templates/backoffice/_original.html
+#: backoffice/templates/backoffice/_original.html:1
 msgid "No original kept"
 msgstr "Kein Original gespeichert"
 
-#: backoffice/templates/backoffice/archive.html
+#: backoffice/templates/backoffice/archive.html:11
 msgid ""
-"Recipes of deleted accounts. No one sees them until you give them to someone."
+"Recipes of deleted accounts. No one sees them until you give them to "
+"someone."
 msgstr ""
 "Rezepte gelöschter Konten. Niemand sieht sie, bis du sie jemandem gibst."
 
-#: backoffice/templates/backoffice/archive.html
+#: backoffice/templates/backoffice/archive.html:19
 msgid "Give to"
 msgstr "Geben an"
 
-#: backoffice/templates/backoffice/archive.html
+#: backoffice/templates/backoffice/archive.html:21
 msgid "Give to…"
 msgstr "Geben an …"
 
-#: backoffice/templates/backoffice/archive.html
+#: backoffice/templates/backoffice/archive.html:24
 msgid "Give"
 msgstr "Geben"
 
-#: backoffice/templates/backoffice/archive.html
+#: backoffice/templates/backoffice/archive.html:28
 msgid "Nothing in the archive."
 msgstr "Das Archiv ist leer."
 
-#: backoffice/templates/backoffice/base.html
+#: backoffice/templates/backoffice/base.html:17
 msgid "People"
 msgstr "Personen"
 
-#: backoffice/templates/backoffice/base.html
+#: backoffice/templates/backoffice/base.html:19
 msgid "Archive"
 msgstr "Archiv"
 
-#: backoffice/templates/backoffice/people.html
+#: backoffice/templates/backoffice/people.html:23
 msgctxt "role"
 msgid "Admin"
 msgstr "Admin"
 
-#: backoffice/templates/backoffice/people.html
+#: backoffice/templates/backoffice/people.html:24
 msgid "Not confirmed yet"
 msgstr "Noch nicht bestätigt"
 
-#: backoffice/templates/backoffice/people.html
+#: backoffice/templates/backoffice/people.html:24
 msgid "Email and password"
 msgstr "E-Mail und Passwort"
 
-#: backoffice/templates/backoffice/people.html
-#: recipes/templates/recipes/index.html
+#: backoffice/templates/backoffice/people.html:25
+#: recipes/templates/recipes/index.html:43
 #, python-format
 msgid "%(counter)s recipe"
 msgid_plural "%(counter)s recipes"
 msgstr[0] "%(counter)s Rezept"
 msgstr[1] "%(counter)s Rezepte"
 
-#: backoffice/templates/backoffice/people.html
+#: backoffice/templates/backoffice/people.html:27
 #, python-format
 msgid "Last signed in %(when)s"
 msgstr "Zuletzt angemeldet %(when)s"
 
-#: backoffice/templates/backoffice/people.html
+#: backoffice/templates/backoffice/people.html:27
 msgid "Never signed in"
 msgstr "Nie angemeldet"
 
-#: backoffice/templates/backoffice/people.html
+#: backoffice/templates/backoffice/people.html:39
 msgid "May cook"
 msgstr "Darf kochen"
 
-#: backoffice/templates/backoffice/people.html
-#: imports/templates/imports/_progress.html
+#: backoffice/templates/backoffice/people.html:45
+#: imports/templates/imports/_progress.html:45
 msgid "Delete"
 msgstr "Löschen"
 
-#: backoffice/templates/backoffice/people.html
+#: backoffice/templates/backoffice/people.html:48
 #, python-format
 msgid ""
 "%(initials)s can no longer sign in. Their recipes go to the archive, where "
@@ -193,206 +202,200 @@ msgstr ""
 "%(initials)s kann sich nicht mehr anmelden. Die Rezepte kommen ins Archiv, "
 "wo du sie jemand anderem geben kannst."
 
-#: backoffice/templates/backoffice/people.html
+#: backoffice/templates/backoffice/people.html:51
 #, python-format
 msgid "Yes, delete %(initials)s"
 msgstr "Ja, %(initials)s löschen"
 
-#: backoffice/templates/backoffice/people.html
+#: backoffice/templates/backoffice/people.html:60
 msgid "No one has an account yet."
 msgstr "Noch niemand hat ein Konto."
 
-#: backoffice/templates/backoffice/recipes.html
-msgid "Shared"
-msgstr "Geteilt"
-
-#: backoffice/templates/backoffice/recipes.html
-msgid "Private"
-msgstr "Privat"
-
-#: backoffice/templates/backoffice/recipes.html
+#: backoffice/templates/backoffice/recipes.html:27
 msgid "Read again"
 msgstr "Neu einlesen"
 
-#: backoffice/templates/backoffice/recipes.html
-#: recipes/templates/recipes/index.html
+#: backoffice/templates/backoffice/recipes.html:33
+#: recipes/templates/recipes/index.html:73
 msgid "No recipes yet."
 msgstr "Noch keine Rezepte."
 
-#: backoffice/views.py
+#: backoffice/views.py:111
 msgid "You cannot delete yourself."
 msgstr "Dich selbst kannst du nicht löschen."
 
-#: backoffice/views.py
+#: backoffice/views.py:124
 #, python-format
 msgid "%(initials)s was deleted."
 msgstr "%(initials)s wurde gelöscht."
 
-#: backoffice/views.py
+#: backoffice/views.py:170
 msgid "Nothing of this recipe’s original was kept."
 msgstr "Vom Original dieses Rezepts ist nichts gespeichert."
 
-#: backoffice/views.py
+#: backoffice/views.py:241
 #, python-format
 msgid "“%(title)s” belongs to %(initials)s now."
 msgstr "„%(title)s“ gehört jetzt %(initials)s."
 
-#: imports/forms.py
+#: imports/forms.py:50
 msgid "Link to a recipe"
 msgstr "Link zu einem Rezept"
 
-#: imports/forms.py imports/templates/imports/add.html
+#: imports/forms.py:68 imports/forms.py:144
+#: imports/templates/imports/add.html:121
 msgid "Recipe text"
 msgstr "Rezepttext"
 
-#: imports/forms.py
+#: imports/forms.py:72
 msgid ""
 "That is more text than one recipe needs. Copy only the part with the recipe."
 msgstr ""
 "Das ist mehr Text, als ein Rezept braucht. Kopiere nur den Teil mit dem "
 "Rezept."
 
-#: imports/forms.py
+#: imports/forms.py:95
 msgid "Photos"
 msgstr "Fotos"
 
-#: imports/forms.py
+#: imports/forms.py:101
 msgid "Choose at least one photo."
 msgstr "Wähle mindestens ein Foto."
 
-#: imports/forms.py
+#: imports/forms.py:103
 #, python-format
 msgid "At most %(count)s photos at once."
 msgstr "Höchstens %(count)s Fotos auf einmal."
 
-#: imports/forms.py
+#: imports/forms.py:112
 msgid ""
-"This is an iPhone HEIC photo. Choose it from the photo picker, which sends a "
-"JPEG, or set the camera to “Most Compatible”."
+"This is an iPhone HEIC photo. Choose it from the photo picker, which sends a"
+" JPEG, or set the camera to “Most Compatible”."
 msgstr ""
 "Das ist ein HEIC-Foto vom iPhone. Wähle es über die Fotoauswahl, die ein "
 "JPEG sendet, oder stelle die Kamera auf „Maximale Kompatibilität“."
 
-#: imports/forms.py
+#: imports/forms.py:115
 msgid "Use a photo (JPEG, PNG, WebP, GIF) or a PDF."
 msgstr "Verwende ein Foto (JPEG, PNG, WebP, GIF) oder ein PDF."
 
-#: imports/forms.py
+#: imports/forms.py:119
 #, python-format
 msgid "A PDF can be at most %(size)s MB."
 msgstr "Ein PDF darf höchstens %(size)s MB haben."
 
-#: imports/forms.py
+#: imports/forms.py:123
 #, python-format
 msgid "Each photo can be at most %(size)s MB."
 msgstr "Jedes Foto darf höchstens %(size)s MB haben."
 
-#: imports/forms.py
+#: imports/forms.py:128
 #, python-format
 msgid "Together the files can be at most %(size)s MB."
 msgstr "Zusammen dürfen die Dateien höchstens %(size)s MB haben."
 
-#: imports/forms.py
+#: imports/forms.py:137
 msgid "Name"
 msgstr "Name"
 
-#: imports/forms.py
+#: imports/forms.py:140
 msgid "Short description"
 msgstr "Kurze Beschreibung"
 
-#: imports/forms.py
+#: imports/forms.py:142
 msgid "Serves"
 msgstr "Portionen"
 
-#: imports/templates/imports/_progress.html
-#: imports/templates/imports/status.html
+#: imports/templates/imports/_progress.html:10
+#: imports/templates/imports/status.html:6
 msgid "Reading your recipe…"
 msgstr "Dein Rezept wird gelesen…"
 
-#: imports/templates/imports/_progress.html
+#: imports/templates/imports/_progress.html:16
 msgid "Photos received"
 msgstr "Fotos erhalten"
 
-#: imports/templates/imports/_progress.html
+#: imports/templates/imports/_progress.html:16
 msgid "Link received"
 msgstr "Link erhalten"
 
-#: imports/templates/imports/_progress.html
+#: imports/templates/imports/_progress.html:16
 msgid "Text received"
 msgstr "Text erhalten"
 
-#: imports/templates/imports/_progress.html
+#: imports/templates/imports/_progress.html:22
 msgid "Finding the ingredients and steps"
 msgstr "Zutaten und Schritte werden gesucht"
 
-#: imports/templates/imports/_progress.html
+#: imports/templates/imports/_progress.html:26
 msgid "Ready for you to check"
 msgstr "Bereit zum Prüfen"
 
-#: imports/templates/imports/_progress.html
+#: imports/templates/imports/_progress.html:29
 msgid ""
 "This usually takes under a minute. You can leave this page: the draft waits "
 "for you on Home."
 msgstr ""
-"Das dauert meist weniger als eine Minute. Du kannst die Seite verlassen: Der "
-"Entwurf wartet auf der Startseite auf dich."
+"Das dauert meist weniger als eine Minute. Du kannst die Seite verlassen: Der"
+" Entwurf wartet auf der Startseite auf dich."
 
-#: imports/templates/imports/_progress.html
+#: imports/templates/imports/_progress.html:31
 msgid "That did not work"
 msgstr "Das hat nicht geklappt"
 
-#: imports/templates/imports/_progress.html
+#: imports/templates/imports/_progress.html:35
 msgid "Look at what was read"
 msgstr "Ansehen, was gelesen wurde"
 
-#: imports/templates/imports/_progress.html
-#: translations/templates/translations/_progress.html
+#: imports/templates/imports/_progress.html:40
+#: translations/templates/translations/_progress.html:19
 msgid "Try again"
 msgstr "Nochmals versuchen"
 
-#: imports/templates/imports/_recipe_form.html
-#: recipes/templates/recipes/_render.html
+#: imports/templates/imports/_recipe_form.html:29
+#: recipes/templates/recipes/_render.html:34
 msgid "Ingredients"
 msgstr "Zutaten"
 
-#: imports/templates/imports/_recipe_form.html
-#: recipes/templates/recipes/_render.html
+#: imports/templates/imports/_recipe_form.html:40
+#: recipes/templates/recipes/_ingredient.html:19
 msgid "optional"
 msgstr "optional"
 
-#: imports/templates/imports/_recipe_form.html
-#: recipes/templates/recipes/_render.html
+#: imports/templates/imports/_recipe_form.html:47
+#: recipes/templates/recipes/_render.html:95
 msgid "Steps"
 msgstr "Schritte"
 
-#: imports/templates/imports/_recipe_form.html
+#: imports/templates/imports/_recipe_form.html:64
 msgid "Edit the recipe text"
 msgstr "Rezepttext bearbeiten"
 
-#: imports/templates/imports/_recipe_form.html
+#: imports/templates/imports/_recipe_form.html:69
 msgid ""
 "One step per paragraph. Ingredients, times and temperatures are marked like "
 "this:"
 msgstr ""
 "Ein Schritt pro Absatz. Zutaten, Zeiten und Temperaturen werden so markiert:"
 
-#: imports/templates/imports/add.html recipes/templates/recipes/index.html
+#: imports/templates/imports/add.html:17 imports/templates/imports/add.html:28
+#: recipes/templates/recipes/index.html:82
 msgid "Add a recipe"
 msgstr "Rezept hinzufügen"
 
-#: imports/templates/imports/add.html imports/views.py
+#: imports/templates/imports/add.html:31 imports/views.py:44
 msgid "Reading recipes is not set up on this server yet."
 msgstr ""
 "Das Einlesen von Rezepten ist auf diesem Server noch nicht eingerichtet."
 
-#: imports/templates/imports/add.html
+#: imports/templates/imports/add.html:33
 msgid ""
 "Set SNAPCOOK_LLM_API_KEY on the worker container; docs/install.md says how."
 msgstr ""
-"Setze SNAPCOOK_LLM_API_KEY im Worker-Container; wie das geht, steht in docs/"
-"install.md."
+"Setze SNAPCOOK_LLM_API_KEY im Worker-Container; wie das geht, steht in "
+"docs/install.md."
 
-#: imports/templates/imports/add.html
+#: imports/templates/imports/add.html:38
 msgid ""
 "snap-cook picks out the ingredients and the steps, and leaves everything "
 "else out."
@@ -400,91 +403,94 @@ msgstr ""
 "snap-cook sucht die Zutaten und die Schritte heraus und lässt alles andere "
 "weg."
 
-#. Translators: the Ctrl key as keyboards print it. German keyboards say “Strg”, Swiss ones “Ctrl”.
-#: imports/templates/imports/add.html
+#. Translators: the Ctrl key as keyboards print it. German keyboards say
+#. “Strg”, Swiss ones “Ctrl”.
+#: imports/templates/imports/add.html:46
 msgctxt "keyboard key"
 msgid "Ctrl"
 msgstr "Ctrl"
 
-#: imports/templates/imports/add.html
+#: imports/templates/imports/add.html:50
 msgid "Paste a page copied from a website or a PDF"
 msgstr "Eine kopierte Webseite oder PDF-Seite einfügen"
 
-#: imports/templates/imports/add.html
+#: imports/templates/imports/add.html:56
 msgid "Or drop a PDF or a photo onto this page"
 msgstr "Oder ein PDF oder Foto auf diese Seite ziehen"
 
-#: imports/templates/imports/add.html
+#: imports/templates/imports/add.html:73
 msgid "Take a photo"
 msgstr "Foto aufnehmen"
 
-#: imports/templates/imports/add.html
+#: imports/templates/imports/add.html:74
 msgid "Of a cookbook page or a handwritten card"
 msgstr "Von einer Kochbuchseite oder einer handgeschriebenen Karte"
 
-#: imports/templates/imports/add.html
+#: imports/templates/imports/add.html:78
 msgid "Read the photo"
 msgstr "Foto einlesen"
 
-#: imports/templates/imports/add.html
+#: imports/templates/imports/add.html:84
 msgid "Or paste a link"
 msgstr "Oder einen Link einfügen"
 
-#: imports/templates/imports/add.html
+#: imports/templates/imports/add.html:88
 msgid "Get the recipe"
 msgstr "Rezept holen"
 
-#: imports/templates/imports/add.html
+#: imports/templates/imports/add.html:100
 msgid "Choose photos or a PDF"
 msgstr "Fotos oder ein PDF wählen"
 
-#: imports/templates/imports/add.html
+#: imports/templates/imports/add.html:101
 msgid "Screenshots and web pages saved as PDF too, several at once"
 msgstr ""
 "Auch Screenshots und als PDF gespeicherte Webseiten, mehrere auf einmal"
 
-#: imports/templates/imports/add.html
+#: imports/templates/imports/add.html:106
 msgid "Read the photos"
 msgstr "Fotos einlesen"
 
-#: imports/templates/imports/add.html
+#: imports/templates/imports/add.html:113
 msgid "Paste text"
 msgstr "Text einfügen"
 
-#: imports/templates/imports/add.html
+#: imports/templates/imports/add.html:114
 msgid "A whole web page or PDF you copied, an email or a message"
 msgstr ""
 "Eine ganze kopierte Webseite oder ein PDF, eine E-Mail oder eine Nachricht"
 
-#: imports/templates/imports/add.html
+#: imports/templates/imports/add.html:126
 msgid "Read the text"
 msgstr "Text einlesen"
 
-#: imports/templates/imports/add.html
+#: imports/templates/imports/add.html:133
 msgid "New recipes stay private until you share them."
 msgstr "Neue Rezepte bleiben privat, bis du sie teilst."
 
-#: imports/templates/imports/add.html
+#: imports/templates/imports/add.html:139
 msgid "Drop it here to read it"
 msgstr "Hier loslassen zum Einlesen"
 
-#: imports/templates/imports/add.html
+#: imports/templates/imports/add.html:140
 msgid "Sending…"
 msgstr "Wird gesendet…"
 
-#: imports/templates/imports/review.html
+#: imports/templates/imports/review.html:12
+#: imports/templates/imports/review.html:24
 msgid "Check the recipe"
 msgstr "Rezept prüfen"
 
-#: imports/templates/imports/review.html recipes/templates/recipes/_chart.html
+#: imports/templates/imports/review.html:16
+#: recipes/templates/recipes/_chart.html:19
 msgid "Close"
 msgstr "Schliessen"
 
-#: imports/templates/imports/review.html
+#: imports/templates/imports/review.html:19
 msgid "Draft, only you"
 msgstr "Entwurf, nur für dich"
 
-#: imports/templates/imports/review.html
+#: imports/templates/imports/review.html:26
 msgid ""
 "Read again from its original. Saving makes this the recipe’s new version; "
 "the one before is kept."
@@ -492,53 +498,54 @@ msgstr ""
 "Neu eingelesen aus dem Original. Speichern macht dies zur neuen Fassung des "
 "Rezepts; die bisherige bleibt erhalten."
 
-#: imports/templates/imports/review.html
+#: imports/templates/imports/review.html:28
 msgid "Change anything that looks wrong, then save."
 msgstr "Ändere, was nicht stimmt, und speichere dann."
 
-#: imports/templates/imports/review.html
+#: imports/templates/imports/review.html:31
 msgid "Left out:"
 msgstr "Weggelassen:"
 
-#: imports/templates/imports/review.html
+#: imports/templates/imports/review.html:35
 msgid "From:"
 msgstr "Quelle:"
 
-#: imports/templates/imports/review.html
+#: imports/templates/imports/review.html:50
 #, python-format
 msgid ""
 "A step uses “%(name)s”, but no step makes it. Check the recipe text below."
 msgstr ""
-"Ein Schritt verwendet „%(name)s“, aber kein Schritt stellt es her. Prüfe den "
-"Rezepttext unten."
+"Ein Schritt verwendet „%(name)s“, aber kein Schritt stellt es her. Prüfe den"
+" Rezepttext unten."
 
-#: imports/templates/imports/review.html
+#: imports/templates/imports/review.html:72
 msgid "Keep it as it is"
 msgstr "So lassen"
 
-#: imports/templates/imports/review.html
+#: imports/templates/imports/review.html:83
 msgid "Save as new version"
 msgstr "Als neue Fassung speichern"
 
-#: imports/templates/imports/review.html
+#: imports/templates/imports/review.html:83
 msgid "Save recipe"
 msgstr "Rezept speichern"
 
-#: imports/templates/imports/review.html recipes/templates/recipes/edit.html
+#: imports/templates/imports/review.html:84
+#: recipes/templates/recipes/edit.html:36
 msgid "Update the preview"
 msgstr "Vorschau aktualisieren"
 
-#: imports/templates/imports/review.html
+#: imports/templates/imports/review.html:89
 msgid "Delete this draft"
 msgstr "Diesen Entwurf löschen"
 
-#: imports/views.py
+#: imports/views.py:45
 msgid "That link leads into a private network, so it cannot be read."
 msgstr ""
 "Dieser Link führt in ein privates Netzwerk und kann deshalb nicht gelesen "
 "werden."
 
-#: imports/views.py
+#: imports/views.py:47
 msgid ""
 "The page could not be loaded. Check the link, or paste the recipe’s text "
 "instead."
@@ -546,161 +553,171 @@ msgstr ""
 "Die Seite konnte nicht geladen werden. Prüfe den Link oder füge stattdessen "
 "den Text des Rezepts ein."
 
-#: imports/views.py
+#: imports/views.py:49
 msgid "The page is too large to read."
 msgstr "Die Seite ist zu umfangreich zum Lesen."
 
-#: imports/views.py
+#: imports/views.py:50
 msgid "No recipe was found in it."
 msgstr "Darin wurde kein Rezept gefunden."
 
-#: imports/views.py
+#: imports/views.py:51
 msgid "The recipe came back in a form that could not be read."
 msgstr "Das Rezept kam in einer Form zurück, die nicht gelesen werden konnte."
 
-#: imports/views.py
+#: imports/views.py:52
 msgid "The reader declined this one."
 msgstr "Das Einlesen wurde für diese Quelle abgelehnt."
 
-#: imports/views.py
+#: imports/views.py:53
 msgid "The reading service is busy. Try again in a minute."
 msgstr "Der Lesedienst ist ausgelastet. Versuche es in einer Minute nochmals."
 
-#: imports/views.py
+#: imports/views.py:54
 msgid "Reading failed. Try again in a moment."
 msgstr "Das Einlesen ist fehlgeschlagen. Versuche es gleich nochmals."
 
-#: imports/views.py
+#: imports/views.py:55
 msgid "Reading took too long and was stopped."
 msgstr "Das Einlesen hat zu lange gedauert und wurde abgebrochen."
 
-#: imports/views.py
+#: imports/views.py:57
 msgid ""
-"Nothing of the original was kept, and its link no longer loads, so it cannot "
-"be read again."
+"Nothing of the original was kept, and its link no longer loads, so it cannot"
+" be read again."
 msgstr ""
 "Vom Original ist nichts gespeichert, und der Link lädt nicht mehr. Darum "
 "lässt es sich nicht neu einlesen."
 
-#: imports/views.py
+#: imports/views.py:185
 msgid "The draft was deleted."
 msgstr "Der Entwurf wurde gelöscht."
 
-#: imports/views.py
+#: imports/views.py:234
 msgid "That answer no longer fits the text. Edit the text instead."
 msgstr ""
 "Diese Antwort passt nicht mehr zum Text. Bearbeite stattdessen den Text."
 
-#: imports/views.py
-msgid "Saved. Only you can see this recipe."
-msgstr "Gespeichert. Nur du siehst dieses Rezept."
+#: imports/views.py:271
+msgid "Saved. Everyone can read it now."
+msgstr "Gespeichert. Alle können es jetzt lesen."
 
-#: imports/views.py
+#: imports/views.py:287
 msgid "That recipe was deleted meanwhile, so nothing was saved."
 msgstr "Das Rezept wurde inzwischen gelöscht, darum wurde nichts gespeichert."
 
-#: imports/views.py
+#: imports/views.py:304
 #, python-format
 msgid "Saved as a new version of “%(title)s”."
 msgstr "Als neue Fassung von „%(title)s“ gespeichert."
 
-#: recipes/templates/recipes/_chart.html
+#: recipes/templates/recipes/_chart.html:10
 msgid "Zoom out"
 msgstr "Verkleinern"
 
-#: recipes/templates/recipes/_chart.html
+#: recipes/templates/recipes/_chart.html:13
 msgid "Zoom in"
 msgstr "Vergrössern"
 
-#: recipes/templates/recipes/_chart.html
+#: recipes/templates/recipes/_chart.html:16
 msgid "Fit"
 msgstr "Einpassen"
 
-#: recipes/templates/recipes/_facts.html
+#: recipes/templates/recipes/_facts.html:15
 msgid "Takes at least"
 msgstr "Dauert mindestens"
 
-#: recipes/templates/recipes/_facts.html
+#: recipes/templates/recipes/_facts.html:15
 msgid "Ready in"
 msgstr "Fertig in"
 
-#: recipes/templates/recipes/_facts.html
+#: recipes/templates/recipes/_facts.html:24
 msgid "Hands-on"
 msgstr "Arbeitszeit"
 
-#: recipes/templates/recipes/_facts.html
+#: recipes/templates/recipes/_facts.html:30
 msgid "Cooking"
 msgstr "Back-/Kochzeit"
 
-#: recipes/templates/recipes/_facts.html
+#: recipes/templates/recipes/_facts.html:36
 msgid "Resting"
 msgstr "Ruhezeit"
 
-#: recipes/templates/recipes/_render.html
+#: recipes/templates/recipes/_ingredient.html:21
+msgid "Not recognised: please check this ingredient"
+msgstr "Nicht erkannt: Bitte diese Zutat prüfen"
+
+#: recipes/templates/recipes/_render.html:32
 msgid "What you need"
 msgstr "Was du brauchst"
 
-#: recipes/templates/recipes/_render.html
+#: recipes/templates/recipes/_render.html:38
 msgid "Fewer servings"
 msgstr "Weniger Portionen"
 
-#: recipes/templates/recipes/_render.html
+#: recipes/templates/recipes/_render.html:38
 msgid "Less"
 msgstr "Weniger"
 
-#: recipes/templates/recipes/_render.html
+#: recipes/templates/recipes/_render.html:48
 #, python-format
 msgid "%(counter)s serving"
 msgid_plural "%(counter)s servings"
 msgstr[0] "%(counter)s Portion"
 msgstr[1] "%(counter)s Portionen"
 
-#: recipes/templates/recipes/_render.html
+#: recipes/templates/recipes/_render.html:56
 msgid "More servings"
 msgstr "Mehr Portionen"
 
-#: recipes/templates/recipes/_render.html
+#: recipes/templates/recipes/_render.html:56
 msgid "More"
 msgstr "Mehr"
 
-#: recipes/templates/recipes/_render.html
-msgid "Not recognised: please check this ingredient"
-msgstr "Nicht erkannt: Bitte diese Zutat prüfen"
-
-#: recipes/templates/recipes/_render.html
+#: recipes/templates/recipes/_render.html:90
 msgid "Tip: tick off what you have ready."
 msgstr "Tipp: Hake ab, was du schon bereit hast."
 
-#: recipes/templates/recipes/_render.html
+#: recipes/templates/recipes/_render.html:94
 msgid "Let’s cook"
 msgstr "Los geht’s"
 
-#: recipes/templates/recipes/_render.html
+#: recipes/templates/recipes/_render.html:99
 msgid "Save time:"
 msgstr "Zeit sparen:"
 
-#: recipes/templates/recipes/_render.html
+#: recipes/templates/recipes/_render.html:109
 #, python-format
 msgid "Step %(number)s:"
 msgstr "Schritt %(number)s:"
 
-#: recipes/templates/recipes/_render.html
+#: recipes/templates/recipes/_render.html:124
+#, python-format
+msgid "Start a timer for %(time)s"
+msgstr "Timer für %(time)s starten"
+
+#: recipes/templates/recipes/_render.html:131
+msgid "Stop the timer"
+msgstr "Timer beenden"
+
+#: recipes/templates/recipes/_render.html:168
 msgid "The whole recipe"
 msgstr "Das ganze Rezept"
 
-#: recipes/templates/recipes/_render.html
+#: recipes/templates/recipes/_render.html:169
 msgid "At a glance"
 msgstr "Auf einen Blick"
 
-#: recipes/templates/recipes/_render.html
+#: recipes/templates/recipes/_render.html:174
 msgid "Full screen"
 msgstr "Vollbild"
 
-#: recipes/templates/recipes/_render.html recipes/templates/recipes/chart.html
+#: recipes/templates/recipes/_render.html:178
+#: recipes/templates/recipes/chart.html:22
 msgid "Print"
 msgstr "Drucken"
 
-#: recipes/templates/recipes/_render.html
+#: recipes/templates/recipes/_render.html:183
 msgid ""
 "The recipe as a chart: the ingredients in green go into the numbered steps, "
 "and the dark green shape at the end is the finished dish."
@@ -708,46 +725,65 @@ msgstr ""
 "Das Rezept als Diagramm: Die Zutaten in Grün gehen in die nummerierten "
 "Schritte, und die dunkelgrüne Form am Ende ist das fertige Gericht."
 
-#: recipes/templates/recipes/base.html
+#: recipes/templates/recipes/base.html:55
 msgid "Your settings: language and units"
 msgstr "Deine Einstellungen: Sprache und Einheiten"
 
-#: recipes/templates/recipes/base.html templates/account/login.html
+#: recipes/templates/recipes/base.html:59 templates/account/login.html:11
+#: templates/account/login.html:15 templates/account/login.html:36
 msgid "Sign in"
 msgstr "Anmelden"
 
-#: recipes/templates/recipes/chart.html recipes/templates/recipes/edit.html
+#: recipes/templates/recipes/chart.html:18
+#: recipes/templates/recipes/edit.html:21
 msgid "Back to the recipe"
 msgstr "Zurück zum Rezept"
 
-#: recipes/templates/recipes/chart.html
+#: recipes/templates/recipes/chart.html:32
 #, python-format
 msgid "for %(counter)s serving"
 msgid_plural "for %(counter)s servings"
 msgstr[0] "für %(counter)s Portion"
 msgstr[1] "für %(counter)s Portionen"
 
-#: recipes/templates/recipes/detail.html
+#: recipes/templates/recipes/detail.html:25
 msgid "Edit"
 msgstr "Bearbeiten"
 
-#: recipes/templates/recipes/edit.html
+#: recipes/templates/recipes/detail.html:56
+msgid "Time’s up"
+msgstr "Zeit ist um"
+
+#: recipes/templates/recipes/detail.html:56
+msgid "Pause the timer"
+msgstr "Timer anhalten"
+
+#: recipes/templates/recipes/detail.html:57
+msgid "Continue the timer"
+msgstr "Timer fortsetzen"
+
+#: recipes/templates/recipes/detail.html:57
+msgid "Time’s up: tap to stop the alarm"
+msgstr "Zeit ist um: tippen, um den Alarm zu beenden"
+
+#: recipes/templates/recipes/edit.html:15
+#: recipes/templates/recipes/edit.html:25
 msgid "Edit recipe"
 msgstr "Rezept bearbeiten"
 
-#: recipes/templates/recipes/edit.html
+#: recipes/templates/recipes/edit.html:26
 msgid ""
 "Saving keeps the earlier version, and translations of what you did not "
 "change."
 msgstr ""
-"Beim Speichern bleibt die frühere Fassung erhalten, ebenso die Übersetzungen "
-"von allem, was du nicht änderst."
+"Beim Speichern bleibt die frühere Fassung erhalten, ebenso die Übersetzungen"
+" von allem, was du nicht änderst."
 
-#: recipes/templates/recipes/edit.html
+#: recipes/templates/recipes/edit.html:42
 msgid "Delete recipe"
 msgstr "Rezept löschen"
 
-#: recipes/templates/recipes/edit.html
+#: recipes/templates/recipes/edit.html:46
 #, python-format
 msgid ""
 "“%(title)s” disappears from your recipes, and for everyone you shared it "
@@ -756,64 +792,56 @@ msgstr ""
 "„%(title)s“ verschwindet aus deinen Rezepten und bei allen, mit denen du es "
 "geteilt hast."
 
-#: recipes/templates/recipes/edit.html
+#: recipes/templates/recipes/edit.html:49
 msgid "Yes, delete it"
 msgstr "Ja, löschen"
 
-#: recipes/templates/recipes/index.html
+#: recipes/templates/recipes/index.html:10
 msgid "Search recipes"
 msgstr "Rezepte suchen"
 
-#: recipes/templates/recipes/index.html
+#: recipes/templates/recipes/index.html:13
 msgid "Search by name or ingredient"
 msgstr "Nach Name oder Zutat suchen"
 
-#: recipes/templates/recipes/index.html
+#: recipes/templates/recipes/index.html:16
 msgid "Search"
 msgstr "Suchen"
 
-#: recipes/templates/recipes/index.html
+#: recipes/templates/recipes/index.html:21
 msgid "Waiting for you"
 msgstr "Wartet auf dich"
 
-#: recipes/templates/recipes/index.html
+#: recipes/templates/recipes/index.html:28
 msgid "New recipe"
 msgstr "Neues Rezept"
 
-#: recipes/templates/recipes/index.html
+#: recipes/templates/recipes/index.html:30
 msgid "Ready to check"
 msgstr "Bereit zum Prüfen"
 
-#: recipes/templates/recipes/index.html
+#: recipes/templates/recipes/index.html:30
 msgid "Could not be read"
 msgstr "Konnte nicht gelesen werden"
 
-#: recipes/templates/recipes/index.html
+#: recipes/templates/recipes/index.html:30
 msgid "Reading…"
 msgstr "Wird gelesen…"
 
-#: recipes/templates/recipes/index.html
-msgid "Only you can see this"
-msgstr "Nur du kannst das sehen"
-
-#: recipes/templates/recipes/index.html
-msgid "Anyone with the link can see this"
-msgstr "Alle mit dem Link können das sehen"
-
-#: recipes/templates/recipes/index.html
+#: recipes/templates/recipes/index.html:68
 #, python-format
 msgid "No recipe matches “%(query)s”."
 msgstr "Kein Rezept passt zu „%(query)s“."
 
-#: recipes/templates/recipes/index.html
+#: recipes/templates/recipes/index.html:69
 msgid "Show all recipes"
 msgstr "Alle Rezepte anzeigen"
 
-#: recipes/templates/recipes/index.html
+#: recipes/templates/recipes/index.html:74
 msgid "Recipes appear here as soon as they are added."
 msgstr "Rezepte erscheinen hier, sobald sie hinzugefügt sind."
 
-#: recipes/templatetags/recipe_extras.py
+#: recipes/templatetags/recipe_extras.py:27
 #, python-format
 msgid ""
 "Steps %(first)s and %(last)s don’t depend on each other, so you can do them "
@@ -822,7 +850,7 @@ msgstr ""
 "Die Schritte %(first)s und %(last)s hängen nicht voneinander ab, du kannst "
 "sie also gleichzeitig erledigen."
 
-#: recipes/templatetags/recipe_extras.py
+#: recipes/templatetags/recipe_extras.py:31
 #, python-format
 msgid ""
 "Steps %(first)s to %(last)s don’t depend on each other, so you can do them "
@@ -831,22 +859,22 @@ msgstr ""
 "Die Schritte %(first)s bis %(last)s hängen nicht voneinander ab, du kannst "
 "sie also gleichzeitig erledigen."
 
-#: recipes/templatetags/recipe_extras.py
+#: recipes/templatetags/recipe_extras.py:47
 #, python-format
 msgid "Uses what you made in step %(number)s."
 msgstr "Verwendet, was du in Schritt %(number)s zubereitet hast."
 
-#: recipes/templatetags/recipe_extras.py
+#: recipes/templatetags/recipe_extras.py:48
 #, python-format
 msgid "%(list)s and %(last)s"
 msgstr "%(list)s und %(last)s"
 
-#: recipes/templatetags/recipe_extras.py
+#: recipes/templatetags/recipe_extras.py:52
 #, python-format
 msgid "Uses what you made in steps %(numbers)s."
 msgstr "Verwendet, was du in den Schritten %(numbers)s zubereitet hast."
 
-#: recipes/views.py
+#: recipes/views.py:138
 msgid ""
 "Times and oven temperatures stay as in the recipe. Check them when you cook "
 "more or less."
@@ -854,7 +882,7 @@ msgstr ""
 "Zeiten und Ofentemperaturen bleiben wie im Rezept. Prüfe sie, wenn du mehr "
 "oder weniger kochst."
 
-#: recipes/views.py
+#: recipes/views.py:144
 msgid ""
 "Some amounts cannot be shown in cups and ounces, so they stay as in the "
 "recipe."
@@ -862,66 +890,69 @@ msgstr ""
 "Manche Mengen lassen sich nicht in Cups und Unzen zeigen und bleiben wie im "
 "Rezept."
 
-#: recipes/views.py
+#: recipes/views.py:225
 #, python-format
 msgid "This text cannot be read: %(detail)s"
 msgstr "Dieser Text lässt sich nicht lesen: %(detail)s"
 
-#: recipes/views.py
+#: recipes/views.py:251
 #, python-format
 msgid "“%(title)s” was deleted."
 msgstr "„%(title)s“ wurde gelöscht."
 
-#: recipes/views.py
+#: recipes/views.py:264
 #, python-format
 msgid "by %(initials)s"
 msgstr "von %(initials)s"
 
-#: templates/account/_google.html
+#: templates/account/_google.html:14
 msgid "Continue with Google"
 msgstr "Weiter mit Google"
 
-#: templates/account/login.html
+#: templates/account/login.html:16
 msgid ""
 "Anyone can read the recipes. Sign in to keep your settings, and to add "
 "recipes of your own."
 msgstr ""
-"Die Rezepte kann jede und jeder lesen. Melde dich an, um deine Einstellungen "
-"zu behalten und eigene Rezepte hinzuzufügen."
+"Die Rezepte kann jede und jeder lesen. Melde dich an, um deine Einstellungen"
+" zu behalten und eigene Rezepte hinzuzufügen."
 
-#: templates/account/login.html templates/account/signup.html
+#: templates/account/login.html:22 templates/account/signup.html:21
 msgid "or with your email"
 msgstr "oder mit deiner E-Mail"
 
-#: templates/account/login.html templates/account/signup.html
+#: templates/account/login.html:27 templates/account/login.html:28
+#: templates/account/signup.html:26
 msgid "Email"
 msgstr "E-Mail"
 
-#: templates/account/login.html templates/account/signup.html
+#: templates/account/login.html:31 templates/account/login.html:32
+#: templates/account/signup.html:30
 msgid "Password"
 msgstr "Passwort"
 
-#: templates/account/login.html
+#: templates/account/login.html:39
 msgid "Forgot your password?"
 msgstr "Passwort vergessen?"
 
-#: templates/account/login.html templates/account/signup.html
+#: templates/account/login.html:40 templates/account/signup.html:11
+#: templates/account/signup.html:15 templates/account/signup.html:40
 msgid "Create an account"
 msgstr "Konto erstellen"
 
-#: templates/account/messages/email_confirmation_failed.txt
+#: templates/account/messages/email_confirmation_failed.txt:1
 msgid "That address is already confirmed by another account."
 msgstr "Diese Adresse ist schon bei einem anderen Konto bestätigt."
 
-#: templates/account/messages/email_confirmation_sent.txt
+#: templates/account/messages/email_confirmation_sent.txt:1
 msgid "We sent you a link to confirm your email."
 msgstr "Wir haben dir einen Link geschickt, um deine E-Mail zu bestätigen."
 
-#: templates/account/messages/email_confirmed.txt
+#: templates/account/messages/email_confirmed.txt:1
 msgid "Your email is confirmed."
 msgstr "Deine E-Mail ist bestätigt."
 
-#: templates/account/signup.html
+#: templates/account/signup.html:16
 msgid ""
 "We send you a link to confirm your email. Your address is never shown to "
 "anyone; you appear by your initials."
@@ -929,19 +960,19 @@ msgstr ""
 "Wir schicken dir einen Link, um deine E-Mail zu bestätigen. Deine Adresse "
 "sieht niemand; du erscheinst mit deinen Initialen."
 
-#: templates/account/signup.html
+#: templates/account/signup.html:33
 msgid "At least 12 characters, and not a common one."
 msgstr "Mindestens 12 Zeichen, und kein gängiges."
 
-#: templates/account/signup.html
+#: templates/account/signup.html:35
 msgid "Password again"
 msgstr "Passwort nochmals"
 
-#: templates/account/signup.html
+#: templates/account/signup.html:43
 msgid "I already have an account"
 msgstr "Ich habe schon ein Konto"
 
-#: translations/templates/translations/_progress.html
+#: translations/templates/translations/_progress.html:12
 msgid ""
 "Translating this recipe. It changes by itself when it is done, usually "
 "within a minute."
@@ -949,16 +980,16 @@ msgstr ""
 "Das Rezept wird übersetzt. Es wechselt von selbst, sobald es fertig ist, "
 "meist innerhalb einer Minute."
 
-#: translations/templates/translations/_progress.html
+#: translations/templates/translations/_progress.html:16
 msgid "This recipe could not be translated, so it is shown as written."
 msgstr ""
-"Das Rezept konnte nicht übersetzt werden und wird deshalb so gezeigt, wie es "
-"geschrieben ist."
+"Das Rezept konnte nicht übersetzt werden und wird deshalb so gezeigt, wie es"
+" geschrieben ist."
 
-#: translations/templates/translations/_progress.html
+#: translations/templates/translations/_progress.html:24
 msgid ""
-"Translating is not set up on this server, so most of this recipe is shown as "
-"written."
+"Translating is not set up on this server, so most of this recipe is shown as"
+" written."
 msgstr ""
 "Übersetzen ist auf diesem Server nicht eingerichtet, deshalb steht das "
 "meiste so da, wie es geschrieben ist."

@@ -231,6 +231,18 @@ representation, not two.
 | `prep time: 25 min` | **snap-cook** frontmatter, with `cook time`, `rest time` and `total time`: the times the source states, in hours and minutes |
 | `=> dough` | **snap-cook**: names this action's output state |
 | `@&{dough}` | **snap-cook**: consumes a named state |
+| `= Teig` / `== Teig ==` | a line of its own: the steps below belong to the part "Teig" (Cooklang's section); a bare `=` ends the part |
+
+### Parts of a recipe
+
+A source that lists its ingredients under headings of their own ("Für den
+Teig", "Für die Füllung", "Für den Guss") keeps them. Each action records the
+part it belongs to in `section`, a localised text, absent when the source has
+no parts; the steps of one part carry the same text. A page lists the
+ingredients and the method under the same headings, in the order the parts
+start. The printer writes a heading before the first step of each part, and a
+bare `=` before a step that leaves the parts. Absent means encoded as absent, so
+a recipe without parts hashes as it did before `section` existed.
 
 ### Named references, not positional
 

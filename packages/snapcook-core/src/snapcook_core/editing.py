@@ -135,6 +135,7 @@ def _map_localized(recipe: Recipe, fn: Callable[[LocalizedText], LocalizedText])
             )
         return item.model_copy(
             update={
+                "section": each(item.section),
                 "verb": each(item.verb),
                 "notes": each(item.notes),
                 "text": text,

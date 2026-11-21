@@ -19,6 +19,32 @@ change** and says so explicitly here.
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-11-21
+
+### Changed
+
+- Every recipe is open to read, to everyone, signed in or not; only the
+  person who added it may change or delete it. A recipe marked private before
+  is open too: the one access rule (`catalog.access`) no longer looks at it.
+- A "Save time" tip stands in the step it starts at, below its times, instead
+  of above all the steps.
+
+### Added
+
+- A recipe whose source lists its ingredients in parts ("Für den Teig", "Für
+  die Füllung", "Für den Guss") keeps them: the ingredients and the steps stand
+  under the same headings. Imports keep the parts from now on; an older recipe
+  gets them by reading it again from its original (`/admin`, Rezepte), or by
+  adding `= Teig` lines in its text. A new optional `section` on each step;
+  recipes without parts keep their hashes (`RECIPE_SPEC.md` §6).
+- An import groups the steps into parts by the components the dish is made of
+  (a dough, a filling, a glaze), never a part per step, merging headings the
+  source makes finer than that. A dish of one component has no parts.
+- A step's time is a timer: a tap counts it down on the pill, another pauses
+  it, and the cross stops it. At the end it beeps and, on a phone, buzzes.
+  Timers keep running through a change of servings or a reload, several at
+  once, and the screen stays on while one runs.
+
 ## [0.8.1] - 2026-11-21
 
 ### Changed
@@ -296,7 +322,8 @@ under the existing canonical form, not a new wire contract.
 - Documentation: README, AGENTS, CLAUDE, CONTRIBUTING, LICENSING,
   THIRD_PARTY_DATA, SECURITY, RECIPE_SPEC
 
-[Unreleased]: https://github.com/yannicksuter/snap-cook/compare/v0.8.1...main
+[Unreleased]: https://github.com/yannicksuter/snap-cook/compare/v0.9.0...main
+[0.9.0]: https://github.com/yannicksuter/snap-cook/compare/v0.8.1...v0.9.0
 [0.8.1]: https://github.com/yannicksuter/snap-cook/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/yannicksuter/snap-cook/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/yannicksuter/snap-cook/compare/v0.6.0...v0.7.0

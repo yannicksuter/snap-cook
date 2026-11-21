@@ -102,9 +102,10 @@ brought back the same way: [restore a recipe](runbooks/restore-a-recipe.md).
 
 ## Who may do what
 
-Anyone may read the shared recipes, without an account. Signing in, with Google
-or with an address and a password, keeps a person's settings. Adding, changing,
-deleting and translating recipes spends API credit, so a new account only reads
+Anyone may read every recipe, without an account: the site is a cookbook open
+to all. Only the person who added a recipe may change or delete it. Signing in,
+with Google or with an address and a password, keeps a person's settings.
+Adding, changing, deleting and translating recipes spends API credit, so a new account only reads
 until an admin switches **May cook** on for it in `/admin`. Admins are the
 confirmed addresses in `SNAPCOOK_ADMIN_EMAILS`; they always may cook.
 
@@ -158,7 +159,7 @@ Behind the tunnel, or any other reverse proxy, the site takes the scheme from
 and Google's exact match would refuse it.
 
 > **The ops API answers only your LAN or a VPN.** It ignores ownership and can
-> read every user's private recipe, so the app refuses every request that came
+> read every recipe's history and originals, so the app refuses every request that came
 > through the tunnel or another proxy, even one with the right token. Switched
 > on, it answers at `http://<unraid-ip>:8931/ops/api/` and nowhere else
 > ([ops API](reference/api-ops.md)).

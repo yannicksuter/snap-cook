@@ -40,7 +40,15 @@ def render_text(model: RenderModel) -> str:
 
     lines.append("Ingredients")
     lines.append("-" * 11)
-    if model.ingredients:
+    if model.sections:
+        for section in model.sections:
+            indent = "  "
+            if section.title and section.ingredients:
+                lines.append(f"  {section.title}")
+                indent = "    "
+            for ingredient in section.ingredients:
+                lines.append(f"{indent}- {_ingredient_line(ingredient)}")
+    elif model.ingredients:
         for ingredient in model.ingredients:
             lines.append(f"  - {_ingredient_line(ingredient)}")
     else:

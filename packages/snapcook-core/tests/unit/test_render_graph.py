@@ -99,3 +99,12 @@ def test_a_steps_ingredients_flow_in_on_one_card() -> None:
     assert chart.count(":::ingredient") == 2, "steps 1 and 3 take ingredients, 2 and 4 do not"
     assert f"in_{first} --> {first}" in chart
     assert "iuse_" not in chart
+
+
+def test_a_timer_knows_how_long_to_count_down() -> None:
+    text = "---\ntitle: T\nlang: de\n---\n~{1.5%h} gehen lassen, ~{10-15%min} backen.\n"
+    timers = build_render_model(parse_cook(text), RenderOptions(lang="de")).steps[0].timers
+    assert [(timer.display, timer.seconds) for timer in timers] == [
+        ("1.5 h", 5400),
+        ("10–15 min", 600),
+    ], "a range counts down to its lower end, when to first check"

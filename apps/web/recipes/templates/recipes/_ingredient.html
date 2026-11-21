@@ -1,0 +1,27 @@
+{% comment %}
+SPDX-License-Identifier: AGPL-3.0-or-later
+
+One ingredient line, to tick off while cooking. Its box is keyed by the
+ingredient's id, so the tick survives a change of servings and stays with its
+line whichever group the line is in.
+{% endcomment %}{% load i18n %}
+<li class="border-b border-line-soft last:border-b-0">
+  <label class="group flex items-baseline gap-3 py-3 cursor-pointer">
+    <input type="checkbox" data-ingredient="{{ ingredient.use_id }}" class="peer flex-none w-5 h-5 translate-y-[3px] rounded accent-herb print:hidden">
+    <span class="flex-1 grid grid-cols-[6.75rem_minmax(0,1fr)] gap-3 items-baseline peer-checked:opacity-45 peer-checked:[&_.name]:line-through">
+      {% if ingredient.quantity and not ingredient.quantity.after_name %}
+        <span class="text-right text-[18px] font-bold text-herb tabular-nums">{{ ingredient.quantity.display }}</span>
+      {% else %}
+        <span></span>
+      {% endif %}
+      <span class="text-[18px]">
+        <span class="name">{{ ingredient.name }}</span>{% if ingredient.quantity.after_name %} <span class="text-ink-3">{{ ingredient.quantity.display }}</span>{% endif %}{% if ingredient.prep %}<span class="text-ink-2">, {{ ingredient.prep }}</span>{% endif %}
+        {% if ingredient.optional %}<span class="text-ink-3">({% translate "optional" %})</span>{% endif %}
+        {% if ingredient.unresolved and view.system == "us" %}
+          <svg role="img" aria-label="{% translate 'Not recognised: please check this ingredient' %}" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9A4A12" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="inline align-[-3px]"><path d="M12 3 2 21h20L12 3z"/><path d="M12 10v5M12 18h.01"/></svg>
+        {% endif %}
+        {% if ingredient.notes %}<span class="block text-[16px] text-ink-3">{{ ingredient.notes }}</span>{% endif %}
+      </span>
+    </span>
+  </label>
+</li>

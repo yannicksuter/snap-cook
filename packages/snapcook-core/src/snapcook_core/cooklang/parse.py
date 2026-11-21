@@ -102,6 +102,11 @@ _OVEN_MODES: dict[str, OvenMode] = {
 }  # fmt: skip
 _PRODUCE = re.compile(r"\s*=>\s*(?P<name>[^{}@#~^]+?)\s*$")
 
+# A line of its own that starts a part of the recipe, as Cooklang writes
+# sections: "= Teig" or "== Teig ==". A bare "=" ends the part. Never "=> name",
+# which ends a step.
+_SECTION = re.compile(r"^=+(?!>)\s*(?P<name>[^=]*?)\s*=*$")
+
 # Surface -> approx token, best effort. Text round-trips on the surface alone, so
 # an unrecognised phrase is stored as AS_NEEDED without affecting the printed form.
 _APPROX_TOKENS: dict[str, ApproxToken] = {
@@ -136,8 +141,11 @@ def parse_cook(text: str, *, registry: IngredientRegistry | None = None) -> Reci
 
     name_to_state: dict[str, str] = {}
     actions: list[Action] = []
-    for index, block in enumerate(_split_steps(body), start=1):
-        actions.append(_parse_step(block, index, lang, registry, name_to_state))
+    for index, (section, block) in enumerate(_split_steps(body), start=1):
+        action = _parse_step(block, index, lang, registry, name_to_state)
+        if section:
+            action = action.model_copy(update={"section": LocalizedText.mono(lang, section)})
+        actions.append(action)
 
     return Recipe(
         id=ids.new_recipe_id(),
@@ -159,8 +167,24 @@ def parse_cook(text: str, *, registry: IngredientRegistry | None = None) -> Reci
     )
 
 
-def _split_steps(body: str) -> list[str]:
-    return [block.strip() for block in re.split(r"\n\s*\n", body) if block.strip()]
+def _split_steps(body: str) -> list[tuple[str | None, str]]:
+    """Each step's text, and the part of the recipe it is in (``= Teig``)."""
+    steps: list[tuple[str | None, str]] = []
+    section: str | None = None
+    for block in re.split(r"\n\s*\n", body):
+        lines: list[str] = []
+        for line in block.splitlines():
+            match = _SECTION.match(line.strip())
+            if match is None:
+                lines.append(line)
+                continue
+            if "\n".join(lines).strip():
+                steps.append((section, "\n".join(lines).strip()))
+            lines = []
+            section = match.group("name") or None
+        if "\n".join(lines).strip():
+            steps.append((section, "\n".join(lines).strip()))
+    return steps
 
 
 def _parse_step(

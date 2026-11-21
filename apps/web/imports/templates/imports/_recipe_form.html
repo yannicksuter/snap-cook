@@ -5,7 +5,7 @@ A recipe's details, a preview, and its text: the fields of the form that checks
 an import (imports/review.html) and of the one that edits a saved recipe
 (recipes/edit.html). Expects ``form`` (a DetailsForm), ``model`` (the preview,
 or None) and ``problem``; ``text_open`` shows the text without a click.
-{% endcomment %}{% load i18n %}
+{% endcomment %}{% load i18n recipe_extras %}
 <div class="flex flex-col gap-2">
   <label for="id_title" class="text-[17px] font-extrabold">{{ form.title.label }}</label>
   <input id="id_title" name="title" type="text" maxlength="200" required value="{{ form.title.value|default_if_none:'' }}"
@@ -27,8 +27,10 @@ or None) and ``problem``; ``text_open`` shows the text without a click.
 {% if model %}
   <section class="pt-4" aria-labelledby="preview-ingredients">
     <h2 id="preview-ingredients" class="text-[24px] font-extrabold">{% translate "Ingredients" %}</h2>
+    {% for group in model|ingredient_groups %}
+    {% if group.title %}<h3 class="mt-4 text-[18px] font-extrabold text-herb-dark">{{ group.title }}</h3>{% endif %}
     <ul class="mt-2">
-      {% for ingredient in model.ingredients %}
+      {% for ingredient in group.ingredients %}
         <li class="grid grid-cols-[6.5rem_minmax(0,1fr)] gap-3.5 items-baseline py-3 border-b border-line-soft">
           {% if ingredient.quantity and not ingredient.quantity.after_name %}
             <span class="text-right text-[18px] font-extrabold text-herb">{{ ingredient.quantity.display }}</span>
@@ -39,17 +41,21 @@ or None) and ``problem``; ``text_open`` shows the text without a click.
         </li>
       {% endfor %}
     </ul>
+    {% endfor %}
   </section>
   <section class="pt-4" aria-labelledby="preview-steps">
     <h2 id="preview-steps" class="text-[24px] font-extrabold">{% translate "Steps" %}</h2>
+    {% for part in model.steps|in_parts %}
+    {% if part.title %}<h3 class="mt-4 text-[18px] font-extrabold text-herb-dark">{{ part.title }}</h3>{% endif %}
     <ol class="mt-1">
-      {% for step in model.steps %}
+      {% for step in part.steps %}
         <li class="flex gap-3.5 py-3.5{% if not forloop.last %} border-b border-line-soft{% endif %}">
           <span aria-hidden="true" class="flex-none w-9 h-9 rounded-full bg-ink text-white flex items-center justify-center text-[18px] font-extrabold">{{ step.index }}</span>
           <p class="pt-1 text-[18px] leading-normal min-w-0">{{ step.text }}</p>
         </li>
       {% endfor %}
     </ol>
+    {% endfor %}
   </section>
 {% endif %}
 

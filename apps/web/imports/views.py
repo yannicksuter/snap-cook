@@ -268,7 +268,7 @@ def _save(request: HttpRequest, job: ImportJob, recipe) -> HttpResponse:
         job.status, job.recipe_slug, job.recipe_id = ImportJob.Status.SAVED, row.slug, recipe.id
         job.save(update_fields=["status", "recipe_slug", "recipe_id", "updated_at"])
         sources.keep(job, recipe.id)
-    messages.success(request, _("Saved. Only you can see this recipe."))
+    messages.success(request, _("Saved. Everyone can read it now."))
     return redirect("recipes:detail", row.slug)
 
 

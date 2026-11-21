@@ -15,7 +15,7 @@ version. A kept copy is always used before the live link, which may be gone.
         <div class="min-w-0 flex-1">
           <p class="text-[18px] font-bold leading-snug">{{ recipe.title }}</p>
           <p class="mt-0.5 text-[15px] leading-snug text-ink-3">
-            {{ recipe.owner }} · {% if recipe.public %}{% translate "Shared" %}{% else %}{% translate "Private" %}{% endif %}
+            {{ recipe.owner }}
             · {% include "backoffice/_original.html" with kind=recipe.original %}
           </p>
         </div>
