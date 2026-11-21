@@ -19,6 +19,13 @@ change** and says so explicitly here.
 
 ## [Unreleased]
 
+### Changed
+
+- The chart grows downwards instead of sideways. A step's ingredients stand on
+  one card, a line each, instead of a shape each side by side, and the branches
+  keep close together with straight lines. A cinnamon-roll chart is half as
+  wide as before, so a phone shows it at a readable size.
+
 ## [0.8.0] - 2026-11-21
 
 ### Added

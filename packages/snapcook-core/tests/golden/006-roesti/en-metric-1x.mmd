@@ -1,19 +1,13 @@
 flowchart TD
     step_act_ro_1("<span class=n>1</span> grate"):::step
-    iuse_ro_potato(["<span class=qty>800 g</span> potato"]):::ingredient
-    iuse_ro_onion(["<span class=qty>1 medium</span> onion"]):::ingredient
-    iuse_ro_salt(["salt <span class=qty>to taste</span>"]):::ingredient
-    iuse_ro_pepper(["pepper <span class=qty>to taste</span>"]):::ingredient
+    in_step_act_ro_1("<span class=qty>800 g</span> potato<br><span class=qty>1 medium</span> onion<br>salt <span class=qty>to taste</span><br>pepper <span class=qty>to taste</span>"):::ingredient
     nod_ro_grated["grated potatoes"]:::state
     step_act_ro_2("<span class=n>2</span> fry<br><span class=time>15 min</span><span class=temp>180 °C</span>"):::step
-    iuse_ro_butter(["<span class=qty>40 g</span> butter"]):::ingredient
+    in_step_act_ro_2("<span class=qty>40 g</span> butter"):::ingredient
     nod_ro_done(["rösti"]):::dish
 
-    iuse_ro_potato --> step_act_ro_1
-    iuse_ro_onion --> step_act_ro_1
-    iuse_ro_salt --> step_act_ro_1
-    iuse_ro_pepper --> step_act_ro_1
+    in_step_act_ro_1 --> step_act_ro_1
     step_act_ro_1 --> nod_ro_grated
-    iuse_ro_butter --> step_act_ro_2
+    in_step_act_ro_2 --> step_act_ro_2
     nod_ro_grated --> step_act_ro_2
     step_act_ro_2 --> nod_ro_done
