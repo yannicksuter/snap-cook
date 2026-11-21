@@ -65,22 +65,37 @@ def test_the_title_says_who_added_it_and_every_ingredient_can_be_ticked(client, 
     assert page.count('type="checkbox" data-ingredient=') == 1
 
 
-def test_a_recipe_in_parts_lists_them_under_the_sources_headings(
-    client, settings, tmp_path, django_user_model
-) -> None:
+def _shared(settings, tmp_path, django_user_model, text: str):
     settings.SNAPCOOK_STORE_DIR = tmp_path / "store"
     owner = django_user_model.objects.create_user(username="nonna", email="n@example.com")
     store = FilesystemStore(settings.SNAPCOOK_STORE_DIR)
-    recipe = parse_cook(
-        "---\ntitle: Schnecken\nlang: de\nvisibility: public\n---\n"
+    recipe = parse_cook(f"---\ntitle: Schnecken\nlang: de\nvisibility: public\n---\n{text}")
+    store.commit(recipe, author="nonna", created_at="2026-11-21T10:00:00")
+    return project_recipe(store, recipe.id, owner)
+
+
+def test_a_recipe_in_parts_lists_them_under_the_sources_headings(
+    client, settings, tmp_path, django_user_model
+) -> None:
+    row = _shared(
+        settings,
+        tmp_path,
+        django_user_model,
         "= Teig\n\n@Mehl{500%g} kneten. => Teig\n\n"
         "= Guss\n\n@Puderzucker{80%g} rühren. => Guss\n\n"
-        "=\n\nDen @&{Teig} backen und mit dem @&{Guss} bestreichen.\n"
+        "=\n\nDen @&{Teig} backen und mit dem @&{Guss} bestreichen.\n",
     )
-    store.commit(recipe, author="nonna", created_at="2026-11-21T10:00:00")
-    row = project_recipe(store, recipe.id, owner)
     page = client.get(f"/r/{row.slug}/?lang=de").content.decode()
     teig, guss = page.index(">Teig</h3>"), page.index(">Guss</h3>")
     assert teig < page.index("Mehl") < guss < page.index("Puderzucker")
     assert page.count(">Teig</h3>") == 2, "over its ingredients and over its step"
     assert 'data-ingredient="iuse_1_1"' in page, "a tick is keyed by its ingredient"
+
+
+def test_a_steps_time_is_a_button_that_counts_it_down(
+    client, settings, tmp_path, django_user_model
+) -> None:
+    row = _shared(settings, tmp_path, django_user_model, "@Mehl{500%g} ~{1%h} ruhen lassen.\n")
+    page = client.get(f"/r/{row.slug}/?lang=de", HTTP_ACCEPT_LANGUAGE="de").content.decode()
+    assert 'data-timer="act_1:0" data-seconds="3600" data-display="1 h"' in page
+    assert 'aria-label="Timer für 1 h starten"' in page

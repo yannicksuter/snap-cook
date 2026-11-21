@@ -555,7 +555,19 @@ def _render_timer(
     scaled = scale_spec(spec, opts.scale, issues=issues, element_id=element_id)
     display = format_quantity(scaled.quantity, metric_profile())
     label = _resolve_localized(timer.name, recipe, opts) if timer.name else None
-    return RenderedTimer(label=label, display=display)
+    return RenderedTimer(label=label, display=display, seconds=_timer_seconds(timer))
+
+
+def _timer_seconds(timer: Timer) -> int | None:
+    """A timer's length for a countdown; a range counts from its lower end."""
+    quantity = timer.quantity
+    value = quantity.value if isinstance(quantity, Scalar) else quantity.low
+    unit = (quantity.unit.unit_id if quantity.unit else None) or "unit:min"
+    try:
+        seconds = int(convert_value(value, unit, "unit:s").to_integral_value())
+    except Exception:  # noqa: BLE001 - a time that is not a duration gets no countdown
+        return None
+    return seconds if seconds > 0 else None
 
 
 # The oven setting after a temperature, in the reader's language. English as

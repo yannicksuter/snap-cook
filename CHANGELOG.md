@@ -27,6 +27,13 @@ change** and says so explicitly here.
   gets them by reading it again from its original (`/admin`, Rezepte), or by
   adding `= Teig` lines in its text. A new optional `section` on each step;
   recipes without parts keep their hashes (`RECIPE_SPEC.md` §6).
+- An import groups the steps into parts by the components the dish is made of
+  (a dough, a filling, a glaze), never a part per step, merging headings the
+  source makes finer than that. A dish of one component has no parts.
+- A step's time is a timer: a tap counts it down on the pill, another pauses
+  it, and the cross stops it. At the end it beeps and, on a phone, buzzes.
+  Timers keep running through a change of servings or a reload, several at
+  once, and the screen stays on while one runs.
 
 ## [0.8.1] - 2026-11-21
 

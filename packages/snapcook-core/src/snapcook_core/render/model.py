@@ -70,6 +70,9 @@ class RenderedIngredient:
 class RenderedTimer:
     label: str | None
     display: str
+    seconds: int | None = None
+    """How long to count down: a range from its lower end, when to first check.
+    None when the time cannot be read as a duration."""
 
 
 @dataclass(frozen=True, slots=True)

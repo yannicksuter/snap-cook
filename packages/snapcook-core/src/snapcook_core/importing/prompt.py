@@ -102,13 +102,19 @@ step uses it. That later step refers to it as `@&{name}`, spelled exactly the \
 same. This is how a recipe records which parts are prepared separately and \
 combined later. Name only what a later step uses.
 
-When the source lists its ingredients in parts under headings of their own (for \
-the dough, for the filling, for the glaze), keep the parts: a line `= heading` on \
-its own before the steps of each part, the heading short and in the source's \
-words, such as `= Teig` for "Für den Teig". A step belongs to the heading above \
-it. Steps that bring the parts together come after a line with a bare `=`, \
-unless the source gives them a heading of their own. Without headings in the \
-source, write none.
+Group the steps into parts when the dish is made of components that are \
+prepared on their own and brought together, such as a dough, a filling and a \
+glaze: a line `= heading` on its own before the steps of each part. A step \
+belongs to the heading above it, and the ingredient list is shown under the same \
+headings. Name a part after the component it results in, short and in the \
+source's language; when the source heads its ingredients (Für den Teig, Für die \
+Füllung), use its words, such as `= Teig`. Review the parts before you answer: \
+a part is a whole component, never a stage of one and never a part per step. \
+The yeast milk (`=> Hefemilch`) is a stage of the dough, so its step belongs to \
+the dough's part. Merge headings the source makes finer than its components. \
+Steps that bring the parts together come after a line with a bare `=`, unless \
+the source gives them a heading of their own. A dish that is one \
+component, as most soups, salads and stews are, has no parts.
 
 Numbers are decimals with a point: 0.5, 1.5, 0.25. Never fractions (½, 1/2) or \
 commas (1,5). A range is written 2-3.
