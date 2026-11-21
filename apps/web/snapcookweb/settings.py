@@ -326,7 +326,7 @@ MAILERS = {
             },
         }
         if SNAPCOOK_MAIL_ENABLED
-        else {"BACKEND": "django.core.mail.backends.console.EmailBackend"}
+        else {"BACKEND": "accounts.mail.MailOffBackend"}
     )
 }
 DEFAULT_FROM_EMAIL = os.environ.get("SNAPCOOK_MAIL_FROM", _SMTP_USER or "snap-cook@localhost")

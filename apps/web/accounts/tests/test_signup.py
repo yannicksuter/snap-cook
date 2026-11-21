@@ -71,3 +71,16 @@ def test_the_sign_in_page_offers_both_ways(client, with_mail) -> None:
     page = client.get("/accounts/login/").content.decode()
     assert "Continue with Google" in page
     assert 'name="password"' in page and "/accounts/signup/" in page
+
+
+def test_without_mail_nothing_is_sent_and_no_address_is_logged(caplog, settings) -> None:
+    from django.core.mail import EmailMessage
+
+    from accounts.mail import MailOffBackend
+
+    sent = MailOffBackend(alias="default").send_messages(
+        [EmailMessage("Confirm", "https://x/confirm/KEY/", to=["secret.person@example.com"])]
+    )
+    assert sent == 0
+    assert "1 mail(s) not sent" in caplog.text
+    assert "secret.person" not in caplog.text
