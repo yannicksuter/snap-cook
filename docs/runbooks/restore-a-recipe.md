@@ -5,8 +5,9 @@ Its directory moves, whole and unchanged, from `/data/store/<recipe id>/` to
 `/data/store/.trash/<recipe id>/`, where nothing lists or reads it. Every
 version is still there, and backups of `/data` include the trash.
 
-What does not come back: the photos or files the recipe was imported from.
-Deleting a recipe deletes those, as deleting a draft does.
+The original it was read from (photos, PDF, page) moves the same way, from
+`/sources/<recipe id>/` to `/sources/.trash/<recipe id>/` (or under
+`/data/sources/` without a `/sources` mount).
 
 ## Find it
 
@@ -25,6 +26,7 @@ Move it back under its own id, then project it into the catalog:
 
 ```bash
 docker exec snap-cook mv /data/store/.trash/rcp_01J8ZQ... /data/store/rcp_01J8ZQ...
+docker exec snap-cook mv /sources/.trash/rcp_01J8ZQ... /sources/rcp_01J8ZQ...
 docker exec snap-cook python manage.py reindex --recipe rcp_01J8ZQ...
 ```
 

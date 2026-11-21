@@ -23,7 +23,6 @@ auth models and the reverse-proxy rules stay fully independent: you can expose
 from __future__ import annotations
 
 from django.conf import settings
-from django.contrib import admin
 from django.urls import include, path
 
 from snapcookweb import views
@@ -31,7 +30,9 @@ from snapcookweb import views
 urlpatterns = [
     # Unauthenticated, deliberately. This is the container health probe.
     path("up", views.up, name="up"),
-    path("admin/", admin.site.urls),
+    # snap-cook's own admin pages, for the addresses in SNAPCOOK_ADMIN_EMAILS.
+    # Django's generic admin is not installed.
+    path("admin/", include("backoffice.urls")),
     path("accounts/", include("allauth.urls")),
     path("settings/", include("accounts.urls")),
     path("", include("imports.urls")),

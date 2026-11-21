@@ -1,0 +1,8 @@
+{% comment %} djlint:off {% endcomment %}{% load allauth %}
+{% if "link" in attrs.tags or "cancel" in attrs.tags or "secondary" in attrs.tags or "outline" in attrs.tags or attrs.href %}
+  {% if attrs.href %}<a href="{{ attrs.href }}"{% else %}<button {% if attrs.form %}form="{{ attrs.form }}"{% endif %} {% if attrs.name %}name="{{ attrs.name }}"{% endif %} {% if attrs.value %}value="{{ attrs.value }}"{% endif %} type="{{ attrs.type|default:'submit' }}"{% endif %}
+     class="inline-flex h-12 px-3 items-center justify-center rounded-full text-[17px] font-bold text-ink-2 hover:bg-surface hover:text-ink">{% slot %}{% endslot %}{% if attrs.href %}</a>{% else %}</button>{% endif %}
+{% else %}
+  <button {% if attrs.form %}form="{{ attrs.form }}"{% endif %} {% if attrs.id %}id="{{ attrs.id }}"{% endif %} {% if attrs.name %}name="{{ attrs.name }}"{% endif %} {% if attrs.value %}value="{{ attrs.value }}"{% endif %} type="{{ attrs.type|default:'submit' }}"
+          class="h-14 w-full rounded-2xl bg-herb text-white text-[19px] font-extrabold hover:bg-herb-dark">{% slot %}{% endslot %}</button>
+{% endif %}

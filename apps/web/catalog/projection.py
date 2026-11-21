@@ -137,14 +137,23 @@ def project_store(store: RecipeStore, owner_for: OwnerResolver) -> tuple[int, li
 
 
 def owner_resolver_from_db() -> OwnerResolver:
-    """Resolve a store author handle to a local user, by username or email.
+    """Resolve a store author handle to a local user.
+
+    By username (the uid, for every account since uids), by the name an account
+    had before (``Profile.former_handle``, which older versions carry), or by
+    address. An author no account answers to -- ``archive``, or a deleted
+    account -- resolves to no one, so its recipe stays out of the catalog until
+    an admin gives it to someone.
 
     Built once as a dict so projecting a whole store is not a query per recipe.
     """
-    users = get_user_model().objects.all()
+    users = get_user_model().objects.select_related("profile")
     by_key: dict[str, object] = {}
     for user in users:
         by_key[user.get_username()] = user
+        profile = getattr(user, "profile", None)
+        if profile is not None and profile.former_handle:
+            by_key.setdefault(profile.former_handle, user)
         if getattr(user, "email", ""):
             by_key.setdefault(user.email, user)
     return lambda author: by_key.get(author)

@@ -26,11 +26,14 @@ from django.views.decorators.http import require_http_methods, require_POST
 from django_q.tasks import async_task
 from ruamel.yaml import YAMLError
 
+from catalog.models import Recipe as CatalogRecipe
 from catalog.projection import project_recipe
+from imports import sources
 from imports.forms import EXTENSIONS, DetailsForm, FilesForm, LinkForm, TextForm
 from imports.models import ImportJob
 from imports.providers import is_set_up
 from snapcook_core.cooklang.frontmatter import parse_document
+from snapcook_core.editing import carry_translations
 from snapcook_core.importing import apply_answer, read_draft, with_details
 from snapcook_core.render import RenderOptions, build_render_model
 from snapcook_core.store import FilesystemStore
@@ -50,6 +53,10 @@ PROBLEMS = {
     "busy": gettext_lazy("The reading service is busy. Try again in a minute."),
     "model_failed": gettext_lazy("Reading failed. Try again in a moment."),
     "timed_out": gettext_lazy("Reading took too long and was stopped."),
+    "no_source": gettext_lazy(
+        "Nothing of the original was kept, and its link no longer loads, "
+        "so it cannot be read again."
+    ),
 }
 # The worker gives up on a task after 300 s; anything pending far longer died.
 _STUCK_AFTER = timedelta(minutes=10)
@@ -192,13 +199,14 @@ def _start(
     job = ImportJob.objects.create(
         owner=request.user, kind=kind, source_url=source_url, source_text=source_text
     )
-    if files:
-        directory = job.source_dir()
-        directory.mkdir(parents=True, exist_ok=True)
-        for number, (upload, media_type) in enumerate(files, start=1):
-            with (directory / f"{number}.{EXTENSIONS[media_type]}").open("wb") as out:
-                for chunk in upload.chunks():
-                    out.write(chunk)
+    directory = job.source_dir()
+    directory.mkdir(parents=True, exist_ok=True)
+    for number, (upload, media_type) in enumerate(files, start=1):
+        with (directory / f"{number}.{EXTENSIONS[media_type]}").open("wb") as out:
+            for chunk in upload.chunks():
+                out.write(chunk)
+    if source_text:
+        (directory / sources.PASTED_TEXT).write_text(source_text, encoding="utf-8")
     _enqueue(job)
     return redirect("imports:status", job.pk)
 
@@ -245,6 +253,8 @@ def _details(cooklang: str) -> dict:
 
 
 def _save(request: HttpRequest, job: ImportJob, recipe) -> HttpResponse:
+    if job.replaces:
+        return _save_again(request, job, recipe)
     store = FilesystemStore(settings.SNAPCOOK_STORE_DIR)
     store.commit(
         recipe,
@@ -257,5 +267,39 @@ def _save(request: HttpRequest, job: ImportJob, recipe) -> HttpResponse:
         row = project_recipe(store, recipe.id, request.user)
         job.status, job.recipe_slug, job.recipe_id = ImportJob.Status.SAVED, row.slug, recipe.id
         job.save(update_fields=["status", "recipe_slug", "recipe_id", "updated_at"])
+        sources.keep(job, recipe.id)
     messages.success(request, _("Saved. Only you can see this recipe."))
     return redirect("recipes:detail", row.slug)
+
+
+def _save_again(request: HttpRequest, job: ImportJob, draft_recipe) -> HttpResponse:
+    """A saved recipe read again from its original: a new version of the same recipe.
+
+    In its owner's name, as every version must be (``reindex`` takes the owner
+    from the latest one), keeping who may see it and every translation of what
+    reads the same as before.
+    """
+    store = FilesystemStore(settings.SNAPCOOK_STORE_DIR)
+    with transaction.atomic():
+        row = CatalogRecipe.objects.select_for_update().filter(recipe_id=job.replaces).first()
+        head = store.head(job.replaces) if row else None
+        if head is None:
+            messages.warning(request, _("That recipe was deleted meanwhile, so nothing was saved."))
+            return redirect("backoffice:recipes")
+        current = head.recipe
+        recipe = carry_translations(
+            current,
+            draft_recipe.model_copy(update={"id": current.id, "visibility": current.visibility}),
+        )
+        store.commit(
+            recipe,
+            author=head.author,
+            created_at=timezone.now().strftime("%Y-%m-%dT%H:%M:%S"),
+            message="read again from the original",
+            origin="imported",
+        )
+        row = project_recipe(store, current.id, row.owner)
+        job.status, job.recipe_slug, job.recipe_id = ImportJob.Status.SAVED, row.slug, current.id
+        job.save(update_fields=["status", "recipe_slug", "recipe_id", "updated_at"])
+    messages.success(request, _("Saved as a new version of “%(title)s”.") % {"title": row.title})
+    return redirect("backoffice:recipes")

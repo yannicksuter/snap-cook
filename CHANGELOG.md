@@ -23,26 +23,51 @@ change** and says so explicitly here.
 
 ### Added
 
+- Anyone can read the shared recipes, without an account. Signing in is for
+  keeping one's settings and for cooking.
+- Sign in with Google, or with an email address and a password of at least 12
+  characters. An address counts once it is confirmed (by Google, or by the link
+  in a mail); until then the account reads as anyone does.
+- New accounts read; adding, changing, deleting and translating recipes, which
+  spends API credit, needs an admin to switch **May cook** on. Admins are the
+  confirmed addresses in `SNAPCOOK_ADMIN_EMAILS`.
+- `/admin`, in the site's own look: everyone with an account, their last
+  sign-in and the cook switch; deleting an account; every recipe, each of which
+  can be read again from its kept original; and an archive of the recipes of
+  deleted accounts, to give them to someone else.
+- Every recipe keeps the original it was read from, in a folder of its own:
+  the photos and PDFs, the pasted text, and the page as it was fetched, so
+  reading it again does not depend on a link that may be gone. The folder can
+  be a share of its own, mounted at `/sources`.
 - The owner can delete a recipe, at the end of its edit page, after a second
   tap to confirm. It disappears for everyone it was shared with. On the server
-  it moves to a trash folder and can be brought back
-  (`docs/runbooks/restore-a-recipe.md`); the photos or files it was imported
-  from are deleted.
+  it moves to a trash folder with its original and can be brought back
+  (`docs/runbooks/restore-a-recipe.md`).
 
 ### Changed
 
+- People appear by two or three initials taken from their address (YS for
+  yannick.suter@…). No page shows an address; `/admin` shows it masked. A
+  person's id, and so the author of their recipe versions, is a keyed hash of
+  the address, never a name or the address itself.
+- Django's generic admin is gone; `/admin` is snap-cook's own.
 - A calmer recipe page, with nothing taken away: times and oven settings in one
   strip between thin lines, the servings control beside the ingredients, steps
   without boxes, and chart buttons without frames.
 - A calmer add page: the same five ways to add a recipe, with fewer boxes.
-- Updates: django-allauth 65.22.1 (security fixes; none affects a Google-only
-  setup), gunicorn 27 (stricter HTTP parsing), pydantic 2.14, and the CI
-  actions on Node 24.
+- Updates: django-allauth 65.22.1 (security fixes), gunicorn 27 (stricter HTTP
+  parsing), pydantic 2.14, and the CI actions on Node 24.
 
 ### Notes
 
-- Rolling back to 0.7.0 is safe. A deleted recipe stays deleted there, as 0.7.0
-  does not read the trash either.
+- Set `SNAPCOOK_ADMIN_EMAILS` to reach `/admin`, and the `SNAPCOOK_SMTP_*`
+  variables to offer password accounts ([install](docs/install.md#mail)).
+  Mounting `/sources` is optional; on the next start the originals move there.
+- Accounts that existed before keep cooking. Their usernames become ids on the
+  first start, and their older recipe versions still find them.
+- Rolling back to 0.7.0 works for reading and Google sign-in, but password
+  accounts cannot sign in there, and a full reindex there would leave out
+  recipes not changed since this update.
 
 ## [0.7.0] - 2026-11-19
 

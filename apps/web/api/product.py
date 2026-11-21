@@ -5,7 +5,7 @@ Mounted only when SNAPCOOK_API_ENABLED=1; otherwise the router is never
 included and every path under it returns 404.
 
 .. warning::
-   This surface is exempt from LoginRequiredMiddleware. Authorization comes
+   This surface is exempt from AccessMiddleware. Authorization comes
    entirely from the ``auth=`` declaration below and from
    ``catalog.access.visible_recipes``. An endpoint added without an auth
    declaration is published to the internet.

@@ -5,9 +5,10 @@ DB-authoritative, like ``accounts``: a draft is work in progress that exists
 nowhere else until someone saves it, and only then does a recipe reach the
 store. ``reindex`` never touches this app.
 
-The source a job read -- the page text or the uploaded files -- is retained, so
-a draft can be read again when the prompt or the model improves. Files live on
-disk under ``SNAPCOOK_SOURCES_DIR/<job id>/``; text lives in the row.
+The source a job read -- the uploaded files, the pasted text, the fetched page
+-- is kept on disk (``imports.sources``): in a draft's own folder until it is
+saved, then in its recipe's, so a recipe can be read again from its original
+when the prompt or the model improves.
 """
 
 from __future__ import annotations
@@ -63,6 +64,12 @@ class ImportJob(models.Model):
     left_out = models.JSONField(default=list, blank=True)
 
     recipe_slug = models.CharField(max_length=200, blank=True, help_text="Set once saved")
+    replaces = models.CharField(
+        max_length=40,
+        blank=True,
+        db_default="",
+        help_text="Reading a saved recipe again: saving makes a new version of this one",
+    )
     recipe_id = models.CharField(
         max_length=40,
         blank=True,
@@ -94,14 +101,21 @@ class ImportJob(models.Model):
         return str(front.get("title") or "")
 
     def source_dir(self) -> Path:
-        return Path(settings.SNAPCOOK_SOURCES_DIR) / str(self.id)
+        """Where what this job reads is kept: its recipe's folder, or its own as a draft."""
+        root = Path(settings.SNAPCOOK_SOURCES_DIR)
+        recipe = self.recipe_id or self.replaces
+        return root / recipe if recipe else root / "drafts" / str(self.id)
 
     def source_files(self) -> list[Path]:
-        directory = self.source_dir()
-        return sorted(directory.iterdir()) if directory.is_dir() else []
+        """The uploaded photos and PDFs, in the order they were given."""
+        from imports.sources import uploaded_files
+
+        return uploaded_files(self.source_dir())
 
     def delete_sources(self) -> None:
-        shutil.rmtree(self.source_dir(), ignore_errors=True)
+        """A draft's own original; never a recipe's, which outlives the job."""
+        if not (self.recipe_id or self.replaces):
+            shutil.rmtree(self.source_dir(), ignore_errors=True)
 
     def open_questions(self) -> list[Question]:
         return [Question.model_validate(question) for question in self.questions]

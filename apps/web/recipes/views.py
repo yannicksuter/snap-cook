@@ -39,6 +39,7 @@ from ruamel.yaml import YAMLError
 from catalog.access import get_recipe_or_404, visible_recipes
 from catalog.models import Recipe as CatalogRecipe
 from catalog.projection import project_recipe
+from imports import sources
 from imports.forms import DetailsForm
 from imports.models import ImportJob
 from snapcook_core.cooklang.frontmatter import parse_document
@@ -89,7 +90,9 @@ def index(request: HttpRequest) -> HttpResponse:
         )
     # The reader's own unsaved imports: where a draft waits after they left the
     # page that was reading it.
-    drafts = ImportJob.objects.filter(owner=request.user).exclude(status=ImportJob.Status.SAVED)
+    drafts = ImportJob.objects.none()
+    if request.access.cook:
+        drafts = ImportJob.objects.filter(owner=request.user).exclude(status=ImportJob.Status.SAVED)
     context = {"recipes": recipes[:50], "query": query, "drafts": drafts[:10]}
     return render(request, "recipes/index.html", context)
 
@@ -104,10 +107,14 @@ def detail(request: HttpRequest, slug: str) -> HttpResponse:
         "view": view,
         "mermaid": render_mermaid(model),
         "notes": _notes(model, view),
-        # Shown in another language, a recipe is translated once, in the worker.
+        # Shown in another language, a recipe is translated once, in the worker --
+        # for someone who may cook, as it spends API credit. Anyone else reads
+        # whatever translations there are, and the rest as written.
         "translation": progress_for(
             request.user, catalog_recipe.recipe_id, recipe, head.version_id, view.lang
-        ),
+        )
+        if request.access.cook
+        else None,
     }
     is_htmx = request.headers.get("HX-Request")
     template = "recipes/_render.html" if is_htmx else "recipes/detail.html"
@@ -223,10 +230,10 @@ def edit(request: HttpRequest, slug: str) -> HttpResponse:
 def delete(request: HttpRequest, slug: str) -> HttpResponse:
     """The owner deletes a recipe, for everyone it was shared with too.
 
-    The store moves its files aside rather than away (``RecipeStore.remove``), so
-    whoever runs the server can bring it back: docs/runbooks/restore-a-recipe.md.
-    What it was imported from goes with it, as when a draft is deleted: photos
-    and files someone uploaded are not kept for a recipe they deleted.
+    The store moves its files aside rather than away (``RecipeStore.remove``),
+    and the original it was read from goes aside with it (``imports.sources``),
+    so whoever runs the server can bring both back:
+    docs/runbooks/restore-a-recipe.md.
     """
     row = get_recipe_or_404(request.user, slug)
     if row.owner_id != request.user.pk:
@@ -238,9 +245,8 @@ def delete(request: HttpRequest, slug: str) -> HttpResponse:
         locked = CatalogRecipe.objects.select_for_update().get(pk=row.pk)
         locked.delete()
         store.remove(row.recipe_id)
-    for job in ImportJob.objects.filter(owner=request.user, recipe_id=row.recipe_id):
-        job.delete_sources()
-        job.delete()
+    sources.trash(row.recipe_id)
+    ImportJob.objects.filter(recipe_id=row.recipe_id).delete()
     messages.success(request, _("“%(title)s” was deleted.") % {"title": row.title})
     return redirect("recipes:index")
 

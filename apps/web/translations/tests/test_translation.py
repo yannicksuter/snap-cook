@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import pytest
 
+from accounts.testing import verified
 from catalog.projection import owner_resolver_from_db, project_recipe
 from imports.providers import ProviderError
 from imports.providers.fake import FakeImporter
@@ -34,12 +35,16 @@ lang: de
 
 @pytest.fixture
 def owner(django_user_model):
-    return django_user_model.objects.create_user(username="nonna", email="nonna@example.com")
+    return verified(
+        django_user_model.objects.create_user(username="nonna", email="nonna@example.com")
+    )
 
 
 @pytest.fixture
 def reader(client, django_user_model):
-    user = django_user_model.objects.create_user(username="cook", email="cook@example.com")
+    user = verified(
+        django_user_model.objects.create_user(username="cook", email="cook@example.com")
+    )
     client.force_login(user)
     return user
 

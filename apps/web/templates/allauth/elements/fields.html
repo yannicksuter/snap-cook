@@ -1,0 +1,19 @@
+{% comment %}
+Every field of a sign-in form, labelled, with its errors under it. The inputs
+are styled from here, as the library renders the widgets itself.
+{% endcomment %}
+{% for error in attrs.form.non_field_errors %}
+  <p class="rounded-2xl bg-ember-tint px-4 py-3 text-[17px] leading-relaxed" role="alert">{{ error }}</p>
+{% endfor %}
+{% for field in attrs.form %}
+  {% if field.is_hidden %}
+    {{ field }}
+  {% else %}
+    <div class="flex flex-col gap-1.5 [&_input:not([type=checkbox])]:h-14 [&_input:not([type=checkbox])]:w-full [&_input:not([type=checkbox])]:px-4 [&_input:not([type=checkbox])]:rounded-[14px] [&_input:not([type=checkbox])]:border-2 [&_input:not([type=checkbox])]:border-line-strong [&_input]:text-[18px] [&_input]:outline-none [&_input:focus]:border-herb">
+      <label for="{{ field.id_for_label }}" class="text-[17px] font-bold{% if attrs.unlabeled %} sr-only{% endif %}">{{ field.label }}</label>
+      {{ field }}
+      {% for error in field.errors %}<p class="text-[16px] text-ember" role="alert">{{ error }}</p>{% endfor %}
+      {% if field.help_text %}<div class="text-[15px] leading-snug text-ink-3 [&_ul]:list-disc [&_ul]:pl-5">{{ field.help_text|safe }}</div>{% endif %}
+    </div>
+  {% endif %}
+{% endfor %}

@@ -45,12 +45,27 @@ another language without changing this.
       <button type="submit" class="h-14 rounded-2xl bg-herb text-white text-[19px] font-extrabold hover:bg-herb-dark">{% translate "Save" %}</button>
     </form>
 
-    <div class="mt-10 pt-6 border-t border-line">
-      <p class="text-[16px] text-ink-2">{% blocktranslate trimmed with email=user.email|default:user.username %}Signed in as {{ email }}{% endblocktranslate %}</p>
-      <form method="post" action="{% url 'account_logout' %}" class="mt-3">
-        {% csrf_token %}
-        <button type="submit" class="h-12 px-5 rounded-[14px] border-2 border-line-strong text-[17px] font-bold hover:border-ink-3">{% translate "Sign out" %}</button>
-      </form>
-    </div>
+    <section class="mt-10 pt-6 border-t border-line-soft" aria-labelledby="you">
+      <h2 id="you" class="sr-only">{% translate "Your account" %}</h2>
+      <div class="flex items-center gap-4">
+        <span aria-hidden="true" class="flex-none w-14 h-14 rounded-full bg-herb-tint text-herb-dark text-[19px] font-extrabold tracking-wide flex items-center justify-center">{{ access.initials }}</span>
+        <div class="min-w-0">
+          <p class="text-[17px] font-bold">{{ masked_email }}</p>
+          <p class="text-[16px] leading-snug text-ink-2">{% if access.cook %}{% translate "You can add and change recipes." %}{% else %}{% translate "You can read every shared recipe. An admin can let you add your own." %}{% endif %}</p>
+        </div>
+      </div>
+      <div class="mt-5 flex flex-wrap items-center gap-x-1 gap-y-2 -ml-3">
+        {% if user.has_usable_password %}
+          <a href="{% url 'account_change_password' %}" class="inline-flex h-11 px-3 items-center rounded-full text-[17px] font-bold text-ink-2 hover:bg-surface hover:text-ink">{% translate "Change password" %}</a>
+        {% endif %}
+        {% if access.admin %}
+          <a href="{% url 'backoffice:people' %}" class="inline-flex h-11 px-3 items-center rounded-full text-[17px] font-bold text-ink-2 hover:bg-surface hover:text-ink">{% translate "Admin" %}</a>
+        {% endif %}
+        <form method="post" action="{% url 'account_logout' %}">
+          {% csrf_token %}
+          <button type="submit" class="inline-flex h-11 px-3 items-center rounded-full text-[17px] font-bold text-ink-2 hover:bg-surface hover:text-ink">{% translate "Sign out" %}</button>
+        </form>
+      </div>
+    </section>
   </div>
 {% endblock %}

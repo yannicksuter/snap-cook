@@ -1,0 +1,63 @@
+{% extends "backoffice/base.html" %}
+{% comment %}
+SPDX-License-Identifier: AGPL-3.0-or-later
+
+Everyone with an account, last seen first. A person is their initials and a
+masked address. The switch lets them add and change recipes (it spends API
+credit); deleting is folded away behind a second tap, as on a recipe.
+{% endcomment %}
+{% load i18n %}
+
+{% block admin %}
+  <ul class="mt-2">
+    {% for person in people %}
+      <li class="py-4 border-b border-line-soft">
+        <div class="flex items-start gap-4">
+          <span aria-hidden="true" class="flex-none w-12 h-12 rounded-full {% if person.verified %}bg-herb-tint text-herb-dark{% else %}bg-surface text-ink-3{% endif %} text-[16px] font-extrabold tracking-wide flex items-center justify-center">{{ person.initials }}</span>
+          <div class="min-w-0 flex-1">
+            <p class="text-[18px] font-bold">
+              {{ person.initials }}
+              <span class="font-normal text-ink-2">{{ person.email }}</span>
+            </p>
+            <p class="mt-0.5 text-[15px] leading-snug text-ink-3">
+              {% if person.admin %}{% translate "Admin" context "role" %} · {% endif %}
+              {% if not person.verified %}{% translate "Not confirmed yet" %}{% elif person.google %}Google{% else %}{% translate "Email and password" %}{% endif %}
+              · {% blocktranslate trimmed count counter=person.recipes %}{{ counter }} recipe{% plural %}{{ counter }} recipes{% endblocktranslate %}
+              <br>
+              {% if person.last_login %}{% blocktranslate trimmed with when=person.last_login|date:"j. F Y, H:i" %}Last signed in {{ when }}{% endblocktranslate %}{% else %}{% translate "Never signed in" %}{% endif %}
+            </p>
+            <div class="mt-1 -ml-3 flex flex-wrap items-center gap-x-2">
+              {% if person.verified and not person.admin %}
+                <form method="post" action="{% url 'backoffice:set_cook' person.pk %}">
+                  {% csrf_token %}
+                  <input type="hidden" name="can_cook" value="{% if person.can_cook %}0{% else %}1{% endif %}">
+                  <button type="submit" role="switch" aria-checked="{% if person.can_cook %}true{% else %}false{% endif %}"
+                          class="inline-flex items-center gap-2.5 h-11 px-3 rounded-full text-[15px] font-bold {% if person.can_cook %}text-herb-dark{% else %}text-ink-3{% endif %} hover:bg-surface">
+                    <span aria-hidden="true" class="relative w-11 h-7 rounded-full {% if person.can_cook %}bg-herb{% else %}bg-line-strong{% endif %}">
+                      <span class="absolute top-1 {% if person.can_cook %}left-5{% else %}left-1{% endif %} w-5 h-5 rounded-full bg-white shadow"></span>
+                    </span>
+                    {% translate "May cook" %}
+                  </button>
+                </form>
+              {% endif %}
+              {% if not person.is_you %}
+                <details class="[&[open]]:basis-full">
+                  <summary class="inline-flex items-center h-11 px-3 rounded-full cursor-pointer list-none text-[15px] font-bold text-ink-3 hover:text-ember [&::-webkit-details-marker]:hidden">{% translate "Delete" %}</summary>
+                  <form method="post" action="{% url 'backoffice:delete_person' person.pk %}" class="mt-1 ml-3 rounded-2xl bg-ember-tint px-4 py-4 flex flex-col gap-3">
+                    {% csrf_token %}
+                    <p class="text-[16px] leading-relaxed">{% blocktranslate trimmed with initials=person.initials %}
+                      {{ initials }} can no longer sign in. Their recipes go to the archive, where you can give them to someone else.
+                    {% endblocktranslate %}</p>
+                    <button type="submit" class="h-12 rounded-[14px] bg-ember text-white text-[17px] font-extrabold hover:bg-[#7F3D0F]">{% blocktranslate trimmed with initials=person.initials %}Yes, delete {{ initials }}{% endblocktranslate %}</button>
+                  </form>
+                </details>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </li>
+    {% empty %}
+      <li class="py-6 text-[17px] text-ink-2">{% translate "No one has an account yet." %}</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

@@ -72,7 +72,14 @@ sort of that graph; a flowchart is a drawing of it. One model, many views.
 > as a number makes Python and Dart compute different hashes for one recipe.
 > `float` is banned from every schema field.
 
-> **`/api/` and `/ops/api/` are exempt from `LoginRequiredMiddleware`, so
+> **Pages are open, member, cook or admin by view name, in
+> `accounts.middleware.AccessMiddleware`; a view not listed needs someone who
+> may cook.** Fail closed: list a view as public only deliberately. People are
+> known by a keyed hash of their address (`accounts.identity`), which is also
+> their username and so every version's author. Never put an address into the
+> store, a log or a page.
+
+> **`/api/` and `/ops/api/` are exempt from `AccessMiddleware`, so
 > neither gets any protection from it.** All API authorization is explicit, in
 > the django-ninja `auth=` declaration and in `require_ops_access`. An endpoint
 > added without an auth declaration is published to the internet. This is the
@@ -119,8 +126,10 @@ packages/snapcook-core/src/snapcook_core/
 apps/web/
 ├── snapcookweb/settings.py # single flat settings; env-var docstring at the top
 ├── snapcookweb/urls.py     # conditional mounting of the two API surfaces
-├── accounts/middleware.py  # LoginRequiredMiddleware + its exempt prefixes
-├── accounts/models.py      # UserPreferences, ApiToken (per-user PATs)
+├── accounts/middleware.py  # AccessMiddleware: who may open which view; fails closed
+├── accounts/identity.py    # uids (keyed hash of the address), initials, roles
+├── accounts/models.py      # UserPreferences, ApiToken (per-user PATs), Profile
+├── backoffice/views.py     # /admin: people and the cook switch, recipes, archive
 ├── catalog/models.py       # the derived projection -- read the warning first
 ├── catalog/access.py       # visible_recipes(): the ONE authorization funnel
 ├── catalog/management/commands/reindex.py   # proof that Postgres is a cache
@@ -129,6 +138,7 @@ apps/web/
 ├── api/ops.py              # /ops/api/ -- ignores ownership. Read the danger note.
 ├── imports/fetch.py        # fetches only from the public internet; read before touching
 ├── imports/tasks.py        # the worker's half of an import: fetch, read, normalise
+├── imports/sources.py      # each recipe's kept original, under SNAPCOOK_SOURCES_DIR
 └── translations/tasks.py   # commits a translation in the OWNER's name; read why first
 ```
 

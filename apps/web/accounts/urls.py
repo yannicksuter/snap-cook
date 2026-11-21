@@ -2,7 +2,7 @@
 """The reader's own pages.
 
 Mounted at ``/settings/``, never under ``/accounts/``: that prefix belongs to
-allauth and is exempt from ``LoginRequiredMiddleware``.
+allauth and is exempt from ``AccessMiddleware``.
 """
 
 from django.urls import path

@@ -15,6 +15,7 @@ import mimetypes
 
 from django.db import transaction
 
+from imports import sources
 from imports.fetch import FetchError, fetch_page
 from imports.models import ImportJob
 from imports.page import read_page
@@ -64,13 +65,11 @@ def read_recipe(job_id: str) -> None:
 
 
 def source_for(job: ImportJob) -> ImportSource:
-    """What the job's reader gave us, fetched and loaded. Retains a page's text."""
+    """What the job's reader gave us, fetched and loaded. Keeps a fetched page."""
+    if job.replaces:
+        return _kept_original(job)
     if job.kind == ImportJob.Kind.PAGE:
-        page = fetch_page(job.source_url)
-        source = read_page(page.url, page.html)
-        job.source_text = source.text
-        job.save(update_fields=["source_text", "updated_at"])
-        return source
+        return _fetched(job)
     if job.kind == ImportJob.Kind.FILES:
         files = tuple(
             ImportFile(data=path.read_bytes(), media_type=_media_type(path.name))
@@ -78,6 +77,49 @@ def source_for(job: ImportJob) -> ImportSource:
         )
         return ImportSource(kind="files", files=files)
     return ImportSource(kind="text", text=job.source_text)
+
+
+def _fetched(job: ImportJob) -> ImportSource:
+    """The page behind the link, read, and kept as fetched for reading it again."""
+    page = fetch_page(job.source_url)
+    directory = job.source_dir()
+    directory.mkdir(parents=True, exist_ok=True)
+    (directory / sources.PAGE_HTML).write_text(page.html, encoding="utf-8")
+    source = read_page(page.url, page.html)
+    job.source_text = source.text
+    job.save(update_fields=["source_text", "updated_at"])
+    return source
+
+
+def _kept_original(job: ImportJob) -> ImportSource:
+    """A saved recipe's original, as it was kept: never the live page if there is a copy.
+
+    A link may be gone by now, or show something else; the copy is what the
+    recipe was read from. Only with no copy at all is the link tried, and if it
+    no longer loads the job fails with a reason the admin page shows.
+    """
+    directory = job.source_dir()
+    files = job.source_files()
+    if files:
+        return ImportSource(
+            kind="files",
+            files=tuple(
+                ImportFile(data=path.read_bytes(), media_type=_media_type(path.name))
+                for path in files
+            ),
+        )
+    if (directory / sources.PAGE_HTML).is_file():
+        html = (directory / sources.PAGE_HTML).read_text(encoding="utf-8")
+        return read_page(job.source_url or "https://example.invalid/", html)
+    for name in (sources.PAGE_TEXT, sources.PASTED_TEXT):
+        if (directory / name).is_file():
+            return ImportSource(kind="text", text=(directory / name).read_text(encoding="utf-8"))
+    if job.source_url:
+        try:
+            return _fetched(job)
+        except FetchError as error:
+            raise FetchError("no_source", error.detail) from error
+    raise FetchError("no_source", "nothing of the original was kept")
 
 
 def _media_type(name: str) -> str:

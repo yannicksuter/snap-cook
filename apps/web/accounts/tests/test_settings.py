@@ -8,13 +8,16 @@ import re
 import pytest
 
 from accounts.models import UserPreferences
+from accounts.testing import verified
 
 pytestmark = pytest.mark.django_db
 
 
 @pytest.fixture
 def cook(client, django_user_model):
-    user = django_user_model.objects.create_user(username="cook", email="cook@example.com")
+    user = verified(
+        django_user_model.objects.create_user(username="cook", email="cook@example.com"), cook=False
+    )
     client.force_login(user)
     return user
 
@@ -22,7 +25,7 @@ def cook(client, django_user_model):
 def test_the_page_needs_a_sign_in(client) -> None:
     response = client.get("/settings/")
     assert response.status_code == 302
-    assert "google" in response["Location"]
+    assert response["Location"] == "/accounts/login/?next=%2Fsettings%2F"
 
 
 def test_looking_saves_nothing(cook, client) -> None:

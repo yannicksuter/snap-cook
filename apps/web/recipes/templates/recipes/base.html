@@ -47,11 +47,13 @@ docs/architecture/units-and-i18n.md.
   <header class="border-b border-line print:hidden">
     <div class="max-w-3xl mx-auto px-5 py-3 flex items-center justify-between gap-3">
       <a href="{% url 'recipes:index' %}" class="text-[23px] font-extrabold tracking-tight text-ink hover:text-herb">snap-cook</a>
-      {% if user.is_authenticated %}
+      {% if access.member %}
+        {# The person's initials: their whole identity on the page, see accounts.identity. #}
         <a href="{% url 'accounts:settings' %}" aria-label="{% translate 'Your settings: language and units' %}"
-           class="w-12 h-12 rounded-full border border-line-strong bg-surface text-ink flex items-center justify-center hover:border-ink-3">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-        </a>
+           class="w-12 h-12 rounded-full bg-herb-tint text-herb-dark text-[16px] font-extrabold tracking-wide flex items-center justify-center hover:bg-[#D5E6D9]">{{ access.initials }}</a>
+      {% else %}
+        <a href="{% url 'account_login' %}?next={{ request.get_full_path|urlencode }}"
+           class="h-11 px-4 rounded-full border-2 border-line-strong text-[16px] font-bold flex items-center hover:border-ink-3">{% translate "Sign in" %}</a>
       {% endif %}
     </div>
   </header>
@@ -83,5 +85,6 @@ docs/architecture/units-and-i18n.md.
     </div>
   </footer>
 
+  {% block extra_body %}{% endblock %}
 </body>
 </html>

@@ -18,7 +18,20 @@ convenience copy — if they disagree, the docstring wins.
 
 | Variable | Default | Notes |
 |---|---|---|
-| `SNAPCOOK_DATA_DIR` | `/data` | **The only thing that must be backed up** |
+| `SNAPCOOK_DATA_DIR` | `/data` | **Must be backed up**: the recipes, the database, the uid key |
+| `SNAPCOOK_SOURCES_DIR` | `/sources` if mounted, else `<data>/sources` | The originals recipes were read from. Back it up too. |
+
+## Accounts and mail
+
+| Variable | Default | Notes |
+|---|---|---|
+| `SNAPCOOK_ADMIN_EMAILS` | — | Comma-separated addresses that may open `/admin`, once confirmed |
+| `SNAPCOOK_UID_KEY` | made on first start, kept in `<data>/secrets/uid.key` | Keys the hash people are known by. Never change it. |
+| `SNAPCOOK_SMTP_HOST` | — | Without it no mail goes out, and only Google sign-in is offered |
+| `SNAPCOOK_SMTP_PORT` | `587` | `465` for TLS from the start, else STARTTLS |
+| `SNAPCOOK_SMTP_USER` / `SNAPCOOK_SMTP_PASSWORD` | — | |
+| `SNAPCOOK_MAIL_FROM` | the SMTP user | Sender of confirmation and reset mails |
+| `SNAPCOOK_PUBLIC_HOST` | first public `DJANGO_ALLOWED_HOSTS` entry | The host mails link to |
 
 ## API surfaces
 

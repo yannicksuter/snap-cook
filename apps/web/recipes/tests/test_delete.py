@@ -2,8 +2,8 @@
 """The owner deletes a recipe: gone from the catalog, moved aside in the store.
 
 Only the owner may, and only by a POST. A full reindex must not bring it back,
-because the store is what the catalog is rebuilt from. What it was imported
-from goes too, as when a draft is deleted.
+because the store is what the catalog is rebuilt from. The original it was
+read from goes aside with it, to be restored together.
 """
 
 from __future__ import annotations
@@ -11,6 +11,7 @@ from __future__ import annotations
 import pytest
 from django.core.management import call_command
 
+from accounts.testing import verified
 from catalog.models import Recipe
 from catalog.projection import project_recipe
 from imports.models import ImportJob
@@ -33,7 +34,9 @@ lang: de
 
 @pytest.fixture
 def owner(client, django_user_model):
-    user = django_user_model.objects.create_user(username="nonna", email="nonna@example.com")
+    user = verified(
+        django_user_model.objects.create_user(username="nonna", email="nonna@example.com")
+    )
     client.force_login(user)
     return user
 
@@ -68,7 +71,7 @@ def test_deleting_takes_it_out_of_the_catalog_and_the_store(stored, client) -> N
     assert not Recipe.objects.exists(), "a rebuild from the store must not bring it back"
 
 
-def test_what_it_was_imported_from_goes_with_it(stored, owner, client) -> None:
+def test_its_original_goes_aside_with_it(stored, owner, client, settings) -> None:
     _store, row = stored
     job = ImportJob.objects.create(
         owner=owner, kind="files", status="saved", recipe_slug=row.slug, recipe_id=row.recipe_id
@@ -78,14 +81,19 @@ def test_what_it_was_imported_from_goes_with_it(stored, owner, client) -> None:
     other = ImportJob.objects.create(owner=owner, kind="text", source_text="another recipe")
 
     client.post(f"/r/{row.slug}/delete/")
-    assert not ImportJob.objects.filter(pk=job.pk).exists()
     assert not job.source_dir().exists()
+    assert (
+        settings.SNAPCOOK_SOURCES_DIR / ".trash" / row.recipe_id / "1.jpg"
+    ).read_bytes() == b"photo"
+    assert not ImportJob.objects.filter(pk=job.pk).exists()
     assert ImportJob.objects.filter(pk=other.pk).exists()
 
 
 def test_only_the_owner_may_delete(stored, client, django_user_model) -> None:
     store, row = stored
-    reader = django_user_model.objects.create_user(username="cook", email="cook@example.com")
+    reader = verified(
+        django_user_model.objects.create_user(username="cook", email="cook@example.com")
+    )
     client.force_login(reader)
     assert "Käsekuchen" in client.get(f"/r/{row.slug}/").content.decode()
     assert client.post(f"/r/{row.slug}/delete/").status_code == 404

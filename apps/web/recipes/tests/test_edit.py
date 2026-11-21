@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import pytest
 
+from accounts.testing import verified
 from catalog.projection import project_recipe
 from snapcook_core.cooklang import parse_cook
 from snapcook_core.store import FilesystemStore
@@ -33,7 +34,9 @@ Bei ^conventional{175%C} (^fan{155%C}) ~{55%min} backen.
 
 @pytest.fixture
 def owner(client, django_user_model):
-    user = django_user_model.objects.create_user(username="nonna", email="nonna@example.com")
+    user = verified(
+        django_user_model.objects.create_user(username="nonna", email="nonna@example.com")
+    )
     client.force_login(user)
     return user
 
@@ -65,7 +68,9 @@ def test_only_the_owner_is_offered_edit(stored, owner, client, django_user_model
     _store, row = stored
     assert f'href="/r/{row.slug}/edit/"' in client.get(f"/r/{row.slug}/").content.decode()
 
-    other = django_user_model.objects.create_user(username="cook", email="cook@example.com")
+    other = verified(
+        django_user_model.objects.create_user(username="cook", email="cook@example.com")
+    )
     client.force_login(other)
     page = client.get(f"/r/{row.slug}/").content.decode()
     assert "Käsekuchen" in page

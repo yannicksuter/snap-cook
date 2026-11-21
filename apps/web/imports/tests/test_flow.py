@@ -13,6 +13,7 @@ import re
 import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 
+from accounts.testing import verified
 from catalog.models import Recipe
 from imports import forms, views
 from imports.models import ImportJob
@@ -26,7 +27,9 @@ _PDF = b"%PDF-1.7\n" + b"0" * 128
 
 @pytest.fixture
 def cook(client, django_user_model):
-    user = django_user_model.objects.create_user(username="cook", email="cook@example.com")
+    user = verified(
+        django_user_model.objects.create_user(username="cook", email="cook@example.com")
+    )
     client.force_login(user)
     return user
 
@@ -220,7 +223,7 @@ def test_unreadable_text_can_be_fixed_by_hand(cook, client, reader) -> None:
 
 
 def test_someone_elses_draft_does_not_exist(cook, client, django_user_model) -> None:
-    other = django_user_model.objects.create_user(username="other", email="o@example.com")
+    other = verified(django_user_model.objects.create_user(username="other", email="o@example.com"))
     job = ImportJob.objects.create(owner=other, kind="text", source_text="secret family recipe")
     for url in (f"/drafts/{job.pk}/", f"/drafts/{job.pk}/check/"):
         assert client.get(url).status_code == 404

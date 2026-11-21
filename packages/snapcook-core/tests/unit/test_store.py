@@ -138,3 +138,33 @@ def test_a_second_removal_of_the_same_id_does_not_overwrite_the_first(tmp_path: 
         store.commit(recipe, author="user:alice", created_at=at)
         store.remove(recipe.id)
     assert sorted(p.name for p in (tmp_path / ".trash").iterdir()) == [recipe.id, f"{recipe.id}.2"]
+
+
+# -- handing a recipe to someone else -----------------------------------------------
+
+
+def test_reassigning_makes_a_version_with_the_same_content_and_a_new_author(store) -> None:
+    recipe = get_recipe("006-roesti")
+    first = _commit(store, recipe)
+    moved = store.reassign(recipe.id, author="user:bob", created_at="2026-07-21T10:00:00")
+    assert (moved.author, moved.origin, moved.parents) == (
+        "user:bob",
+        "reassigned",
+        [first.version_id],
+    )
+    assert moved.content_hash == first.content_hash
+    assert moved.version_id != first.version_id
+    assert store.head(recipe.id).author == "user:bob"
+    assert len(store.history(recipe.id)) == 2
+
+
+def test_reassigning_to_the_author_already_there_changes_nothing(store) -> None:
+    recipe = get_recipe("006-roesti")
+    first = _commit(store, recipe)
+    assert store.reassign(recipe.id, author="user:alice", created_at="2026-07-21T10:00:00") == first
+    assert len(store.history(recipe.id)) == 1
+
+
+def test_reassigning_what_is_not_there_raises(store) -> None:
+    with pytest.raises(RefNotFoundError):
+        store.reassign("rcp_does_not_exist", author="user:bob", created_at="2026-07-21T10:00:00")

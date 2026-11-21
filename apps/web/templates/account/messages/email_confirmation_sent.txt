@@ -1,0 +1,1 @@
+{% load i18n %}{% translate "We sent you a link to confirm your email." %}

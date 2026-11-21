@@ -2,7 +2,9 @@
 
 snap-cook runs as one container, `ghcr.io/yannicksuter/snap-cook`: the site, the
 background worker that reads new recipes, and a Postgres database of its own.
-Everything it keeps lives in one folder, mounted at `/data`.
+Everything it keeps lives in one folder, mounted at `/data`; the originals
+recipes were read from (photos, PDFs, pages) can live in a second one, mounted
+at `/sources`.
 
 `stable` is the newest release ([how releases work](runbooks/release.md)).
 `GET /up` returns `{"status": "ok", "commit": "<Git commit SHA>"}` without
@@ -12,7 +14,8 @@ signing in, so you can tell which build is live.
 > and its history, and the database with the accounts, settings, API tokens and
 > drafts. Back it up while the container is stopped, as CA Appdata Backup does,
 > so the database files are consistent. See
-> [restore-from-backup](runbooks/restore-from-backup.md).
+> [restore-from-backup](runbooks/restore-from-backup.md). Back up `/sources`
+> too if you mount it: it is the only copy of each recipe's original.
 
 ## Unraid setup
 
@@ -25,6 +28,7 @@ In **Docker → Add Container**, enable **Advanced View** and use these settings
 | Network Type | `Bridge` |
 | Port (HTTP) | Config Type **Port**: Container Port `8931`, Host Port `8931`, TCP |
 | Path (data) | Config Type **Path**: Container Path `/data`, Host Path `/mnt/user/appdata/snap-cook`, Access Mode **Read/Write** |
+| Path (originals) | Config Type **Path**: Container Path `/sources`, Host Path a share of your choice, e.g. `/mnt/user/snap-cook-sources`, Access Mode **Read/Write**. Optional: without it the originals stay in `/data/sources`. Once mounted, the next start moves them there. |
 | Variables | See [Environment variables](#environment-variables) |
 | WebUI | `http://[IP]:[PORT:8931]/` |
 | Extra Parameters | `--restart=unless-stopped --stop-timeout=30` |
@@ -50,6 +54,13 @@ the **Key** and **Value**, and set **Password Mask: Yes** for every secret.
 | `DJANGO_ALLOWED_HOSTS` | yes | Every host name the site is reached by, comma-separated, e.g. `cook.example.com,192.168.1.42`. Others get `400 Bad Request`. |
 | `GOOGLE_CLIENT_ID` | yes | From [Google sign-in](#google-sign-in) |
 | `GOOGLE_CLIENT_SECRET` | yes | Password Mask |
+| `SNAPCOOK_ADMIN_EMAILS` | for `/admin` | The addresses that may open `/admin`, comma-separated. They must sign in and be confirmed like everyone else. |
+| `SNAPCOOK_SMTP_HOST` | for passwords | The mail server for confirmation and password-reset mails, e.g. `smtp.gmail.com`. Without it, signing up with a password is closed and only Google works. See [Mail](#mail). |
+| `SNAPCOOK_SMTP_PORT` | no | `587` (default, STARTTLS) or `465` (TLS) |
+| `SNAPCOOK_SMTP_USER` | with SMTP | The mail account's user name |
+| `SNAPCOOK_SMTP_PASSWORD` | with SMTP | Password Mask. For Gmail, an app password, not the account's own. |
+| `SNAPCOOK_MAIL_FROM` | no | The sender, e.g. `snap-cook <you@gmail.com>`. Default: the SMTP user. |
+| `SNAPCOOK_PUBLIC_HOST` | no | The host name mails link to. Default: the first public name in `DJANGO_ALLOWED_HOSTS`. |
 | `SNAPCOOK_API_TOKEN_PEPPER` | yes | `openssl rand -hex 32`. Password Mask. Changing it invalidates every Personal Access Token users have made. |
 | `SNAPCOOK_LLM_API_KEY` | to add recipes | An API key from the [Claude Console](https://platform.claude.com/), billed separately from a Claude subscription. Password Mask. Without it, "Add a recipe" says it is not set up. |
 | `SNAPCOOK_LLM_MODEL` | no | Default `claude-opus-5-5` |
@@ -74,7 +85,9 @@ http://0.0.0.0:8931` and `Q Cluster ... running.`. The container's health turns
 **healthy**, and `http://<unraid-ip>:8931/up` answers with the commit.
 
 The folder then holds `store/` (the recipes), `postgres/` (the database),
-`sources/` (the photos and pages imports read) and `logs/`.
+`secrets/` (the key people's ids are made with; never delete it), `logs/`, and,
+without a `/sources` mount, `sources/` (the originals recipes were read from,
+one folder per recipe).
 
 To start with the six example recipes, run once in the Unraid terminal:
 
@@ -87,10 +100,36 @@ Other `manage.py` commands, such as `reindex --full --yes`
 in front, or typed into the container's **Console**. A deleted recipe can be
 brought back the same way: [restore a recipe](runbooks/restore-a-recipe.md).
 
+## Who may do what
+
+Anyone may read the shared recipes, without an account. Signing in, with Google
+or with an address and a password, keeps a person's settings. Adding, changing,
+deleting and translating recipes spends API credit, so a new account only reads
+until an admin switches **May cook** on for it in `/admin`. Admins are the
+confirmed addresses in `SNAPCOOK_ADMIN_EMAILS`; they always may cook.
+
+An address counts once it is confirmed: Google confirms it, a password account
+by the link in the mail it gets. Until then the account reads as anyone does.
+People appear by two or three initials (yannick.suter@… is **YS**); no page
+shows an address, and `/admin` shows it masked. Accounts that existed before
+keep cooking.
+
+`/admin` lists everyone with the switch, and recipes, which an admin can read
+again from their kept original, and an archive: deleting an account moves its
+recipes there, where they can be given to someone else.
+
+## Mail
+
+Confirmation and password-reset mails go out over SMTP. With Gmail: turn on
+2-step verification for the account, create an **app password** at
+[myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords),
+and set `SNAPCOOK_SMTP_HOST=smtp.gmail.com`, `SNAPCOOK_SMTP_USER=<the address>`
+and `SNAPCOOK_SMTP_PASSWORD=<the app password>`. Without `SNAPCOOK_SMTP_HOST`
+only Google sign-in is offered.
+
 ## Google sign-in
 
-The site asks for a Google sign-in on every page (`/up`, the two APIs and
-Django's `/admin/` have access rules of their own). Google redirects back only
+Google redirects back only
 to `localhost` or a real HTTPS host name, never to a LAN address such as
 `192.168.1.42`, so a server needs a public host name. With a Cloudflare Tunnel:
 in Cloudflare Zero Trust, open your tunnel → **Public Hostname** → **Add**, e.g.
@@ -111,9 +150,7 @@ subdomain `cook`, Service Type `HTTP`, URL `<unraid-ip>:8931`.
 4. Set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` on the container (for a
    local checkout, in `.env`), and **Apply**.
 
-The credentials come from the environment only. Do not also add a **Social
-application** in Django's admin: with two sets, sign-in fails with
-`MultipleObjectsReturned`.
+The credentials come from the environment only.
 
 Behind the tunnel, or any other reverse proxy, the site takes the scheme from
 `X-Forwarded-Proto` and trusts `https://<host>` for forms, for every host in

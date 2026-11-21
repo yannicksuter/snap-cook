@@ -11,6 +11,7 @@ from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods
 
 from accounts.forms import PreferencesForm
+from accounts.identity import mask
 from accounts.models import UserPreferences
 
 
@@ -28,7 +29,8 @@ def preferences(request: HttpRequest) -> HttpResponse:
             return redirect("accounts:settings")
     else:
         form = PreferencesForm(instance=instance)
-    return render(request, "accounts/settings.html", {"form": form})
+    context = {"form": form, "masked_email": mask(request.user.email)}
+    return render(request, "accounts/settings.html", context)
 
 
 def _preferences_for(request: HttpRequest) -> UserPreferences:
