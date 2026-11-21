@@ -87,3 +87,12 @@ def in_parts(steps) -> list[dict]:
         {"title": title, "steps": list(run)}
         for title, run in groupby(steps, key=lambda step: step.section)
     ]
+
+
+@register.simple_tag
+def side_by_side_from(model, step) -> tuple[int, ...] | None:
+    """The run of steps that can go side by side, if it starts at ``step``.
+
+    Its tip stands in that step, where the cook is when it helps.
+    """
+    return next((run for run in model.side_by_side if run[0] == step.index), None)

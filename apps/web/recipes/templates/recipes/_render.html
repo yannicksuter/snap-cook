@@ -92,12 +92,6 @@ ingredients sit beside the steps and stay in view while you scroll them.
   <section class="mt-12 lg:mt-0" aria-labelledby="steps">
     <p class="text-[13px] font-extrabold uppercase tracking-[0.16em] text-herb">02 / {% translate "Let’s cook" %}</p>
     <h2 id="steps" class="mt-1.5 text-[28px] lg:text-[34px] font-extrabold tracking-[-0.01em] text-herb-dark">{% translate "Steps" %}</h2>
-    {% for run in model.side_by_side %}
-      <p class="mt-4 flex gap-3 rounded-2xl bg-herb-tint px-4 py-3.5 text-[17px] leading-snug">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="flex-none mt-0.5 text-herb"><path d="M4 7h14M15 4l3 3-3 3M4 17h14M15 14l3 3-3 3"/></svg>
-        <span><strong class="font-bold text-herb-dark">{% translate "Save time:" %}</strong> {% side_by_side_hint run %}</span>
-      </p>
-    {% endfor %}
     {% for part in model.steps|in_parts %}
     {% if part.title %}<h3 class="mt-7 text-[20px] font-extrabold text-herb-dark">{{ part.title }}</h3>{% endif %}
     <ol class="{% if part.title %}mt-1{% else %}mt-3{% endif %}">
@@ -149,6 +143,13 @@ ingredients sit beside the steps and stay in view while you scroll them.
                     {% if temperature.setting %}{{ temperature.value }}<span class="sr-only"> {{ temperature.setting }}</span>{% else %}{{ temperature.display }}{% endif %}
                   </span>
                 {% endfor %}
+              </p>
+            {% endif %}
+            {% side_by_side_from model step as run %}
+            {% if run %}
+              <p class="flex gap-2.5 rounded-xl bg-herb-tint px-3.5 py-2.5 text-[16px] leading-snug">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="flex-none mt-0.5 text-herb"><path d="M4 7h14M15 4l3 3-3 3M4 17h14M15 14l3 3-3 3"/></svg>
+                <span><strong class="font-bold text-herb-dark">{% translate "Save time:" %}</strong> {% side_by_side_hint run %}</span>
               </p>
             {% endif %}
           </div>

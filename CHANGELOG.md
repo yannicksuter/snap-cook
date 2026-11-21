@@ -24,6 +24,8 @@ change** and says so explicitly here.
 - Every recipe is open to read, to everyone, signed in or not; only the
   person who added it may change or delete it. A recipe marked private before
   is open too: the one access rule (`catalog.access`) no longer looks at it.
+- A "Save time" tip stands in the step it starts at, below its times, instead
+  of above all the steps.
 
 ### Added
 

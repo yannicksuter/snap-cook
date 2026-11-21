@@ -101,3 +101,19 @@ def test_a_steps_time_is_a_button_that_counts_it_down(
     page = client.get(f"/r/{row.slug}/?lang=de", HTTP_ACCEPT_LANGUAGE="de").content.decode()
     assert 'data-timer="act_1:0" data-seconds="3600" data-display="1 h"' in page
     assert 'aria-label="Timer für 1 h starten"' in page
+
+
+def test_a_save_time_tip_stands_in_the_step_it_starts_at(
+    client, settings, tmp_path, django_user_model
+) -> None:
+    row = _shared(
+        settings,
+        tmp_path,
+        django_user_model,
+        "@Zwiebel{1} schneiden. => Zwiebeln\n\n@Tomaten{4} würfeln. => Tomaten\n\n"
+        "Die @&{Zwiebeln} mit den @&{Tomaten} kochen.\n",
+    )
+    page = client.get(f"/r/{row.slug}/?lang=de").content.decode()
+    tip = page.index("Steps 1 and 2 don’t depend on each other")
+    assert page.index("schneiden.") < tip < page.index("würfeln."), "inside step 1, not above"
+    assert page.count("don’t depend on each other") == 1
