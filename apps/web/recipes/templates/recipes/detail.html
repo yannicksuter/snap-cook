@@ -80,27 +80,43 @@ chart's look and behaviour (_chart_assets.html, shared with the print page).
         !timer ? "idle" : timer.rang ? "done" : timer.paused != null ? "paused" : "running";
 
       // The sound is made here rather than loaded, and a browser lets it play
-      // only once a tap has allowed it.
+      // only once a tap has allowed it: the tap that starts a timer plays a
+      // moment of silence, which is what unlocks sound on an iPhone. Marked as
+      // playback, so an iPhone's silent switch does not mute the alarm.
       let audio = null;
       const allowSound = () => {
-        audio ??= new (window.AudioContext || window.webkitAudioContext)();
+        if (navigator.audioSession) navigator.audioSession.type = "playback";
+        if (!audio) {
+          audio = new (window.AudioContext || window.webkitAudioContext)();
+          const silence = audio.createBufferSource();
+          silence.buffer = audio.createBuffer(1, 1, 22050);
+          silence.connect(audio.destination);
+          silence.start(0);
+        }
         audio.resume();
       };
+      // A kitchen timer's ring: two tones, high then higher, four times over.
       const ring = () => {
-        navigator.vibrate?.([300, 150, 300]);
+        navigator.vibrate?.([400, 150, 400, 150, 400]);
         if (!audio) return;
-        const now = audio.currentTime;
-        for (const at of [0, 0.3, 0.6]) {
-          const tone = audio.createOscillator();
-          const level = audio.createGain();
-          tone.frequency.value = 880;
-          level.gain.setValueAtTime(0.0001, now + at);
-          level.gain.exponentialRampToValueAtTime(0.4, now + at + 0.02);
-          level.gain.exponentialRampToValueAtTime(0.0001, now + at + 0.25);
-          tone.connect(level).connect(audio.destination);
-          tone.start(now + at);
-          tone.stop(now + at + 0.3);
-        }
+        const play = () => {
+          const now = audio.currentTime;
+          for (let n = 0; n < 8; n++) {
+            const at = now + n * 0.18 + Math.floor(n / 2) * 0.12;
+            const tone = audio.createOscillator();
+            const level = audio.createGain();
+            tone.type = "triangle";
+            tone.frequency.value = n % 2 ? 1319 : 988;
+            level.gain.setValueAtTime(0.0001, at);
+            level.gain.exponentialRampToValueAtTime(0.8, at + 0.015);
+            level.gain.exponentialRampToValueAtTime(0.0001, at + 0.16);
+            tone.connect(level).connect(audio.destination);
+            tone.start(at);
+            tone.stop(at + 0.17);
+          }
+        };
+        if (audio.state === "running") play();
+        else audio.resume().then(play, () => {});
       };
 
       let lock = null;
