@@ -7,7 +7,7 @@
 {% block content %}
   <form method="get" action="{% url 'recipes:index' %}" role="search" class="px-5 pt-4 flex gap-2">
     <label for="q" class="sr-only">{% translate "Search recipes" %}</label>
-    <div class="flex-1 min-w-0 flex items-center gap-2.5 h-[52px] px-4 rounded-[14px] border-2 border-line-strong text-ink-2 focus-within:border-herb">
+    <div class="flex-1 min-w-0 flex items-center gap-2.5 h-[52px] px-4 rounded-[14px] border-2 border-line-strong bg-white text-ink-2 focus-within:border-herb">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="flex-none"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
       <input id="q" name="q" type="search" value="{{ query }}" placeholder="{% translate 'Search by name or ingredient' %}"
              class="flex-1 min-w-0 bg-transparent text-[18px] text-ink outline-none placeholder:text-ink-3">
@@ -50,7 +50,7 @@
     <ul class="px-5 pt-3 pb-8 grid gap-3 sm:grid-cols-2">
       {% for recipe in recipes %}
         <li>
-          <a href="{% url 'recipes:detail' recipe.slug %}" class="h-full flex items-center gap-3.5 p-3 rounded-2xl border border-line hover:border-ink-3">
+          <a href="{% url 'recipes:detail' recipe.slug %}" class="h-full flex items-center gap-3.5 p-3 rounded-2xl border border-line-soft bg-white hover:border-ink-3">
             <span aria-hidden="true" class="flex-none w-[72px] h-[72px] rounded-xl flex items-center justify-center text-[30px] font-extrabold {% cycle 'bg-ember-tint text-ember' 'bg-herb-tint text-herb' %}">{{ recipe.title|slice:":1"|upper }}</span>
             <span class="min-w-0 flex flex-col gap-1">
               <span class="text-[20px] font-bold leading-tight">{{ recipe.title }}</span>
@@ -80,7 +80,7 @@
   {% endif %}
 
   {% if access.cook %}
-  <div class="sticky bottom-0 px-5 py-3 border-t border-line bg-white">
+  <div class="sticky bottom-0 px-5 py-3 border-t border-line bg-paper">
     <a href="{% url 'imports:add' %}" class="flex items-center justify-center gap-2.5 h-14 rounded-2xl bg-herb text-white text-[19px] font-bold hover:bg-herb-dark">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
       {% translate "Add a recipe" %}

@@ -26,11 +26,11 @@ password, so the form is left out.
         {% for error in form.non_field_errors %}<p class="rounded-2xl bg-ember-tint px-4 py-3 text-[17px] leading-relaxed" role="alert">{{ error }}</p>{% endfor %}
         <label for="id_login" class="sr-only">{% translate "Email" %}</label>
         <input id="id_login" name="login" type="email" autocomplete="email" required placeholder="{% translate 'Email' %}" value="{{ form.login.value|default_if_none:'' }}"
-               class="h-14 px-4 rounded-[14px] border-2 border-line-strong text-[18px] outline-none focus:border-herb">
+               class="bg-white h-14 px-4 rounded-[14px] border-2 border-line-strong text-[18px] outline-none focus:border-herb">
         {% for error in form.login.errors %}<p class="text-[16px] text-ember" role="alert">{{ error }}</p>{% endfor %}
         <label for="id_password" class="sr-only">{% translate "Password" %}</label>
         <input id="id_password" name="password" type="password" autocomplete="current-password" required placeholder="{% translate 'Password' %}"
-               class="h-14 px-4 rounded-[14px] border-2 border-line-strong text-[18px] outline-none focus:border-herb">
+               class="bg-white h-14 px-4 rounded-[14px] border-2 border-line-strong text-[18px] outline-none focus:border-herb">
         {% for error in form.password.errors %}<p class="text-[16px] text-ember" role="alert">{{ error }}</p>{% endfor %}
         {{ redirect_field }}
         <button type="submit" class="mt-1 h-14 rounded-2xl bg-herb text-white text-[19px] font-extrabold hover:bg-herb-dark">{% translate "Sign in" %}</button>

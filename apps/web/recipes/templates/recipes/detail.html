@@ -10,6 +10,9 @@ chart's look and behaviour (_chart_assets.html, shared with the print page).
 
 {% block title %}{{ model.title }} · snap-cook{% endblock %}
 
+{# Wide enough on a large screen for the ingredients to sit beside the steps. #}
+{% block page_width %}72rem{% endblock %}
+
 {% block content %}
   <div class="px-3 pt-3 flex items-center justify-between gap-2 print:hidden">
     <a href="{% url 'recipes:index' %}" class="inline-flex items-center gap-1 h-11 pl-1 pr-3 rounded-full text-[17px] font-bold text-ink-2 hover:bg-surface hover:text-ink">
@@ -29,4 +32,23 @@ chart's look and behaviour (_chart_assets.html, shared with the print page).
   </div>
 
   {% include "recipes/_chart_assets.html" %}
+  <script>
+    // Ticked-off ingredients, kept for this tab while cooking, and through a
+    // change of servings, which swaps the list for a new one.
+    (() => {
+      const key = `ticked:${location.pathname}`;
+      const boxes = () => document.querySelectorAll("[data-ingredient]");
+      const restore = () => {
+        const ticked = JSON.parse(sessionStorage.getItem(key) || "[]");
+        boxes().forEach((box) => { box.checked = ticked.includes(box.dataset.ingredient); });
+      };
+      document.addEventListener("change", (event) => {
+        if (!event.target.matches("[data-ingredient]")) return;
+        const ticked = [...boxes()].filter((box) => box.checked).map((box) => box.dataset.ingredient);
+        sessionStorage.setItem(key, JSON.stringify(ticked));
+      });
+      document.addEventListener("htmx:afterSwap", restore);
+      restore();
+    })();
+  </script>
 {% endblock %}

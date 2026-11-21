@@ -84,7 +84,7 @@ checks them as it checks a form filled in by hand.
         <label for="link" class="block text-[17px] font-bold">{% translate "Or paste a link" %}</label>
         <div class="mt-2 flex gap-2">
           <input id="link" name="url" type="url" inputmode="url" required placeholder="https://…" value="{{ forms.link.url.value|default_if_none:'' }}"
-                 class="min-w-0 flex-1 h-14 px-4 rounded-[14px] border-2 border-line-strong text-[18px] outline-none focus:border-herb">
+                 class="bg-white min-w-0 flex-1 h-14 px-4 rounded-[14px] border-2 border-line-strong text-[18px] outline-none focus:border-herb">
           <button type="submit" class="flex-none h-14 px-4 rounded-[14px] bg-herb-tint text-herb-dark text-[17px] font-extrabold hover:bg-[#D5E6D9]">{% translate "Get the recipe" %}</button>
         </div>
         {% for error in forms.link.url.errors %}<p class="mt-2 text-[16px] text-ember" role="alert">{{ error }}</p>{% endfor %}
@@ -120,7 +120,7 @@ checks them as it checks a form filled in by hand.
             <input type="hidden" name="kind" value="text">
             <label for="text" class="sr-only">{% translate "Recipe text" %}</label>
             {% with field=forms.text.fields.text %}
-              <textarea id="text" name="text" rows="8" required data-max="{{ field.max_length|unlocalize }}" data-too-long="{{ field.error_messages.max_length }}" class="px-4 py-3 rounded-[14px] border-2 border-line-strong text-[17px] leading-relaxed outline-none focus:border-herb">{{ forms.text.text.value|default_if_none:'' }}</textarea>
+              <textarea id="text" name="text" rows="8" required data-max="{{ field.max_length|unlocalize }}" data-too-long="{{ field.error_messages.max_length }}" class="bg-white px-4 py-3 rounded-[14px] border-2 border-line-strong text-[17px] leading-relaxed outline-none focus:border-herb">{{ forms.text.text.value|default_if_none:'' }}</textarea>
             {% endwith %}
             <div id="text-errors" role="alert" class="text-[16px] text-ember">{% for error in forms.text.text.errors %}<p>{{ error }}</p>{% endfor %}</div>
             <button type="submit" class="h-[52px] rounded-[14px] bg-herb-tint text-herb-dark text-[18px] font-extrabold hover:bg-[#D5E6D9]">{% translate "Read the text" %}</button>

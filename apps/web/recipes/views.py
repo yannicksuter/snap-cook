@@ -22,7 +22,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlsplit
 
 from django.conf import settings
 from django.contrib import messages
@@ -103,6 +103,7 @@ def detail(request: HttpRequest, slug: str) -> HttpResponse:
     recipe = head.recipe
     context = {
         "recipe": catalog_recipe,
+        "eyebrow": _eyebrow(catalog_recipe, recipe),
         "model": model,
         "view": view,
         "mermaid": render_mermaid(model),
@@ -249,6 +250,25 @@ def delete(request: HttpRequest, slug: str) -> HttpResponse:
     ImportJob.objects.filter(recipe_id=row.recipe_id).delete()
     messages.success(request, _("“%(title)s” was deleted.") % {"title": row.title})
     return redirect("recipes:index")
+
+
+def _eyebrow(row: CatalogRecipe, recipe) -> str:
+    """The line over the title: who added it, and where it is from.
+
+    "by YS · Betty Bossi". People by their initials only (accounts.identity); a
+    source by its name, or failing that its web address's host.
+    """
+    parts = []
+    initials = getattr(getattr(row.owner, "profile", None), "initials", "")
+    if initials:
+        parts.append(_("by %(initials)s") % {"initials": initials})
+    provenance = recipe.provenance
+    source = provenance.source_title or ""
+    if not source and provenance.source_url:
+        source = (urlsplit(provenance.source_url).hostname or "").removeprefix("www.")
+    if source:
+        parts.append(source)
+    return " · ".join(parts)
 
 
 def _edit_fields(text: str) -> dict:

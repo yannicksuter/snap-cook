@@ -27,6 +27,8 @@ docs/architecture/units-and-i18n.md.
             ink:     { DEFAULT: '#1C1F1D', 2: '#4B524D', 3: '#5F6762' },
             line:    { DEFAULT: '#DCE1DD', soft: '#E4E8E5', strong: '#C9D0CB' },
             surface: '#F3F5F3',
+            // The page itself: a warm off-white, so white cards stand off it.
+            paper:   '#FAF8F3',
             herb:    { DEFAULT: '#2F6B3A', dark: '#24552D', tint: '#E7F0E9' },
             ember:   { DEFAULT: '#9A4A12', edge: '#B5652A', tint: '#FBEEE3' },
           },
@@ -42,10 +44,11 @@ docs/architecture/units-and-i18n.md.
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700;800&display=swap" rel="stylesheet">
 </head>
-<body class="min-h-full bg-white text-ink font-sans antialiased flex flex-col">
+{# --page: how wide the header, page and footer run; a recipe on a wide screen asks for more. #}
+<body class="min-h-full bg-paper text-ink font-sans antialiased flex flex-col print:bg-white" style="--page: {% block page_width %}48rem{% endblock %}">
 
   <header class="border-b border-line print:hidden">
-    <div class="max-w-3xl mx-auto px-5 py-3 flex items-center justify-between gap-3">
+    <div class="max-w-[var(--page)] mx-auto px-5 py-3 flex items-center justify-between gap-3">
       <a href="{% url 'recipes:index' %}" class="text-[23px] font-extrabold tracking-tight text-ink hover:text-herb">snap-cook</a>
       {% if access.member %}
         {# The person's initials: their whole identity on the page, see accounts.identity. #}
@@ -59,19 +62,19 @@ docs/architecture/units-and-i18n.md.
   </header>
 
   {% if messages %}
-    <div class="max-w-3xl w-full mx-auto px-5 pt-4" role="status">
+    <div class="max-w-[var(--page)] w-full mx-auto px-5 pt-4" role="status">
       {% for message in messages %}
         <p class="rounded-2xl bg-herb-tint px-4 py-3 text-[17px]">{{ message }}</p>
       {% endfor %}
     </div>
   {% endif %}
 
-  <main class="flex-1 w-full max-w-3xl mx-auto">
+  <main class="flex-1 w-full max-w-[var(--page)] mx-auto">
     {% block content %}{% endblock %}
   </main>
 
   <footer class="border-t border-line print:hidden">
-    <div class="max-w-3xl mx-auto px-5 py-4 text-[15px] text-ink-3">
+    <div class="max-w-[var(--page)] mx-auto px-5 py-4 text-[15px] text-ink-3">
       {% comment %}
         The build commit, so "which version am I looking at?" is answerable
         from the browser. Matches what /up reports.

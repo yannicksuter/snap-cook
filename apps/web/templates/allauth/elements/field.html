@@ -7,7 +7,7 @@
          {% if attrs.name %}name="{{ attrs.name }}"{% endif %} {% if attrs.id %}id="{{ attrs.id }}"{% endif %}
          {% if attrs.placeholder %}placeholder="{{ attrs.placeholder }}"{% endif %} {% if attrs.autocomplete %}autocomplete="{{ attrs.autocomplete }}"{% endif %}
          {% if attrs.value is not None %}value="{{ attrs.value }}"{% endif %} type="{{ attrs.type }}"
-         class="{% if attrs.type == 'checkbox' or attrs.type == 'radio' %}w-5 h-5{% else %}h-14 w-full px-4 rounded-[14px] border-2 border-line-strong text-[18px] outline-none focus:border-herb{% endif %}">
+         class="bg-white {% if attrs.type == 'checkbox' or attrs.type == 'radio' %}w-5 h-5{% else %}h-14 w-full px-4 rounded-[14px] border-2 border-line-strong text-[18px] outline-none focus:border-herb{% endif %}">
   {% if attrs.type == "checkbox" or attrs.type == "radio" %}
     <label for="{{ attrs.id }}" class="text-[17px]">{% slot label %}{% endslot %}</label>
   {% endif %}

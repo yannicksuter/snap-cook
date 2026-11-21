@@ -5,15 +5,15 @@ What a cook wants to know before starting: how long it takes and how the oven
 is set. Times as the source states them; without a stated total, the longest
 chain of timed steps, shown as "at least" because untimed work is not counted.
 
-One quiet strip between two hairlines: a small label over each value, no boxes.
-Two columns on a phone, one row on a wider screen.
+One quiet grid between two hairlines: a small label over each value, two to a
+row; on a wide screen it stands beside the title.
 {% endcomment %}{% load i18n recipe_extras %}
 {% if model.time or model.oven %}
-  <dl class="mt-6 grid grid-cols-2 gap-x-6 gap-y-4 border-y border-line-soft py-4 sm:flex sm:flex-wrap sm:gap-x-10">
+  <dl class="mt-6 lg:mt-0 grid grid-cols-2 gap-x-6 gap-y-5 border-y border-line-soft py-5">
     {% if model.time.total %}
       <div>
         <dt class="text-[15px] text-ink-3">{% if model.time.at_least %}{% translate "Takes at least" %}{% else %}{% translate "Ready in" %}{% endif %}</dt>
-        <dd class="mt-0.5 flex items-center gap-2 text-[19px] font-bold">
+        <dd class="mt-0.5 flex items-center gap-2 text-[19px] font-bold text-herb-dark">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="flex-none text-herb"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
           {{ model.time.total }}
         </dd>
@@ -22,25 +22,25 @@ Two columns on a phone, one row on a wider screen.
     {% if model.time.prep %}
       <div>
         <dt class="text-[15px] text-ink-3">{% translate "Hands-on" %}</dt>
-        <dd class="mt-0.5 text-[19px] font-bold">{{ model.time.prep }}</dd>
+        <dd class="mt-0.5 text-[19px] font-bold text-herb-dark">{{ model.time.prep }}</dd>
       </div>
     {% endif %}
     {% if model.time.cook %}
       <div>
         <dt class="text-[15px] text-ink-3">{% translate "Cooking" %}</dt>
-        <dd class="mt-0.5 text-[19px] font-bold">{{ model.time.cook }}</dd>
+        <dd class="mt-0.5 text-[19px] font-bold text-herb-dark">{{ model.time.cook }}</dd>
       </div>
     {% endif %}
     {% if model.time.rest %}
       <div>
         <dt class="text-[15px] text-ink-3">{% translate "Resting" %}</dt>
-        <dd class="mt-0.5 text-[19px] font-bold">{{ model.time.rest }}</dd>
+        <dd class="mt-0.5 text-[19px] font-bold text-herb-dark">{{ model.time.rest }}</dd>
       </div>
     {% endif %}
     {% for temperature in model.oven %}
       <div>
         <dt class="text-[15px] text-ink-3">{{ temperature.setting }}</dt>
-        <dd class="mt-0.5 flex items-center gap-2 text-[19px] font-bold">
+        <dd class="mt-0.5 flex items-center gap-2 text-[19px] font-bold text-herb-dark">
           <span class="flex-none text-ember">{% oven_icon temperature.mode 24 %}</span>
           {{ temperature.value }}
         </dd>

@@ -56,3 +56,10 @@ def test_reading_in_another_language_spends_nothing(client, stored) -> None:
     page = client.get(f"/r/{stored['public'].slug}/?lang=en").content.decode()
     assert not TranslationJob.objects.exists()
     assert "Translating" not in page
+
+
+def test_the_title_says_who_added_it_and_every_ingredient_can_be_ticked(client, stored) -> None:
+    page = client.get(f"/r/{stored['public'].slug}/?lang=de").content.decode()
+    assert "by NX" in page, "the owner by their initials, never their address"
+    assert "n@example.com" not in page
+    assert page.count('type="checkbox" data-ingredient=') == 1

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: snap-cook\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-21 08:39+0000\n"
+"POT-Creation-Date: 2026-11-21 09:14+0000\n"
 "PO-Revision-Date: 2026-11-16 21:30+0100\n"
 "Last-Translator: snap-cook\n"
 "Language-Team: German\n"
@@ -637,6 +637,10 @@ msgid "Resting"
 msgstr "Ruhezeit"
 
 #: recipes/templates/recipes/_render.html
+msgid "What you need"
+msgstr "Was du brauchst"
+
+#: recipes/templates/recipes/_render.html
 msgid "Fewer servings"
 msgstr "Weniger Portionen"
 
@@ -664,6 +668,14 @@ msgid "Not recognised: please check this ingredient"
 msgstr "Nicht erkannt: Bitte diese Zutat prüfen"
 
 #: recipes/templates/recipes/_render.html
+msgid "Tip: tick off what you have ready."
+msgstr "Tipp: Hake ab, was du schon bereit hast."
+
+#: recipes/templates/recipes/_render.html
+msgid "Let’s cook"
+msgstr "Los geht’s"
+
+#: recipes/templates/recipes/_render.html
 msgid "Save time:"
 msgstr "Zeit sparen:"
 
@@ -671,6 +683,10 @@ msgstr "Zeit sparen:"
 #, python-format
 msgid "Step %(number)s:"
 msgstr "Schritt %(number)s:"
+
+#: recipes/templates/recipes/_render.html
+msgid "The whole recipe"
+msgstr "Das ganze Rezept"
 
 #: recipes/templates/recipes/_render.html
 msgid "At a glance"
@@ -855,6 +871,11 @@ msgstr "Dieser Text lässt sich nicht lesen: %(detail)s"
 #, python-format
 msgid "“%(title)s” was deleted."
 msgstr "„%(title)s“ wurde gelöscht."
+
+#: recipes/views.py
+#, python-format
+msgid "by %(initials)s"
+msgstr "von %(initials)s"
 
 #: templates/account/_google.html
 msgid "Continue with Google"

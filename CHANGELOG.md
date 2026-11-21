@@ -51,9 +51,11 @@ change** and says so explicitly here.
   person's id, and so the author of their recipe versions, is a keyed hash of
   the address, never a name or the address itself.
 - Django's generic admin is gone; `/admin` is snap-cook's own.
-- A calmer recipe page, with nothing taken away: times and oven settings in one
-  strip between thin lines, the servings control beside the ingredients, steps
-  without boxes, and chart buttons without frames.
+- A new recipe page, with nothing taken away: a line on who added it and from
+  where over the title, the times and oven settings beside it, the ingredients
+  in a card to tick off while cooking (the ticks survive a change of servings),
+  and numbered steps. On a wide screen the ingredients stay in view beside the
+  steps. The site is set on a warm off-white, with white cards.
 - A calmer add page: the same five ways to add a recipe, with fewer boxes.
 - Updates: django-allauth 65.22.1 (security fixes), gunicorn 27 (stricter HTTP
   parsing), pydantic 2.14, and the CI actions on Node 24.

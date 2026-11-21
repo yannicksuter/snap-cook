@@ -25,16 +25,16 @@ does. Google needs no confirming, so it is offered first.
       {% for error in form.non_field_errors %}<p class="rounded-2xl bg-ember-tint px-4 py-3 text-[17px] leading-relaxed" role="alert">{{ error }}</p>{% endfor %}
       <label for="id_email" class="text-[17px] font-bold">{% translate "Email" %}</label>
       <input id="id_email" name="email" type="email" autocomplete="email" required value="{{ form.email.value|default_if_none:'' }}"
-             class="h-14 px-4 rounded-[14px] border-2 border-line-strong text-[18px] outline-none focus:border-herb">
+             class="bg-white h-14 px-4 rounded-[14px] border-2 border-line-strong text-[18px] outline-none focus:border-herb">
       {% for error in form.email.errors %}<p class="text-[16px] text-ember" role="alert">{{ error }}</p>{% endfor %}
       <label for="id_password1" class="mt-2 text-[17px] font-bold">{% translate "Password" %}</label>
       <input id="id_password1" name="password1" type="password" autocomplete="new-password" required minlength="12"
-             class="h-14 px-4 rounded-[14px] border-2 border-line-strong text-[18px] outline-none focus:border-herb">
+             class="bg-white h-14 px-4 rounded-[14px] border-2 border-line-strong text-[18px] outline-none focus:border-herb">
       <p class="text-[15px] leading-snug text-ink-3">{% translate "At least 12 characters, and not a common one." %}</p>
       {% for error in form.password1.errors %}<p class="text-[16px] text-ember" role="alert">{{ error }}</p>{% endfor %}
       <label for="id_password2" class="mt-2 text-[17px] font-bold">{% translate "Password again" %}</label>
       <input id="id_password2" name="password2" type="password" autocomplete="new-password" required
-             class="h-14 px-4 rounded-[14px] border-2 border-line-strong text-[18px] outline-none focus:border-herb">
+             class="bg-white h-14 px-4 rounded-[14px] border-2 border-line-strong text-[18px] outline-none focus:border-herb">
       {% for error in form.password2.errors %}<p class="text-[16px] text-ember" role="alert">{{ error }}</p>{% endfor %}
       {{ redirect_field }}
       <button type="submit" class="mt-2 h-14 rounded-2xl bg-herb text-white text-[19px] font-extrabold hover:bg-herb-dark">{% translate "Create an account" %}</button>
