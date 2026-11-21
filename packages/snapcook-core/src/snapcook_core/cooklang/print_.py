@@ -77,8 +77,18 @@ def print_cook(
     state_names = _state_names(ordered, recipe, lang)
 
     front = _frontmatter(recipe, lang)
-    steps = [_print_step(action, recipe, lang, registry, state_names) for action in ordered]
-    body = "\n\n".join(steps)
+    paragraphs: list[str] = []
+    section: str | None = None
+    for action in ordered:
+        name = None
+        if action.section is not None:
+            name, _ = action.section.resolve(lang, source=recipe.source_lang)
+        if name != section:
+            # A part starts with its name; a step outside any part, after one, with "=".
+            paragraphs.append(f"= {name}" if name else "=")
+            section = name
+        paragraphs.append(_print_step(action, recipe, lang, registry, state_names))
+    body = "\n\n".join(paragraphs)
     return f"{dump_frontmatter(front)}\n{body}\n"
 
 

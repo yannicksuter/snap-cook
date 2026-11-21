@@ -63,3 +63,24 @@ def test_the_title_says_who_added_it_and_every_ingredient_can_be_ticked(client, 
     assert "by NX" in page, "the owner by their initials, never their address"
     assert "n@example.com" not in page
     assert page.count('type="checkbox" data-ingredient=') == 1
+
+
+def test_a_recipe_in_parts_lists_them_under_the_sources_headings(
+    client, settings, tmp_path, django_user_model
+) -> None:
+    settings.SNAPCOOK_STORE_DIR = tmp_path / "store"
+    owner = django_user_model.objects.create_user(username="nonna", email="n@example.com")
+    store = FilesystemStore(settings.SNAPCOOK_STORE_DIR)
+    recipe = parse_cook(
+        "---\ntitle: Schnecken\nlang: de\nvisibility: public\n---\n"
+        "= Teig\n\n@Mehl{500%g} kneten. => Teig\n\n"
+        "= Guss\n\n@Puderzucker{80%g} rühren. => Guss\n\n"
+        "=\n\nDen @&{Teig} backen und mit dem @&{Guss} bestreichen.\n"
+    )
+    store.commit(recipe, author="nonna", created_at="2026-11-21T10:00:00")
+    row = project_recipe(store, recipe.id, owner)
+    page = client.get(f"/r/{row.slug}/?lang=de").content.decode()
+    teig, guss = page.index(">Teig</h3>"), page.index(">Guss</h3>")
+    assert teig < page.index("Mehl") < guss < page.index("Puderzucker")
+    assert page.count(">Teig</h3>") == 2, "over its ingredients and over its step"
+    assert 'data-ingredient="iuse_1_1"' in page, "a tick is keyed by its ingredient"

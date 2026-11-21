@@ -30,6 +30,7 @@ from snapcook_core.render.model import (
     RenderEdge,
     RenderedIngredient,
     RenderedQuantity,
+    RenderedSection,
     RenderedStep,
     RenderedTemperature,
     RenderedTime,
@@ -136,6 +137,7 @@ def build_render_model(recipe: Recipe, options: RenderOptions | None = None) -> 
         servings=_scaled_servings(recipe.servings, opts.scale),
         ingredients=tuple(all_ingredient_lines),
         steps=tuple(steps),
+        sections=_sections(steps),
         side_by_side=_side_by_side(steps),
         graph=_build_graph(recipe, ordered, steps_by_action, state_names, title),
         warnings=tuple(issues.issues),
@@ -194,6 +196,11 @@ def _render_step(
         action_id=action.id,
         index=index,
         text=text,
+        section=(
+            action.section.resolve(opts.lang, source=recipe.source_lang)[0]
+            if action.section is not None
+            else None
+        ),
         summary=_summary(plain),
         verb=verb,
         ingredients=tuple(rendered_ings[use.id] for use in action.ingredients),
@@ -594,6 +601,21 @@ def _render_temperature(temperature: Temperature, opts: RenderOptions) -> Render
         mode=temperature.mode,
         value=shown,
         setting=setting,
+    )
+
+
+def _sections(steps: list[RenderedStep]) -> tuple[RenderedSection, ...]:
+    """The steps' parts, each once, in the order they start, with what they use."""
+    if not any(step.section for step in steps):
+        return ()
+    parts: dict[str | None, tuple[list[RenderedIngredient], list[int]]] = {}
+    for step in steps:
+        ingredients, indices = parts.setdefault(step.section, ([], []))
+        ingredients.extend(step.ingredients)
+        indices.append(step.index)
+    return tuple(
+        RenderedSection(title=title, ingredients=tuple(ingredients), steps=tuple(indices))
+        for title, (ingredients, indices) in parts.items()
     )
 
 

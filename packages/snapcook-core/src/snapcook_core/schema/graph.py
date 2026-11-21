@@ -200,10 +200,17 @@ class Action(SnapcookModel):
 
     ``order`` is the authored sequence and the toposort tie-breaker, so a linear
     recipe renders in exactly the order it was written on every machine.
+
+    ``section`` is the part of the recipe the step belongs to, as the source
+    names it: a cinnamon-roll recipe lists its ingredients and method under
+    "Teig", "Füllung" and "Guss". Steps of one part share the same text; a page
+    groups the ingredient list and the method by it. Absent in a recipe whose
+    source has no parts, which is most of them.
     """
 
     id: ActionId
     order: int = 0
+    section: LocalizedText | None = None
     verb: LocalizedText | None = None
 
     uses: list[FoodStateId] = []

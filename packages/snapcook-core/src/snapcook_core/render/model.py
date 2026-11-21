@@ -103,6 +103,8 @@ class RenderedStep:
     action_id: str
     index: int
     text: str
+    section: str | None = None
+    """The part of the recipe the step is in, as the source names it ("Teig")."""
     summary: str = ""
     """The step's first sentence with ingredient names but no amounts, short
     enough for a box in the flowchart, where the amounts have boxes of their own."""
@@ -149,6 +151,17 @@ class RenderEdge:
 
 
 @dataclass(frozen=True, slots=True)
+class RenderedSection:
+    """A part of the recipe as its source names it, such as the dough or the glaze."""
+
+    title: str | None
+    """None for the steps outside every part, in a recipe that has parts."""
+    ingredients: tuple[RenderedIngredient, ...] = ()
+    """What the part's steps use, in their order."""
+    steps: tuple[int, ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
 class RenderGraph:
     nodes: tuple[RenderNode, ...] = ()
     edges: tuple[RenderEdge, ...] = ()
@@ -167,6 +180,10 @@ class RenderModel:
     servings: str | None = None
     ingredients: tuple[RenderedIngredient, ...] = ()
     steps: tuple[RenderedStep, ...] = ()
+    sections: tuple[RenderedSection, ...] = ()
+    """The recipe's parts, each once, in the order they start, with their
+    ingredients: a page lists the ingredients under the same headings as the
+    source. Empty when the source has no parts, which is most recipes."""
     side_by_side: tuple[tuple[int, ...], ...] = ()
     """Runs of consecutive steps that do not depend on one another.
 

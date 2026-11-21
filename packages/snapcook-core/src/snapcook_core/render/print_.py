@@ -70,10 +70,16 @@ def render_print_html(model: RenderModel) -> str:
         parts.append(f'<p class="desc">{escape(model.description)}</p>')
 
     parts.append("<h2>Ingredients</h2>")
-    parts.append('<ul class="ingredients">')
-    for ingredient in model.ingredients:
-        parts.append(f"<li>{_ingredient_html(ingredient)}</li>")
-    parts.append("</ul>")
+    groups = [(s.title, s.ingredients) for s in model.sections] or [(None, model.ingredients)]
+    for title, ingredients in groups:
+        if not ingredients:
+            continue
+        if title:
+            parts.append(f"<h3>{escape(title)}</h3>")
+        parts.append('<ul class="ingredients">')
+        for ingredient in ingredients:
+            parts.append(f"<li>{_ingredient_html(ingredient)}</li>")
+        parts.append("</ul>")
 
     parts.append("<h2>Method</h2>")
     parts.append('<ol class="steps">')

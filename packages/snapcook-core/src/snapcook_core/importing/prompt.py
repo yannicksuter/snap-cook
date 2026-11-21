@@ -102,6 +102,14 @@ step uses it. That later step refers to it as `@&{name}`, spelled exactly the \
 same. This is how a recipe records which parts are prepared separately and \
 combined later. Name only what a later step uses.
 
+When the source lists its ingredients in parts under headings of their own (for \
+the dough, for the filling, for the glaze), keep the parts: a line `= heading` on \
+its own before the steps of each part, the heading short and in the source's \
+words, such as `= Teig` for "Für den Teig". A step belongs to the heading above \
+it. Steps that bring the parts together come after a line with a bare `=`, \
+unless the source gives them a heading of their own. Without headings in the \
+source, write none.
+
 Numbers are decimals with a point: 0.5, 1.5, 0.25. Never fractions (½, 1/2) or \
 commas (1,5). A range is written 2-3.
 

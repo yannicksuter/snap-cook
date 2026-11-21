@@ -19,6 +19,15 @@ change** and says so explicitly here.
 
 ## [Unreleased]
 
+### Added
+
+- A recipe whose source lists its ingredients in parts ("Für den Teig", "Für
+  die Füllung", "Für den Guss") keeps them: the ingredients and the steps stand
+  under the same headings. Imports keep the parts from now on; an older recipe
+  gets them by reading it again from its original (`/admin`, Rezepte), or by
+  adding `= Teig` lines in its text. A new optional `section` on each step;
+  recipes without parts keep their hashes (`RECIPE_SPEC.md` §6).
+
 ## [0.8.1] - 2026-11-21
 
 ### Changed
