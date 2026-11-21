@@ -19,6 +19,8 @@ change** and says so explicitly here.
 
 ## [Unreleased]
 
+## [0.8.1] - 2026-11-21
+
 ### Changed
 
 - The chart grows downwards instead of sideways. A step's ingredients stand on
@@ -294,7 +296,8 @@ under the existing canonical form, not a new wire contract.
 - Documentation: README, AGENTS, CLAUDE, CONTRIBUTING, LICENSING,
   THIRD_PARTY_DATA, SECURITY, RECIPE_SPEC
 
-[Unreleased]: https://github.com/yannicksuter/snap-cook/compare/v0.8.0...main
+[Unreleased]: https://github.com/yannicksuter/snap-cook/compare/v0.8.1...main
+[0.8.1]: https://github.com/yannicksuter/snap-cook/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/yannicksuter/snap-cook/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/yannicksuter/snap-cook/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/yannicksuter/snap-cook/compare/v0.5.0...v0.6.0
